@@ -1,7 +1,7 @@
 /* NISAN dealer app: always try the network first (so the newest app and prices load when online),
    fall back to the saved copy when offline. */
-var CACHE = "nisan-dealer-v1";
-var CORE = ["./", "./index.html", "./manifest.json", "./icon-192.png", "./icon-512.png"];
+var CACHE = "npro-partner-v2";
+var CORE = ["./", "./index.html", "./manifest.json", "./icon-192.png", "./icon-512.png", "./apple-touch-icon.png"];
 self.addEventListener("install", function (e) {
   self.skipWaiting();
   e.waitUntil(caches.open(CACHE).then(function (c) { return c.addAll(CORE); }).catch(function () {}));

@@ -1,4 +1,4 @@
-# NISAN dealer order app
+# NPRO Partner – NISAN dealer order app
 
 Installable web app for NISAN ELECTRONICS dealers:
 **https://santosh723-bit.github.io/nisan-dealer-app/**
