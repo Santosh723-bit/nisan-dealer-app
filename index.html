@@ -248,6 +248,8 @@ h2{font-size:20px;color:var(--ink);margin:6px 2px 12px}
 .codebox b{display:block;font-size:30px;letter-spacing:3px;color:var(--brand);font-family:ui-monospace,Menlo,Consolas,monospace;margin:4px 0 8px}
 .codebox button{padding:7px 16px}
 .gcard .wa{background:#25D366;color:#fff}
+.gwelcome{margin:-8px 0 12px;color:var(--ink)}
+.adminrow .wa{background:#25D366;color:#fff}
 </style>
 </head>
 <body>
@@ -898,7 +900,7 @@ function renderHist(){var h='<h2>My Orders</h2><div class="bar muted">All your P
 function renderHelp(){var s=DATA.settings;$("#main").innerHTML='<h2>How to use</h2><div class="bar help"><b>1.</b> Tap <b>My Details</b> once and fill your company, GSTIN, licence, address and State. They stay saved.<br><b>2.</b> Scroll the products, set <b>Qty</b>, tap <b>Add to cart</b>. Within '+esc(s.homeState)+' you can untick <b>Stamping</b> if not needed.<br><b>3.</b> Tap <b>Checkout</b>: your Purchase Order with Grand Total appears.<br><b>4.</b> Attach your <b>payment screenshot</b> from the gallery and the UTR number.<br><b>5.</b> <b>Share / Save PDF</b>, then <b>WhatsApp to Dispatch</b> (attach the PDF) and <b>Email</b>.<br><br>Prices update automatically when you have internet. Current price list: <b>'+esc(s.priceRef)+'</b>, '+fmtDT(DATA.version)+'. '+esc(note2())+'.<br><br>Faulty unit received? Call <b>Service Support '+esc(s.service)+'</b>.<br>Dispatch: <b>'+esc(s.dispatch)+'</b> &middot; Email: '+esc(s.email)+'</div>'}
 /* ================= auto-update (dealer) ================= */
 /* ================= dealer authorization + sync (v4) ================= */
-var APP_BUILD=40, DEVCODE="", syncing=null, updAsked=false;
+var APP_BUILD=41, DEVCODE="", syncing=null, updAsked=false;
 var CODE_ABC="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 function normCode(c){return String(c||"").toUpperCase().replace(/[^A-Z0-9]/g,"")}
 function fmtCode(c){c=normCode(c);return c.slice(0,5)+"-"+c.slice(5)}
@@ -936,12 +938,12 @@ function ensureFresh(next){if(!WEB){next();return}
  if(navigator.onLine===false){toast("Please switch on internet: prices are checked online before every order");return}
  toast("Checking latest prices...");syncNow().then(function(st){if(st==="ok"||st==="same"){if(st==="ok")toast("Prices updated to the latest list");next()}else if(st==="noauth")showRegister("Your access is not active. Please contact "+(DATA.settings.supplier||"NISAN")+".");else toast("Could not reach the price list. Please check internet and try again.")})}
 /* ================= registration screen (web app) ================= */
-var regMsg="";
+var regMsg="",REGREF=null;
 function showRegister(msg){view="register";regMsg=msg||"";render()}
-function renderRegister(){var s=DATA.settings;$("#app").innerHTML='<div class="gate"><div class="gcard"><div class="logo big">N</div><h1>'+esc(s.supplier||"NISAN ELECTRONICS")+'</h1><p class="gsub">Dealer Order App &middot; Registration</p>'+
+function renderRegister(){var s=DATA.settings;$("#app").innerHTML='<div class="gate"><div class="gcard"><div class="logo big">N</div><h1>'+esc(s.supplier||"NISAN ELECTRONICS")+'</h1><p class="gsub">Dealer Order App &middot; Registration</p>'+(REGREF&&REGREF.n?'<p class="gwelcome">Welcome, <b>'+esc(REGREF.n)+'</b></p>':'')+
  (regMsg?'<div class="gwarn">'+esc(regMsg)+'</div>':'')+
  '<div class="codebox"><span>Your device code</span><b id="devcode">'+fmtCode(DEVCODE)+'</b><button class="b-sec" data-a="copy-code">Copy</button></div>'+
- '<label for="reg-name">Your company name</label><input id="reg-name" placeholder="e.g. Shree Ganesh Scales" value="'+esc(prof.company||"")+'">'+
+ '<label for="reg-name">Your company name</label><input id="reg-name" placeholder="e.g. Shree Ganesh Scales" value="'+esc(prof.company||(REGREF&&REGREF.n)||"")+'">'+
  '<button class="wa gbtn" data-a="reg-wa">Send code to '+esc(s.supplier||"NISAN")+' on WhatsApp</button>'+
  '<button class="b-main gbtn" data-a="reg-check">Check access</button>'+
  '<p class="gnote"><b>1.</b> Send this code to '+esc(s.supplier||"NISAN")+'. <b>2.</b> When they confirm activation, tap <b>Check access</b> (internet needed).</p></div></div>'}
@@ -954,29 +956,35 @@ function installCard(){if(!WEB||isStandalone())return "";var ios=/iphone|ipad|ip
 /* ================= master: dealer list (v4) ================= */
 var DF=[["company","Dealer company name",1],["contact","Contact person",1],["mobile","Mobile (10 digits)",1,"tel"],["email","Email",0],["gstin","GSTIN",0],["lmlic","Legal Metrology dealer licence no",0],["bill","Billing address",0,"area"],["billpin","Billing PIN",0,"tel"],["ship","Delivery address (blank = billing)",0,"area"],["shippin","Delivery PIN",0,"tel"],["state","State",1,"state"],["transport","Transport",0,"transport"]];
 function dealers(){if(!DATA.dealers)DATA.dealers=[];return DATA.dealers}
+function appBase(){return String(DATA.settings.updateUrl||"").replace(/nisan-data\.json.*$/,"")}
+function dealerLink(d){return appBase()+"?ref="+encodeURIComponent(d.id)+"&n="+encodeURIComponent(d.company||"")}
+function sendDealerLink(d){var m=digits(d.mobile);if(m.length!==10){toast("Dealer mobile must be 10 digits");return}var s=DATA.settings;
+ var txt="Dear "+(d.contact||d.company)+",\nWelcome to the "+s.supplier+" dealer network.\n\nPlease install our order app:\n"+dealerLink(d)+"\n\n1. Open the link in Chrome and tap Install.\n2. In the app, tap 'Send code on WhatsApp' and send us your code.\nWe will then activate your access to our price list.\n\n"+s.supplier+"\nDispatch: "+s.dispatch+"  |  Service: "+s.service;
+ d.linkSent=new Date().toISOString();saveDraft();window.open("https://wa.me/91"+m+"?text="+encodeURIComponent(txt),"_blank")}
+function extractCode(raw){var u=String(raw||"").toUpperCase(),m=u.match(/\b([A-HJ-NP-Z2-9]{5})-([A-HJ-NP-Z2-9]{5})\b/);if(m)return m[1]+m[2];var n=normCode(u);return n.length===10?n:(n.length?n:"")}
 function renderAdmDealers(){var D=dealers(),act=D.filter(function(d){return d.active!==false&&normCode(d.code).length===10}).length;
  var h='<h2>Dealers ('+D.length+')</h2><div class="bar" id="savestate">'+saveStateHTML()+'</div><div class="bar muted">Only dealers listed here with an <b>active device code</b> can see prices. '+act+' active. Changes reach dealers after <b>PUBLISH</b>.</div>'+
  '<button class="b-main" style="width:100%;margin-bottom:10px" data-a="dl-new">+ NEW dealer</button>';
  if(!D.length)h+='<div class="empty">No dealers yet. Tap <b>+ NEW dealer</b>.</div>';
  D.forEach(function(d,i){var ok=normCode(d.code).length===10;h+='<div class="adminrow"><div class="x"><b>'+esc(d.company)+'</b> &middot; '+esc(d.state||"")+'<br><span class="muted">'+esc(d.contact||"")+' &middot; '+esc(d.mobile||"")+'</span><br>'+
-  (ok?'<span class="badge '+(d.active===false?"unpaid":"paid")+'">'+(d.active===false?"Blocked":"Active")+' &middot; '+fmtCode(d.code)+'</span>':'<span class="badge unpaid">No device code yet</span>')+'</div><button class="b-main" data-dle="'+i+'">Edit</button><button class="b-red" data-dld="'+i+'">Del</button></div>'});
+  (ok?'<span class="badge '+(d.active===false?"unpaid":"paid")+'">'+(d.active===false?"Blocked":"Active")+' &middot; '+fmtCode(d.code)+'</span>':'<span class="badge unpaid">'+(d.linkSent?"Link sent "+fmtDT(d.linkSent)+" &middot; waiting for code":"No device code yet")+'</span>')+'</div><button class="wa" data-dlw="'+i+'" title="Send app link on WhatsApp">Send app link</button><button class="b-main" data-dle="'+i+'">Edit</button><button class="b-red" data-dld="'+i+'">Del</button></div>'});
  $("#main").innerHTML=h}
 function openDealerForm(i){var d=i==null?{active:true,transport:"",state:""}:dealers()[i];var h='<h2>'+(i==null?"NEW dealer":"Edit "+esc(d.company))+'</h2>';
- h+='<label class="req">Device code (shown on the dealer\'s app, 10 letters/digits)</label><input id="df-code" value="'+esc(d.code?fmtCode(d.code):"")+'" placeholder="XXXXX-XXXXX" style="text-transform:uppercase;letter-spacing:2px;font-weight:700" autocomplete="off">';
+ h+='<label>Device code &ndash; paste the dealer\'s WhatsApp message here, or type XXXXX-XXXXX</label><textarea id="df-code" rows="2" placeholder="Paste the dealer\'s registration message (leave empty until the dealer sends it)" style="min-height:52px;font-weight:700;letter-spacing:1px" autocomplete="off">'+esc(d.code?fmtCode(d.code):"")+'</textarea><div class="muted" id="df-code-hint">'+(d.code?"Code: "+fmtCode(d.code):"")+'</div>';
  h+='<label class="switch" style="margin-top:12px"><input type="checkbox" id="df-active"'+(d.active===false?"":" checked")+'><i></i><span>Active (allowed to see prices and order)</span></label>';
  DF.forEach(function(f){var k=f[0],v=d[k]||"",t=f[3];h+='<label class="'+(f[2]?"req":"")+'">'+f[1]+'</label>';
   if(t==="area")h+='<textarea id="df-'+k+'">'+esc(v)+'</textarea>';
   else if(t==="state")h+='<select id="df-state"><option value="">&mdash; Select &mdash;</option>'+STATES.map(function(x){return '<option'+(v===x?" selected":"")+'>'+x+'</option>'}).join("")+'</select>';
   else if(t==="transport")h+='<select id="df-transport"><option value="">&mdash;</option>'+["Included","To Pay"].map(function(x){return '<option'+(v===x?" selected":"")+'>'+x+'</option>'}).join("")+'</select>';
   else h+='<input id="df-'+k+'" value="'+esc(v)+'"'+(t==="tel"?' inputmode="numeric"':'')+'>'});
- h+='<div class="sendgrid"><button class="b-main" data-a="dl-save" data-i="'+(i==null?"":i)+'">Save dealer</button><button class="b-red" data-a="ov-close">Cancel</button></div>';overlay(h)}
-function saveDealer(i){var D=dealers(),d=i===""?{id:"d"+Date.now().toString(36),added:new Date().toISOString()}:D[+i],tmp={};
+ h+='<div class="sendgrid"><button class="b-main" data-a="dl-save" data-i="'+(i==null?"":i)+'">Save dealer</button><button class="wa" data-a="dl-save-send" data-i="'+(i==null?"":i)+'">Save &amp; send app link</button><button class="b-red" data-a="ov-close">Cancel</button></div>';overlay(h)}
+function saveDealer(i,andSend){var D=dealers(),d=i===""?{id:"d"+Date.now().toString(36),added:new Date().toISOString()}:D[+i],tmp={};
  DF.forEach(function(f){tmp[f[0]]=($("#df-"+f[0]).value||"").trim()});tmp.gstin=tmp.gstin.toUpperCase();
- var code=normCode($("#df-code").value);
+ var code=extractCode($("#df-code").value);
  if(!tmp.company){toast("Enter the dealer company name");return}if(!tmp.contact){toast("Enter the contact person");return}if(digits(tmp.mobile).length!==10){toast("Mobile must be 10 digits");return}if(!tmp.state){toast("Select the state");return}
  if(code&&code.length!==10){toast("Device code must be exactly 10 letters/digits");return}
  var dup=D.some(function(x){return x!==d&&code&&normCode(x.code)===code});if(dup){toast("This device code is already used by another dealer");return}
- Object.assign(d,tmp);d.code=code;d.active=$("#df-active").checked;if(i==="")D.push(d);
+ Object.assign(d,tmp);d.code=code;d.active=$("#df-active").checked;if(i==="")D.push(d);if(andSend)sendDealerLink(d);
  saveDraft().then(function(){toast(code?"Dealer saved. PUBLISH to activate.":"Dealer saved. Add the device code when the dealer sends it.")});closeOv();view="adm-dealers";render()}
 /* build the published package: prices locked with a fresh key, key handed only to active device codes */
 function buildPackage(ver,pubSettings,prods,ph){var K=randHex(32),keys={},n=0;
@@ -1053,8 +1061,9 @@ function ghPublish(text,ver,webText){return sGet("gh_token").then(function(tok){
 function backup(){var b=new Blob([JSON.stringify({app:"NISAN-backup",at:new Date().toISOString(),profile:prof,history:hist,cart:cart,device:DEVCODE})],{type:"application/json"});download(b,"NISAN_my_backup_"+fmtDate(new Date())+".json");toast("Backup saved to Downloads")}
 function restore(file){var fr=new FileReader();fr.onload=function(){try{var j=JSON.parse(fr.result);if(j.app!=="NISAN-backup")throw 0;if(!confirm("Restore details and "+(j.history||[]).length+" order(s) from this backup? Current data on this device will be replaced."))return;prof=j.profile||{};hist=j.history||[];cart=j.cart||{};if(j.device&&normCode(j.device).length===10){DEVCODE=normCode(j.device);sSet("device_code",DEVCODE)}saveProf();saveHist();saveCart();toast("Backup restored");render()}catch(e){toast("Not a valid NISAN backup file")}};fr.readAsText(file)}
 /* ================= events ================= */
-document.addEventListener("click",function(ev){var el=ev.target.closest("[data-dle],[data-dld],[data-a],[data-f],[data-dq],[data-add],[data-rm],[data-hp],[data-hr],[data-ho],[data-up],[data-dn],[data-ed],[data-del]");if(!el)return;var a=el.dataset.a;
+document.addEventListener("click",function(ev){var el=ev.target.closest("[data-dlw],[data-dle],[data-dld],[data-a],[data-f],[data-dq],[data-add],[data-rm],[data-hp],[data-hr],[data-ho],[data-up],[data-dn],[data-ed],[data-del]");if(!el)return;var a=el.dataset.a;
  if(a==="ov-bg"&&ev.target!==el)return;
+ if(el.dataset.dlw!=null){sendDealerLink(dealers()[+el.dataset.dlw]);renderAdmDealers();return}
  if(el.dataset.dle!=null){openDealerForm(+el.dataset.dle);return}
  if(el.dataset.dld!=null){var di=+el.dataset.dld;if(confirm("Delete dealer "+dealers()[di].company+"? Their app loses access after the next PUBLISH.")){dealers().splice(di,1);saveDraft();renderAdmDealers()}return}
  if(el.dataset.f!=null){filt=el.dataset.f;renderShop();return}
@@ -1076,12 +1085,13 @@ document.addEventListener("click",function(ev){var el=ev.target.closest("[data-d
   case "go-cart":if(cartLines().length&&!el.dataset.ok){ensureFresh(function(){el.dataset.ok="1";el.click();delete el.dataset.ok});return}if(!cartLines().length){toast(region()?"Your cart is empty":"Select your delivery state first");if(view!=="shop"){view="shop";render()}return}if(profMissing().length||profErrors().length){view="profile";render();renderProfile("po");toast("Please complete your details first");return}curIdx=-1;view="po";render();break;
   case "go-help":view="help";render();break;
   case "copy-code":try{navigator.clipboard.writeText(fmtCode(DEVCODE)).then(function(){toast("Code copied")},function(){toast(fmtCode(DEVCODE))})}catch(e){toast(fmtCode(DEVCODE))}break;
-  case "reg-wa":var rn=($("#reg-name")||{}).value||"";if(rn){prof.company=rn.trim();saveProf()}var w=digits(DATA.settings.regWa||DATA.settings.dispatch);if(w.length===10)w="91"+w;window.open("https://wa.me/"+w+"?text="+encodeURIComponent("NISAN dealer app registration\nDevice code: "+fmtCode(DEVCODE)+(rn?"\nDealer: "+rn.trim():"")),"_blank");break;
+  case "reg-wa":var rn=($("#reg-name")||{}).value||"";if(rn){prof.company=rn.trim();saveProf()}var w=digits(DATA.settings.regWa||DATA.settings.dispatch);if(w.length===10)w="91"+w;window.open("https://wa.me/"+w+"?text="+encodeURIComponent("NISAN dealer app registration\nDevice code: "+fmtCode(DEVCODE)+(rn?"\nDealer: "+rn.trim():"")+(REGREF&&REGREF.ref?"\nRef: "+REGREF.ref:"")),"_blank");break;
   case "reg-check":regCheck();break;
   case "app-update":closeOv();doAppUpdate();break;
   case "adm-dealers":view="adm-dealers";render();break;
   case "dl-new":openDealerForm(null);break;
   case "dl-save":saveDealer(el.dataset.i);break;
+  case "dl-save-send":saveDealer(el.dataset.i,true);break;
   case "install":if(deferredPrompt){deferredPrompt.prompt();deferredPrompt.userChoice.then(function(){deferredPrompt=null;renderShop()})}break;
   case "checkout":if(cartLines().length&&!el.dataset.ok){ensureFresh(function(){var b=document.querySelector('#cartbar [data-a="checkout"]')||el;b.dataset.ok="1";b.click();delete b.dataset.ok});return}if(!cartLines().length){toast(region()?"Cart is empty - add a product first":"Select your Delivery State first");return}if(profMissing().length||profErrors().length){view="profile";render();renderProfile("po");toast("Please complete your details first");return}curIdx=-1;view="po";render();break;
   case "save-prof":document.querySelectorAll("[data-p]").forEach(function(x){prof[x.dataset.p]=x.dataset.p==="gstin"?x.value.trim().toUpperCase():x.value.trim()});saveProf();var m=profMissing(),e=profErrors();if(m.length){toast("Missing: "+m[0]);return}if(e.length){toast(e[0]);return}toast("Details saved");if($("#main").dataset.after==="po"&&cartLines().length){curIdx=-1;view="po"}else view="shop";render();break;
@@ -1117,15 +1127,16 @@ document.addEventListener("change",function(ev){var t=ev.target;
  if(t.id==="pay-img"&&t.files&&t.files[0]){readPay();resizeImg(t.files[0],1400,.75,function(u){curPO.pay.img=u;saveHist();toast("Payment screenshot attached");renderPO()});return}
  if(t.id==="restore"&&t.files&&t.files[0]){restore(t.files[0]);return}
  if(t.id==="pf-file"&&t.files&&t.files[0]){resizeImg(t.files[0],480,.72,function(u){editPhoto=u;$("#pf-ph").innerHTML='<img alt="" src="'+u+'">'})}});
-document.addEventListener("input",function(ev){if(ev.target.id==="srch"){search=ev.target.value;clearTimeout(window.__st);window.__st=setTimeout(function(){var pos=ev.target.selectionStart;renderShop();var s=$("#srch");s.focus();try{s.setSelectionRange(pos,pos)}catch(e){}},250)}});
+document.addEventListener("input",function(ev){if(ev.target.id==="df-code"){var c=extractCode(ev.target.value),h=$("#df-code-hint");if(h)h.innerHTML=c.length===10?'<span class="saved">&#10003; Code found: '+fmtCode(c)+'</span>':(ev.target.value.trim()?'<span class="unpub">No 10-character code found yet</span>':'');return}if(ev.target.id==="srch"){search=ev.target.value;clearTimeout(window.__st);window.__st=setTimeout(function(){var pos=ev.target.selectionStart;renderShop();var s=$("#srch");s.focus();try{s.setSelectionRange(pos,pos)}catch(e){}},250)}});
 /* ================= device ================= */
 function device(){var pc=window.matchMedia("(pointer:fine)").matches&&window.innerWidth>=900;document.body.classList.toggle("pc",pc)}
 window.addEventListener("resize",device);
 /* ================= boot ================= */
 function boot(){device();
  var key=MODE==="master"?"master_data":"catalog";
- Promise.all([sGet(key),sGet("profile"),sGet("cart"),sGet("history"),sGet("master_meta"),sGet("device_code")]).then(function(r){
+ Promise.all([sGet(key),sGet("profile"),sGet("cart"),sGet("history"),sGet("master_meta"),sGet("device_code"),sGet("reg_ref")]).then(function(r){
   DEVCODE=normCode(r[5]||"");if(DEVCODE.length!==10){DEVCODE=newCode();sSet("device_code",DEVCODE)}
+  REGREF=r[6]||null;try{var qp=new URLSearchParams(location.search);if(qp.get("ref")){REGREF={ref:qp.get("ref"),n:qp.get("n")||""};sSet("reg_ref",REGREF);history.replaceState(null,"",location.pathname)}}catch(e){}
   var saved=r[0];if(saved&&saved.version&&saved.products&&(MODE==="master"?saved.version>=DATA.version:saved.version>DATA.version)){if(MODE==="dealer"&&!WEB)saved.settings.dataKey=DATA.settings.dataKey;DATA=saved}
   if(WEB&&!(DATA.products&&DATA.products.length))view="register";
   prof=r[1]||{};cart=r[2]||{};hist=r[3]||[];meta=r[4]||{dirty:0};
