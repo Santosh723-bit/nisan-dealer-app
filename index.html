@@ -478,13 +478,22 @@ body.pc .pimg .ph{position:absolute;inset:0;width:auto;height:auto;flex:none;bor
 .stx{flex:1;min-width:0}.stx b{display:block;font-size:16px}.stx i{display:block;font-style:normal;font-size:12px;color:var(--gry);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .spr{color:var(--mus);font-weight:700;font-size:14px;white-space:nowrap}
 .main .installbar{background:#1F1F23}
+/* v6.1 spec block: CODE + three full lines */
+.pspec2{flex:0 0 auto;display:flex;align-items:stretch;gap:12px;padding:8px 12px;background:#141416}
+.pcodebox{flex:0 0 auto;display:flex;flex-direction:column;justify-content:center;border-left:3px solid var(--mus);padding:0 12px 0 10px;border-right:1px solid #2E2E33}
+.pcodebox span{font-size:10px;letter-spacing:.24em;font-weight:700;color:var(--gry)}
+.pcodebox b{font-size:24px;font-weight:800;color:var(--mus);letter-spacing:.01em;line-height:1.1}
+.plines{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:2px}
+.plines div{font-size:14.5px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.plines span{color:var(--gry);font-weight:600}
+.plines b{color:#fff;font-weight:700}
 </style>
 </head>
-<body class="pc">
+<body>
 <div id="rotate"><div>↻</div>Please turn your phone upright (portrait) to use the NISAN order app.</div>
 <div id="app"></div>
 <div id="ov"></div>
-<script type="application/json" id="appdata">{"mode":"dealer","data":{"version":"2000-01-01T00:00:00.000Z","settings":{"supplier":"NISAN ELECTRONICS","address":"36, Pesh Industrial Premises, Off Telco Road, MIDC Bhosari, Pune - 411026","email":"nisanscale@gmail.com","dispatch":"+91 9822195935","service":"+91 9527288822","priceRef":"NISAN/DPL/2026-27/01","homeState":"Maharashtra","gst":18,"effDate":"2026-11-01","validMonths":3,"updateUrl":"https://santosh723-bit.github.io/nisan-dealer-app/nisan-data.json","regWa":"+91 9822195935","terms":[]},"products":[]},"web":true}</script>
+<script type="application/json" id="appdata">{"mode":"dealer","data":{"version":"2000-01-01T00:00:00.000Z","settings":{"supplier":"NISAN ELECTRONICS","address":"36, Pesh Industrial Premises, Off Telco Road, MIDC Bhosari, Pune - 411026","email":"nisanscale@gmail.com","dispatch":"+91 9850898822","service":"+91 9527288822","priceRef":"NISAN/DPL/2026-27/01","homeState":"Maharashtra","gst":18,"effDate":"2026-11-01","validMonths":3,"updateUrl":"https://santosh723-bit.github.io/nisan-dealer-app/nisan-data.json","regWa":"+91 9850898822","terms":[]},"products":[]},"web":true}</script>
 <script id="lib1">/** @license
  *
  * jsPDF - PDF Document creation from JavaScript
@@ -997,10 +1006,11 @@ function renderShop(){var q=search.toLowerCase(),cnt=0,body='';
 function compactCap(p){if(!p.cap)return "";return (String(p.cap)+(p.e?"×"+p.e:"")).replace(/\s+/g,"")}
 function compactPan(p){return String(p.pan||"").replace(/\s*mm\s*$/i,"").replace(/\s*[xX]\s*/g,"×")}
 function card(p){var c=cart[p.id],inC=c&&c.q>0,q=draftQ[p.id]!=null?draftQ[p.id]:(inC?c.q:1);var st=draftSt[p.id]!=null?draftSt[p.id]:(c?c.st!==false:true);var rg=region(),hasStamp=rg===1&&+p.stamp>0;
- var spec=[["Model",p.model],["Pan size",compactPan(p)||"—"],["Capacity",compactCap(p)||"—"],[p.panMat?"Pan":"Brand",p.panMat||p.brand]].map(function(x,i){return '<div'+(i===0?' class="m"':'')+'><span>'+x[0]+'</span><b>'+esc(x[1])+'</b></div>'}).join("");
+ var capFull=p.cap?String(p.cap)+(p.e?" \u00d7 "+p.e:""):"",panFull=p.pan?String(p.pan).replace(/\s*[xX]\s*/g," \u00d7 "):"";
+ var spec='<div class="pcodebox"><span>CODE</span><b>'+esc(p.model)+'</b></div><div class="plines">'+[["Capacity",capFull],["Pan Size",panFull],["Pan",p.panMat||""]].filter(function(x){return x[1]}).map(function(x){return '<div><span>'+x[0]+':</span> <b>'+esc(x[1])+'</b></div>'}).join("")+'</div>';
  var stampCtl=hasStamp?'<label class="switch"><input type="checkbox" data-st="'+p.id+'"'+(st?" checked":"")+'><i></i><span>Stamping</span></label>':'<div class="nostamp">'+(rg===2?"No stamping":rg===1?"No stamping for this item":"")+'</div>';
  return '<article class="card'+(inC?" incart":"")+'" id="c-'+p.id+'">'+
- '<div class="pspec">'+spec+'</div>'+
+ '<div class="pspec2">'+spec+'</div>'+
  '<div class="pimg"><div class="ph">'+pic(p)+'</div></div>'+
  '<div class="pbuy"><div class="pleft"><button class="b-addtxt" data-add="'+p.id+'">'+(inC?"UPDATE CART":"ADD TO CART")+'</button>'+stampCtl+
  '<div class="qty"><button class="qb" data-dq="'+p.id+'" data-d="-1" aria-label="decrease quantity">&minus;</button><input type="number" inputmode="numeric" min="0" data-q="'+p.id+'" value="'+q+'" aria-label="quantity"><button class="qb" data-dq="'+p.id+'" data-d="1" aria-label="increase quantity">+</button></div></div>'+
@@ -1146,7 +1156,7 @@ function renderHist(){var h=installCard()+'<h2>My Orders</h2><div class="bar mut
 function renderHelp(){var s=DATA.settings;$("#main").innerHTML='<h2>How to use</h2><div class="bar help"><b>1.</b> Tap <b>My Details</b> once and fill your company, GSTIN, licence, address and State. They stay saved.<br><b>2.</b> Scroll the products, set <b>Qty</b>, tap <b>Add to cart</b>. Within '+esc(s.homeState)+' you can untick <b>Stamping</b> if not needed.<br><b>3.</b> Tap <b>Checkout</b>: your Purchase Order with Grand Total appears.<br><b>4.</b> Attach your <b>payment screenshot</b> from the gallery and the UTR number.<br><b>5.</b> <b>Share / Save PDF</b>, then <b>WhatsApp to Dispatch</b> (attach the PDF) and <b>Email</b>.<br><br>Prices update automatically when you have internet. Current price list: <b>'+esc(s.priceRef)+'</b>, '+fmtDT(DATA.version)+'. '+esc(note2())+'.<br><br>Faulty unit received? Call <b>Service Support '+esc(s.service)+'</b>.<br>Dispatch: <b>'+esc(s.dispatch)+'</b> &middot; Email: '+esc(s.email)+'</div>'}
 /* ================= auto-update (dealer) ================= */
 /* ================= dealer authorization + sync (v4) ================= */
-var APP_BUILD=60, DEVCODE="", syncing=null, updAsked=false;
+var APP_BUILD=61, DEVCODE="", syncing=null, updAsked=false;
 var CODE_ABC="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 function normCode(c){return String(c||"").toUpperCase().replace(/[^A-Z0-9]/g,"")}
 function fmtCode(c){c=normCode(c);return c.slice(0,5)+"-"+c.slice(5)}
