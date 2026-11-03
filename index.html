@@ -524,13 +524,49 @@ body.pc .pimg .ph{position:absolute;inset:0;width:auto;height:auto;flex:none;bor
 .pleft{min-width:0;overflow:hidden}
 .b-exit{background:#1E1E22;color:#fff;border-radius:12px;font-weight:800;letter-spacing:.08em;padding:11px}
 @media (max-width:380px){.switch>span{flex-direction:column;align-items:flex-start;gap:0;line-height:1.15;font-size:12.5px}.samt{font-size:12.5px}}
+/* v6.5 buy area: qty row / aligned stamping+price rows / compact checkout + total */
+.pbuy2{flex:0 0 auto;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:7px 8px;padding:8px 10px 10px;background:linear-gradient(#141416,#0B0B0C)}
+.qrow,.slab2,.noprice.wide{grid-column:1/-1}
+.qrow{display:grid;grid-template-columns:56px minmax(0,1fr) 56px;gap:8px;align-items:stretch}
+.qrow .qb{background:var(--mus);color:var(--blk);border-radius:12px;min-height:42px;padding:0;display:flex;align-items:center;justify-content:center}
+.qrow .qb svg{width:20px;height:20px}
+.qrow .qb:active{transform:scale(.94)}
+.qrow input{background:#1E1E22;color:var(--mus);border:0;border-radius:12px;text-align:center;font-size:24px;font-weight:800;padding:0;min-width:0;-moz-appearance:textfield}
+.qrow input::-webkit-outer-spin-button,.qrow input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.slab2{color:var(--mus2);font-size:11px;text-align:center;margin-top:-2px}
+.stampcell,.brk2{background:#1E1E22;border-radius:12px;padding:6px 10px;min-width:0}
+.stampcell{display:flex;align-items:center;gap:8px}
+.slines,.brk2{display:flex;flex-direction:column}
+.slines{min-width:0}
+.slines span,.slines b,.brk2 div{font-size:13px;line-height:19px;white-space:nowrap}
+.slines span{color:#D4D4D8;font-weight:600}
+.slines b{color:#fff;font-weight:700;overflow:hidden;text-overflow:ellipsis}
+.slines b.off{opacity:.45;text-decoration:line-through}
+.brk2 div{display:flex;justify-content:space-between;gap:12px}
+.brk2 span{color:#D4D4D8;font-weight:600}
+.brk2 b{color:#fff;font-weight:700;font-variant-numeric:tabular-nums}
+.brk2 em{font-style:normal;color:var(--mus);font-size:11px}
+.switch2{position:relative;display:block;flex:0 0 40px;margin:0;cursor:pointer}
+.switch2 input{position:absolute;opacity:0;width:1px;height:1px}
+.switch2 i{display:block;width:40px;height:23px;border-radius:999px;background:#3F3F46;position:relative;transition:.2s}
+.switch2 i:after{content:"";position:absolute;top:3px;left:3px;width:17px;height:17px;border-radius:50%;background:#fff;transition:.2s}
+.switch2 input:checked+i{background:#22C55E}
+.switch2 input:checked+i:after{left:20px}
+.nosw{display:block;width:0}
+.b-co3{background:var(--blk);color:var(--mus);border:2px solid var(--mus);border-radius:12px;font-size:13.5px;font-weight:800;letter-spacing:.08em;padding:6px 4px;align-self:stretch}
+.b-co3:active{background:var(--mus);color:var(--blk)}
+.ptotal2{background:var(--mus);color:var(--blk);border-radius:12px;padding:5px 10px;text-align:right;min-width:0}
+.ptotal2 b{display:block;font-size:22px;font-weight:800;line-height:1.1;white-space:nowrap;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.ptotal2 span{display:block;font-size:10px;font-weight:600;opacity:.75;white-space:nowrap}
+.ptotal2.zero{background:#2A2A2F;color:#fff}
+@media (max-width:380px){.slines span,.slines b,.brk2 div{font-size:12px}.brk2 div{gap:6px}.stampcell,.brk2{padding:6px 8px}.ptotal2 b{font-size:20px}.b-co3{font-size:12.5px;letter-spacing:.05em}}
 </style>
 </head>
-<body class="pc">
+<body>
 <div id="rotate"><div>↻</div>Please turn your phone upright (portrait) to use the NISAN order app.</div>
 <div id="app"></div>
 <div id="ov"></div>
-<script type="application/json" id="appdata">{"mode":"dealer","data":{"version":"2000-01-01T00:00:00.000Z","settings":{"supplier":"NISAN ELECTRONICS","address":"36, Pesh Industrial Premises, Off Telco Road, MIDC Bhosari, Pune - 411026","email":"nisanscale@gmail.com","dispatch":"+91 9822195935","service":"+91 9527288822","priceRef":"NISAN/DPL/2026-27/01","homeState":"Maharashtra","gst":18,"effDate":"2026-11-01","validMonths":3,"updateUrl":"https://santosh723-bit.github.io/nisan-dealer-app/nisan-data.json","regWa":"+91 9822195935","terms":[]},"products":[]},"web":true}</script>
+<script type="application/json" id="appdata">{"mode":"dealer","data":{"version":"2000-01-01T00:00:00.000Z","settings":{"supplier":"NISAN ELECTRONICS","address":"36, Pesh Industrial Premises, Off Telco Road, MIDC Bhosari, Pune - 411026","email":"nisanscale@gmail.com","dispatch":"+91 9850898822","service":"+91 9527288822","priceRef":"NISAN/DPL/2026-27/01","homeState":"Maharashtra","gst":18,"effDate":"2026-11-01","validMonths":3,"updateUrl":"https://santosh723-bit.github.io/nisan-dealer-app/nisan-data.json","regWa":"+91 9850898822","terms":[]},"products":[]},"web":true}</script>
 <script id="lib1">/** @license
  *
  * jsPDF - PDF Document creation from JavaScript
@@ -1046,13 +1082,19 @@ var ICONQ={minus:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="10.
 function card(p){var c=cart[p.id],inC=c&&c.q>0,q=inC?c.q:0;var st=c?c.st!==false:(draftSt[p.id]!=null?draftSt[p.id]:true);var rg=region(),hasStamp=rg===1&&+p.stamp>0;
  var capFull=p.cap?String(p.cap)+(p.e?" \u00d7 "+p.e:""):"",panFull=p.pan?String(p.pan).replace(/\s*[xX]\s*/g," \u00d7 "):"";
  var spec='<div class="pcodebox"><span>CODE</span><b>'+esc(p.model)+'</b></div><div class="plines">'+[["Max",capFull],["Size",panFull],["Pan",p.panMat||""]].filter(function(x){return x[1]}).map(function(x){return '<div><span>'+x[0]+':</span> <b>'+esc(x[1])+'</b></div>'}).join("")+'</div>';
- var stampCtl=hasStamp?'<label class="switch"><input type="checkbox" data-st="'+p.id+'"'+(st?" checked":"")+'><i></i><span>Stamping <b class="samt'+(st?"":" off")+'">&#8377;'+inr(+p.stamp,1)+'</b></span></label>':'<div class="nostamp">'+(rg===2?"No stamping":rg===1?"No stamping for this item":"")+'</div>';
  return '<article class="card'+(inC?" incart":"")+'" id="c-'+p.id+'">'+
  '<div class="pspec2">'+spec+'</div>'+
  '<div class="pimg"><div class="ph">'+pic(p)+'</div></div>'+
- '<div class="pbuy"><div class="pleft"><button class="b-co2" data-a="checkout">CHECK OUT</button>'+stampCtl+
- '<div class="qty"><button class="qb" data-dq="'+p.id+'" data-d="-1" aria-label="decrease quantity">'+ICONQ.minus+'</button><input type="number" inputmode="numeric" min="0" data-q="'+p.id+'" value="'+q+'" aria-label="quantity"><button class="qb" data-dq="'+p.id+'" data-d="1" aria-label="increase quantity">'+ICONQ.plus+'</button></div></div>'+
- '<div class="price">'+priceBox(p,q,st)+'</div></div></article>'}
+ '<div class="pbuy2">'+buyArea(p,q,st)+'</div></article>'}
+function buyArea(p,q,st){var rg=region(),hasStamp=rg===1&&+p.stamp>0,u=unit(p,Math.max(1,q),st),s=DATA.settings;
+ var qrow='<div class="qrow"><button class="qb" data-dq="'+p.id+'" data-d="-1" aria-label="decrease quantity">'+ICONQ.minus+'</button><input type="number" inputmode="numeric" min="0" data-q="'+p.id+'" value="'+q+'" aria-label="quantity"><button class="qb" data-dq="'+p.id+'" data-d="1" aria-label="increase quantity">'+ICONQ.plus+'</button></div>';
+ var stamp='<div class="stampcell">'+(hasStamp?'<label class="switch2"><input type="checkbox" data-st="'+p.id+'"'+(st?" checked":"")+'><i></i></label>':'<span class="nosw"></span>')+
+  '<div class="slines"><span>Stamping</span><b class="samt'+(hasStamp&&!st?" off":"")+'">'+(hasStamp?'&#8377;'+inr(+p.stamp,1):(rg===2?'Not outside '+esc(s.homeState):'Not applicable'))+'</b></div></div>';
+ if(!u)return qrow+'<div class="noprice wide">Your state is not set. Open <b>My Details</b> and choose your state to see prices.</div>';
+ var brk='<div class="brk2"><div><span>Basic'+(u.slab?' <em>'+p.slabQty+'+</em>':'')+'</span><b>&#8377;'+inr(u.rate,1)+'</b></div><div><span>GST '+s.gst+'%</span><b>&#8377;'+inr(u.gst,1)+'</b></div></div>';
+ var tot=q>0?'<div class="ptotal2"><b>&#8377;'+inr(r2(u.total*q),1)+'</b><span>'+q+' &times; &#8377;'+inr(u.total,1)+' incl. GST</span></div>':'<div class="ptotal2 zero"><b>&#8377;'+inr(u.total,1)+'</b><span>per unit incl. GST</span></div>';
+ var slab=+p.slabQty>0?'<div class="slab2">Special rate &#8377;'+inr(rg===1?p.slabMH:p.slabOut,1)+' each for '+p.slabQty+'+ Nos</div>':'';
+ return qrow+slab+stamp+brk+'<button class="b-co3" data-a="checkout">CHECK OUT</button>'+tot}
 function priceBox(p,q,st){var qq=Math.max(1,q),u=unit(p,qq,st),rg=region(),s=DATA.settings;
  if(!u)return '<div class="noprice">Your state is not set. Open <b>My Details</b> and choose your state to see prices.</div>';
  return '<div class="brk"><div><span>Basic'+(u.slab?' <em>'+p.slabQty+'+</em>':'')+'</span><b>&#8377;'+inr(u.rate,1)+'</b></div><div><span>GST '+s.gst+'%</span><b>&#8377;'+inr(u.gst,1)+'</b></div></div>'+
@@ -1082,7 +1124,7 @@ function setQty(id,v){var p=prodById(id);if(!p)return;if(!region()){toast("Pleas
  var el=$("#c-"+id);if(el){var inp=el.querySelector('[data-q]');if(inp&&String(inp.value)!==String(v))inp.value=v;el.classList.toggle("incart",v>0)}
  refreshPrice(id);renderCartBar()}
 function refreshCard(id){var p=prodById(id),el=$("#c-"+id);if(!p||!el||!el.isConnected)return;var tmp=document.createElement("div");tmp.innerHTML=card(p);el.replaceWith(tmp.firstChild)}
-function refreshPrice(id){var p=prodById(id),el=$("#c-"+id);if(!p||!el||!el.isConnected)return;var tmp=document.createElement("div");tmp.innerHTML=card(p);var np=tmp.querySelector(".price"),op=el.querySelector(".price");if(np&&op)op.innerHTML=np.innerHTML}
+function refreshPrice(id){var p=prodById(id),el=$("#c-"+id);if(!p||!el||!el.isConnected)return;var c=cart[p.id],q=c&&c.q>0?c.q:0,st=c?c.st!==false:(draftSt[p.id]!=null?draftSt[p.id]:true);var ba=el.querySelector(".pbuy2");if(ba)ba.innerHTML=buyArea(p,q,st)}
 /* ================= profile ================= */
 function profMissing(){return PROFILE_FIELDS.filter(function(f){return f[2]&&!String(prof[f[0]]||"").trim()}).map(function(f){return f[1]})}
 function profErrors(){var e=[];if(prof.mobile&&digits(prof.mobile).length!==10)e.push("Mobile must be 10 digits");if(prof.gstin&&String(prof.gstin).trim().length!==15)e.push("GSTIN must be 15 characters");if(prof.billpin&&!/^\d{6}$/.test(String(prof.billpin).trim()))e.push("Billing PIN must be 6 digits");if(prof.shippin&&!/^\d{6}$/.test(String(prof.shippin).trim()))e.push("Delivery PIN must be 6 digits");return e}
@@ -1201,7 +1243,7 @@ function renderHist(){var h=installCard()+'<h2>My Orders</h2><div class="bar mut
 function renderHelp(){var s=DATA.settings;$("#main").innerHTML='<h2>How to use</h2><div class="bar help"><b>1.</b> Tap <b>My Details</b> once and fill your company, GSTIN, licence, address and State. They stay saved.<br><b>2.</b> Scroll the products, set <b>Qty</b>, tap <b>Add to cart</b>. Within '+esc(s.homeState)+' you can untick <b>Stamping</b> if not needed.<br><b>3.</b> Tap <b>Checkout</b>: your Purchase Order with Grand Total appears.<br><b>4.</b> Attach your <b>payment screenshot</b> from the gallery and the UTR number.<br><b>5.</b> <b>Share / Save PDF</b>, then <b>WhatsApp to Dispatch</b> (attach the PDF) and <b>Email</b>.<br><br>Prices update automatically when you have internet. Current price list: <b>'+esc(s.priceRef)+'</b>, '+fmtDT(DATA.version)+'. '+esc(note2())+'.<br><br>Faulty unit received? Call <b>Service Support '+esc(s.service)+'</b>.<br>Dispatch: <b>'+esc(s.dispatch)+'</b> &middot; Email: '+esc(s.email)+'</div>'}
 /* ================= auto-update (dealer) ================= */
 /* ================= dealer authorization + sync (v4) ================= */
-var APP_BUILD=64, DEVCODE="", syncing=null, updAsked=false;
+var APP_BUILD=65, DEVCODE="", syncing=null, updAsked=false;
 var CODE_ABC="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 function normCode(c){return String(c||"").toUpperCase().replace(/[^A-Z0-9]/g,"")}
 function fmtCode(c){c=normCode(c);return c.slice(0,5)+"-"+c.slice(5)}
@@ -1434,7 +1476,7 @@ document.addEventListener("change",function(ev){var t=ev.target;
  if(t.id==="po-trans"){readPay();var pd=$("#po-doc");if(pd&&curPO){var tmp=document.createElement("div");tmp.innerHTML=poHTML(curPO);pd.replaceWith(tmp.firstChild)}return}
  if(t.id==="st-sel"){prof.state=t.value;saveProf();renderShop();renderCartBar();return}
  if(t.dataset.q){setQty(t.dataset.q,t.value);return}
- if(t.dataset.st){draftSt[t.dataset.st]=t.checked;var c=cart[t.dataset.st];if(c){c.st=t.checked;saveCart();renderCartBar()}var sa=t.parentNode.querySelector(".samt");if(sa)sa.classList.toggle("off",!t.checked);refreshPrice(t.dataset.st);return}
+ if(t.dataset.st){draftSt[t.dataset.st]=t.checked;var c=cart[t.dataset.st];if(c){c.st=t.checked;saveCart();renderCartBar()}refreshPrice(t.dataset.st);return}
  if(t.dataset.cq){var q=Math.max(0,parseInt(t.value)||0);if(q)cart[t.dataset.cq].q=q;else delete cart[t.dataset.cq];saveCart();readPay();renderPO();return}
  if(t.id==="pay-img"&&t.files&&t.files[0]){readPay();resizeImg(t.files[0],1400,.75,function(u){curPO.pay.img=u;saveHist();toast("Payment screenshot attached");renderPO()});return}
  if(t.id==="restore"&&t.files&&t.files[0]){restore(t.files[0]);return}
