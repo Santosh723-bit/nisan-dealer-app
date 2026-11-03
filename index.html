@@ -500,13 +500,37 @@ body.pc .pimg .ph{position:absolute;inset:0;width:auto;height:auto;flex:none;bor
 .ptotal b{font-size:22px;white-space:nowrap}
 .ptotal span{white-space:nowrap}
 .pimg{min-height:120px}
+/* v6.3: single CHECK OUT, +/- set cart, stamping amount line */
+.pcodebox{flex-direction:column;align-items:flex-start;justify-content:center;gap:0}
+.pcodebox span{font-size:8px;letter-spacing:.16em}
+.pcodebox b{font-size:15px;line-height:1.05}
+.b-co2{background:var(--mus);color:var(--blk);border:0;border-radius:12px;font-size:15px;font-weight:800;letter-spacing:.08em;padding:11px 6px;width:100%}
+.b-co2:active{transform:scale(.97)}
+.switch>span{display:flex;align-items:baseline;gap:6px;white-space:nowrap}
+.samt{color:#fff;font-weight:700}
+.samt.off{opacity:.45;text-decoration:line-through}
+.qty{grid-template-columns:40px minmax(0,1fr) 40px;gap:6px}
+.qty .qb{min-height:44px;padding:0;color:var(--blk)}
+.qty .qb svg{width:20px;height:20px;display:block}
+.qty input{font-size:20px;min-width:0;padding:0 2px;-moz-appearance:textfield}
+.qty input::-webkit-outer-spin-button,.qty input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.ptotal.zero{background:#2A2A2F;color:#fff}
+.ptotal.zero span{opacity:.7}
+.card.incart{box-shadow:none}
+.cartbar{display:none!important}
+.switch{gap:6px;min-width:0}
+.switch>span{font-size:13px;gap:4px;min-width:0}
+.samt{font-size:13px}
+.pleft{min-width:0;overflow:hidden}
+.b-exit{background:#1E1E22;color:#fff;border-radius:12px;font-weight:800;letter-spacing:.08em;padding:11px}
+@media (max-width:380px){.switch>span{flex-direction:column;align-items:flex-start;gap:0;line-height:1.15;font-size:12.5px}.samt{font-size:12.5px}}
 </style>
 </head>
-<body class="pc">
+<body>
 <div id="rotate"><div>↻</div>Please turn your phone upright (portrait) to use the NISAN order app.</div>
 <div id="app"></div>
 <div id="ov"></div>
-<script type="application/json" id="appdata">{"mode":"dealer","data":{"version":"2000-01-01T00:00:00.000Z","settings":{"supplier":"NISAN ELECTRONICS","address":"36, Pesh Industrial Premises, Off Telco Road, MIDC Bhosari, Pune - 411026","email":"nisanscale@gmail.com","dispatch":"+91 9822195935","service":"+91 9527288822","priceRef":"NISAN/DPL/2026-27/01","homeState":"Maharashtra","gst":18,"effDate":"2026-11-01","validMonths":3,"updateUrl":"https://santosh723-bit.github.io/nisan-dealer-app/nisan-data.json","regWa":"+91 9822195935","terms":[]},"products":[]},"web":true}</script>
+<script type="application/json" id="appdata">{"mode":"dealer","data":{"version":"2000-01-01T00:00:00.000Z","settings":{"supplier":"NISAN ELECTRONICS","address":"36, Pesh Industrial Premises, Off Telco Road, MIDC Bhosari, Pune - 411026","email":"nisanscale@gmail.com","dispatch":"+91 9850898822","service":"+91 9527288822","priceRef":"NISAN/DPL/2026-27/01","homeState":"Maharashtra","gst":18,"effDate":"2026-11-01","validMonths":3,"updateUrl":"https://santosh723-bit.github.io/nisan-dealer-app/nisan-data.json","regWa":"+91 9850898822","terms":[]},"products":[]},"web":true}</script>
 <script id="lib1">/** @license
  *
  * jsPDF - PDF Document creation from JavaScript
@@ -1004,7 +1028,7 @@ function render(){if(view==="register"){renderRegister();return}var s=DATA.setti
  renderCartBar();var mn=$("#main");if(mn)mn.scrollTop=0}
 function renderCartBar(){var cb=$("#cartbar");if(!cb)return;var L=cartLines(),t=totals(L);
  var nb=document.querySelector('.bnav [data-a="go-cart"]');if(nb){var i=nb.querySelector(".nb");if(L.length){if(!i){i=document.createElement("i");i.className="nb";nb.insertBefore(i,nb.querySelector("span"))}i.textContent=L.length}else if(i)i.remove()}
- if(view!=="shop"||!L.length){cb.classList.add("hide");return}
+ cb.classList.add("hide");return;
  cb.classList.remove("hide");cb.innerHTML='<div class="ct"><span>'+L.length+' model'+(L.length>1?"s":"")+' &middot; Qty '+t.qty+' &middot; incl. GST</span><b>&#8377; '+inr(t.grand)+'</b></div><button data-a="checkout">CHECKOUT &rsaquo;</button>'}
 function shortGroup(g){return String(g).replace(/^(ECO|NPRO)\s*-\s*/,"").replace(/Platform Scale/,"Platform").replace(/\s*\(([^)]*)\)/," $1")}
 function renderShop(){var q=search.toLowerCase(),cnt=0,body='';
@@ -1018,21 +1042,22 @@ function renderShop(){var q=search.toLowerCase(),cnt=0,body='';
  $("#main").innerHTML=note+'<div class="feed" id="feed">'+body+'</div>'}
 function compactCap(p){if(!p.cap)return "";return (String(p.cap)+(p.e?"×"+p.e:"")).replace(/\s+/g,"")}
 function compactPan(p){return String(p.pan||"").replace(/\s*mm\s*$/i,"").replace(/\s*[xX]\s*/g,"×")}
-function card(p){var c=cart[p.id],inC=c&&c.q>0,q=draftQ[p.id]!=null?draftQ[p.id]:(inC?c.q:1);var st=draftSt[p.id]!=null?draftSt[p.id]:(c?c.st!==false:true);var rg=region(),hasStamp=rg===1&&+p.stamp>0;
+var ICONQ={minus:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="10.5" width="16" height="3" rx="1.5" fill="currentColor"/></svg>',plus:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="10.5" width="16" height="3" rx="1.5" fill="currentColor"/><rect x="10.5" y="4" width="3" height="16" rx="1.5" fill="currentColor"/></svg>'};
+function card(p){var c=cart[p.id],inC=c&&c.q>0,q=inC?c.q:0;var st=c?c.st!==false:(draftSt[p.id]!=null?draftSt[p.id]:true);var rg=region(),hasStamp=rg===1&&+p.stamp>0;
  var capFull=p.cap?String(p.cap)+(p.e?" \u00d7 "+p.e:""):"",panFull=p.pan?String(p.pan).replace(/\s*[xX]\s*/g," \u00d7 "):"";
  var spec='<div class="pcodebox"><span>CODE</span><b>'+esc(p.model)+'</b></div><div class="plines">'+[["Max",capFull],["Size",panFull],["Pan",p.panMat||""]].filter(function(x){return x[1]}).map(function(x){return '<div><span>'+x[0]+':</span> <b>'+esc(x[1])+'</b></div>'}).join("")+'</div>';
- var stampCtl=hasStamp?'<label class="switch"><input type="checkbox" data-st="'+p.id+'"'+(st?" checked":"")+'><i></i><span>Stamping</span></label>':'<div class="nostamp">'+(rg===2?"No stamping":rg===1?"No stamping for this item":"")+'</div>';
+ var stampCtl=hasStamp?'<label class="switch"><input type="checkbox" data-st="'+p.id+'"'+(st?" checked":"")+'><i></i><span>Stamping <b class="samt'+(st?"":" off")+'">&#8377;'+inr(+p.stamp,1)+'</b></span></label>':'<div class="nostamp">'+(rg===2?"No stamping":rg===1?"No stamping for this item":"")+'</div>';
  return '<article class="card'+(inC?" incart":"")+'" id="c-'+p.id+'">'+
  '<div class="pspec2">'+spec+'</div>'+
  '<div class="pimg"><div class="ph">'+pic(p)+'</div></div>'+
- '<div class="pbuy"><div class="pleft"><button class="b-addtxt" data-add="'+p.id+'">'+(inC?"UPDATE CART":"ADD TO CART")+'</button>'+stampCtl+
- '<div class="qty"><button class="qb" data-dq="'+p.id+'" data-d="-1" aria-label="decrease quantity">&minus;</button><input type="number" inputmode="numeric" min="0" data-q="'+p.id+'" value="'+q+'" aria-label="quantity"><button class="qb" data-dq="'+p.id+'" data-d="1" aria-label="increase quantity">+</button></div></div>'+
+ '<div class="pbuy"><div class="pleft"><button class="b-co2" data-a="checkout">CHECK OUT</button>'+stampCtl+
+ '<div class="qty"><button class="qb" data-dq="'+p.id+'" data-d="-1" aria-label="decrease quantity">'+ICONQ.minus+'</button><input type="number" inputmode="numeric" min="0" data-q="'+p.id+'" value="'+q+'" aria-label="quantity"><button class="qb" data-dq="'+p.id+'" data-d="1" aria-label="increase quantity">'+ICONQ.plus+'</button></div></div>'+
  '<div class="price">'+priceBox(p,q,st)+'</div></div></article>'}
-function priceBox(p,q,st){var u=unit(p,q,st),rg=region(),s=DATA.settings,hasStamp=rg===1&&+p.stamp>0;
+function priceBox(p,q,st){var qq=Math.max(1,q),u=unit(p,qq,st),rg=region(),s=DATA.settings;
  if(!u)return '<div class="noprice">Your state is not set. Open <b>My Details</b> and choose your state to see prices.</div>';
- return '<div class="brk"><div><span>Basic'+(u.slab?' <em>'+p.slabQty+'+</em>':'')+'</span><b>&#8377;'+inr(u.rate,1)+'</b></div>'+(hasStamp?'<div'+(st?'':' class="off"')+'><span>Stamping</span><b>&#8377;'+inr(+p.stamp,1)+'</b></div>':'')+'<div><span>GST '+s.gst+'%</span><b>&#8377;'+inr(u.gst,1)+'</b></div></div>'+
-  '<div class="ptotal"><b>&#8377;'+inr(r2(u.total*q),1)+'</b><span>'+q+' &times; &#8377;'+inr(u.total,1)+' incl. GST</span></div>'+
-  (+p.slabQty>0?'<div class="slab">'+inr(rg===1?p.slabMH:p.slabOut,1)+' each for '+p.slabQty+'+ Nos</div>':'')}
+ return '<div class="brk"><div><span>Basic'+(u.slab?' <em>'+p.slabQty+'+</em>':'')+'</span><b>&#8377;'+inr(u.rate,1)+'</b></div><div><span>GST '+s.gst+'%</span><b>&#8377;'+inr(u.gst,1)+'</b></div></div>'+
+  (q>0?'<div class="ptotal"><b>&#8377;'+inr(r2(u.total*q),1)+'</b><span>'+q+' &times; &#8377;'+inr(u.total,1)+' incl. GST</span></div>':'<div class="ptotal zero"><b>&#8377;'+inr(u.total,1)+'</b><span>per unit incl. GST</span></div>')+
+  (+p.slabQty>0?'<div class="slab">&#8377;'+inr(rg===1?p.slabMH:p.slabOut,1)+' each for '+p.slabQty+'+ Nos</div>':'')}
 /* ---------- search panel (bottom menu) ---------- */
 var sBrand="";
 function openSearch(){$("#ov").innerHTML='<div class="ov sfull"><div class="ssheet"><div class="shead">'+ICON.search+'<input id="s2" type="search" placeholder="Search model, capacity, pan size" value="'+esc(search)+'" autocomplete="off"><button class="sx" data-a="ov-close" aria-label="close">&times;</button></div><div class="sres" id="sres"></div></div></div>';renderSearchRes()}
@@ -1049,6 +1074,13 @@ function renderSearchRes(){var box=$("#sres");if(!box)return;var q=(search||"").
  box.innerHTML=h}
 function gotoProduct(id){closeOv();filt="ALL";if(view!=="shop"){view="shop";render()}else renderShop();
  var c=document.getElementById("c-"+id),f=document.getElementById("feed");if(c&&f){f.scrollTop=c.offsetTop;c.classList.add("flash");setTimeout(function(){c.classList.remove("flash")},1200)}}
+function startCheckout(){if(!cartLines().length){overlay('<h2>Select quantity</h2><div class="help">No product is selected yet. Use <b>+</b> on the product you need to choose the quantity, then tap <b>CHECK OUT</b>.</div><div class="sendgrid"><button class="b-co2" data-a="co-select">SELECT QUANTITY</button><button class="b-exit" data-a="co-exit">EXIT</button></div>');return}
+ ensureFresh(function(){if(!cartLines().length){startCheckout();return}if(profMissing().length||profErrors().length){view="profile";render();renderProfile("po");toast("Please complete your details first");return}curIdx=-1;view="po";render()})}
+function setQty(id,v){var p=prodById(id);if(!p)return;if(!region()){toast("Please set your state in My Details first");return}v=Math.max(0,Math.min(9999,parseInt(v)||0));
+ var stEl=$('[data-st="'+id+'"]'),st=stEl?stEl.checked:(cart[id]?cart[id].st!==false:true);
+ if(v>0)cart[id]={q:v,st:st};else delete cart[id];saveCart();
+ var el=$("#c-"+id);if(el){var inp=el.querySelector('[data-q]');if(inp&&String(inp.value)!==String(v))inp.value=v;el.classList.toggle("incart",v>0)}
+ refreshPrice(id);renderCartBar()}
 function refreshCard(id){var p=prodById(id),el=$("#c-"+id);if(!p||!el||!el.isConnected)return;var tmp=document.createElement("div");tmp.innerHTML=card(p);el.replaceWith(tmp.firstChild)}
 function refreshPrice(id){var p=prodById(id),el=$("#c-"+id);if(!p||!el||!el.isConnected)return;var tmp=document.createElement("div");tmp.innerHTML=card(p);var np=tmp.querySelector(".price"),op=el.querySelector(".price");if(np&&op)op.innerHTML=np.innerHTML}
 /* ================= profile ================= */
@@ -1169,7 +1201,7 @@ function renderHist(){var h=installCard()+'<h2>My Orders</h2><div class="bar mut
 function renderHelp(){var s=DATA.settings;$("#main").innerHTML='<h2>How to use</h2><div class="bar help"><b>1.</b> Tap <b>My Details</b> once and fill your company, GSTIN, licence, address and State. They stay saved.<br><b>2.</b> Scroll the products, set <b>Qty</b>, tap <b>Add to cart</b>. Within '+esc(s.homeState)+' you can untick <b>Stamping</b> if not needed.<br><b>3.</b> Tap <b>Checkout</b>: your Purchase Order with Grand Total appears.<br><b>4.</b> Attach your <b>payment screenshot</b> from the gallery and the UTR number.<br><b>5.</b> <b>Share / Save PDF</b>, then <b>WhatsApp to Dispatch</b> (attach the PDF) and <b>Email</b>.<br><br>Prices update automatically when you have internet. Current price list: <b>'+esc(s.priceRef)+'</b>, '+fmtDT(DATA.version)+'. '+esc(note2())+'.<br><br>Faulty unit received? Call <b>Service Support '+esc(s.service)+'</b>.<br>Dispatch: <b>'+esc(s.dispatch)+'</b> &middot; Email: '+esc(s.email)+'</div>'}
 /* ================= auto-update (dealer) ================= */
 /* ================= dealer authorization + sync (v4) ================= */
-var APP_BUILD=62, DEVCODE="", syncing=null, updAsked=false;
+var APP_BUILD=64, DEVCODE="", syncing=null, updAsked=false;
 var CODE_ABC="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 function normCode(c){return String(c||"").toUpperCase().replace(/[^A-Z0-9]/g,"")}
 function fmtCode(c){c=normCode(c);return c.slice(0,5)+"-"+c.slice(5)}
@@ -1340,7 +1372,7 @@ document.addEventListener("click",function(ev){var el=ev.target.closest("[data-s
  if(el.dataset.dle!=null){openDealerForm(+el.dataset.dle);return}
  if(el.dataset.dld!=null){var di=+el.dataset.dld;if(confirm("Delete dealer "+dealers()[di].company+"? Their app loses access after the next PUBLISH.")){dealers().splice(di,1);saveDraft();renderAdmDealers()}return}
  if(el.dataset.f!=null){filt=el.dataset.f;renderShop();return}
- if(el.dataset.dq){var id=el.dataset.dq,inp=$('[data-q="'+id+'"]');var v=Math.max(0,(parseInt(inp.value)||0)+(+el.dataset.d));draftQ[id]=v;inp.value=v;refreshPrice(id);return}
+ if(el.dataset.dq){var id=el.dataset.dq,inp=$('[data-q="'+id+'"]');setQty(id,(parseInt(inp.value)||0)+(+el.dataset.d));return}
  if(el.dataset.add){var id2=el.dataset.add,p=prodById(id2);if(!region()){toast("Please set your state in My Details first");return}var q=parseInt($('[data-q="'+id2+'"]').value)||0;var stEl=$('[data-st="'+id2+'"]');var st=stEl?stEl.checked:true;
   if(q<=0){delete cart[id2];toast(p.model+" removed from cart")}else{cart[id2]={q:q,st:st};toast(p.model+" x "+q+" added")}delete draftQ[id2];delete draftSt[id2];saveCart();refreshCard(id2);renderCartBar();return}
  if(el.dataset.rm){delete cart[el.dataset.rm];saveCart();if(!cartLines().length){hist.splice(curIdx,1);saveHist();curIdx=-1;view="shop";render();return}renderPO();return}
@@ -1358,7 +1390,7 @@ document.addEventListener("click",function(ev){var el=ev.target.closest("[data-s
   case "go-profile":view="profile";render();break;
   case "go-profile-po":view="profile";render();renderProfile("po");break;
   case "go-hist":view="hist";curIdx=-1;render();break;
-  case "go-cart":if(cartLines().length&&!el.dataset.ok){ensureFresh(function(){el.dataset.ok="1";el.click();delete el.dataset.ok});return}if(!cartLines().length){toast(region()?"Your cart is empty":"Select your delivery state first");if(view!=="shop"){view="shop";render()}return}if(profMissing().length||profErrors().length){view="profile";render();renderProfile("po");toast("Please complete your details first");return}curIdx=-1;view="po";render();break;
+  case "go-cart":startCheckout();break;
   case "go-help":view="help";render();break;
   case "copy-code":try{navigator.clipboard.writeText(fmtCode(DEVCODE)).then(function(){toast("Code copied")},function(){toast(fmtCode(DEVCODE))})}catch(e){toast(fmtCode(DEVCODE))}break;
   case "reg-wa":var rn=($("#reg-name")||{}).value||"";if(rn){prof.company=rn.trim();saveProf()}var w=digits(DATA.settings.regWa||DATA.settings.dispatch);if(w.length===10)w="91"+w;window.open("https://wa.me/"+w+"?text="+encodeURIComponent("NISAN dealer app registration\nDevice code: "+fmtCode(DEVCODE)+(rn?"\nDealer: "+rn.trim():"")+(REGREF&&REGREF.ref?"\nRef: "+REGREF.ref:"")),"_blank");break;
@@ -1370,7 +1402,9 @@ document.addEventListener("click",function(ev){var el=ev.target.closest("[data-s
   case "dl-save-send":saveDealer(el.dataset.i,true);break;
   case "install-hide":installHidden=true;try{localStorage.setItem("nisan2_install_hidden","1")}catch(e){}var ib=document.querySelector(".installbar");if(ib)ib.remove();break;
   case "install":if(deferredPrompt){deferredPrompt.prompt();deferredPrompt.userChoice.then(function(){deferredPrompt=null;renderShop()})}break;
-  case "checkout":if(cartLines().length&&!el.dataset.ok){ensureFresh(function(){var b=document.querySelector('#cartbar [data-a="checkout"]')||el;b.dataset.ok="1";b.click();delete b.dataset.ok});return}if(!cartLines().length){toast(region()?"Cart is empty - add a product first":"Select your Delivery State first");return}if(profMissing().length||profErrors().length){view="profile";render();renderProfile("po");toast("Please complete your details first");return}curIdx=-1;view="po";render();break;
+  case "checkout":startCheckout();break;
+  case "co-select":closeOv();if(view!=="shop"){view="shop";render()}var fq=document.querySelector('.card .qty .qb[data-d="1"]');toast("Tap + on the product you need");break;
+  case "co-exit":closeOv();toast("No order placed");if(view!=="shop"){view="shop";render()}break;
   case "save-prof":document.querySelectorAll("[data-p]").forEach(function(x){prof[x.dataset.p]=x.dataset.p==="gstin"?x.value.trim().toUpperCase():x.value.trim()});saveProf();var m=profMissing(),e=profErrors();if(m.length){toast("Missing: "+m[0]);return}if(e.length){toast(e[0]);return}toast("Details saved");if($("#main").dataset.after==="po"&&cartLines().length){curIdx=-1;view="po"}else view="shop";render();break;
   case "pay-save":readPay();toast("Payment details saved with this order");renderPO();break;
   case "pay-rm":curPO.pay.img="";saveHist();renderPO();break;
@@ -1399,8 +1433,8 @@ document.addEventListener("click",function(ev){var el=ev.target.closest("[data-s
 document.addEventListener("change",function(ev){var t=ev.target;
  if(t.id==="po-trans"){readPay();var pd=$("#po-doc");if(pd&&curPO){var tmp=document.createElement("div");tmp.innerHTML=poHTML(curPO);pd.replaceWith(tmp.firstChild)}return}
  if(t.id==="st-sel"){prof.state=t.value;saveProf();renderShop();renderCartBar();return}
- if(t.dataset.q){var v=Math.max(0,parseInt(t.value)||0);draftQ[t.dataset.q]=v;refreshPrice(t.dataset.q);return}
- if(t.dataset.st){draftSt[t.dataset.st]=t.checked;var c=cart[t.dataset.st];if(c){c.st=t.checked;saveCart();renderCartBar()}refreshPrice(t.dataset.st);return}
+ if(t.dataset.q){setQty(t.dataset.q,t.value);return}
+ if(t.dataset.st){draftSt[t.dataset.st]=t.checked;var c=cart[t.dataset.st];if(c){c.st=t.checked;saveCart();renderCartBar()}var sa=t.parentNode.querySelector(".samt");if(sa)sa.classList.toggle("off",!t.checked);refreshPrice(t.dataset.st);return}
  if(t.dataset.cq){var q=Math.max(0,parseInt(t.value)||0);if(q)cart[t.dataset.cq].q=q;else delete cart[t.dataset.cq];saveCart();readPay();renderPO();return}
  if(t.id==="pay-img"&&t.files&&t.files[0]){readPay();resizeImg(t.files[0],1400,.75,function(u){curPO.pay.img=u;saveHist();toast("Payment screenshot attached");renderPO()});return}
  if(t.id==="restore"&&t.files&&t.files[0]){restore(t.files[0]);return}
