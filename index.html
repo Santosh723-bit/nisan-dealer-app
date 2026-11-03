@@ -560,13 +560,28 @@ body.pc .pimg .ph{position:absolute;inset:0;width:auto;height:auto;flex:none;bor
 .ptotal2 span{display:block;font-size:10px;font-weight:600;opacity:.75;white-space:nowrap}
 .ptotal2.zero{background:#2A2A2F;color:#fff}
 @media (max-width:380px){.slines span,.slines b,.brk2 div{font-size:12px}.brk2 div{gap:6px}.stampcell,.brk2{padding:6px 8px}.ptotal2 b{font-size:20px}.b-co3{font-size:12.5px;letter-spacing:.05em}}
+/* v6.6 vertical stamping switch + exit screen */
+.switch2{flex:0 0 22px}
+.switch2 i{width:22px;height:38px}
+.switch2 i:after{top:auto;bottom:3px;left:3px;width:16px;height:16px}
+.switch2 input:checked+i:after{left:3px;bottom:19px}
+.stampcell{gap:7px;padding:6px 8px}
+.slines{flex:1 1 auto}
+.bye{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;padding:24px;background:var(--blk);color:#fff}
+.bye h1{font-size:28px;margin:14px 0 0;color:var(--mus)}
+.bye p{margin:0;font-size:15px;color:#D4D4D8}
+.bye .bsub{font-size:13px;color:var(--gry);margin-bottom:12px}
+.bye .b-co3{padding:12px 22px}
+.brk2 div{flex-wrap:wrap;white-space:normal;column-gap:8px;row-gap:0}
+.brk2 div span,.brk2 div b{white-space:nowrap}
+.brk2 div b{margin-left:auto}
 </style>
 </head>
-<body class="pc">
+<body>
 <div id="rotate"><div>↻</div>Please turn your phone upright (portrait) to use the NISAN order app.</div>
 <div id="app"></div>
 <div id="ov"></div>
-<script type="application/json" id="appdata">{"mode":"dealer","data":{"version":"2000-01-01T00:00:00.000Z","settings":{"supplier":"NISAN ELECTRONICS","address":"36, Pesh Industrial Premises, Off Telco Road, MIDC Bhosari, Pune - 411026","email":"nisanscale@gmail.com","dispatch":"+91 9822195935","service":"+91 9527288822","priceRef":"NISAN/DPL/2026-27/01","homeState":"Maharashtra","gst":18,"effDate":"2026-11-01","validMonths":3,"updateUrl":"https://santosh723-bit.github.io/nisan-dealer-app/nisan-data.json","regWa":"+91 9822195935","terms":[]},"products":[]},"web":true}</script>
+<script type="application/json" id="appdata">{"mode":"dealer","data":{"version":"2000-01-01T00:00:00.000Z","settings":{"supplier":"NISAN ELECTRONICS","address":"36, Pesh Industrial Premises, Off Telco Road, MIDC Bhosari, Pune - 411026","email":"nisanscale@gmail.com","dispatch":"+91 9850898822","service":"+91 9527288822","priceRef":"NISAN/DPL/2026-27/01","homeState":"Maharashtra","gst":18,"effDate":"2026-11-01","validMonths":3,"updateUrl":"https://santosh723-bit.github.io/nisan-dealer-app/nisan-data.json","regWa":"+91 9850898822","terms":[]},"products":[]},"web":true}</script>
 <script id="lib1">/** @license
  *
  * jsPDF - PDF Document creation from JavaScript
@@ -1089,7 +1104,7 @@ function card(p){var c=cart[p.id],inC=c&&c.q>0,q=inC?c.q:0;var st=c?c.st!==false
 function buyArea(p,q,st){var rg=region(),hasStamp=rg===1&&+p.stamp>0,u=unit(p,Math.max(1,q),st),s=DATA.settings;
  var qrow='<div class="qrow"><button class="qb" data-dq="'+p.id+'" data-d="-1" aria-label="decrease quantity">'+ICONQ.minus+'</button><input type="number" inputmode="numeric" min="0" data-q="'+p.id+'" value="'+q+'" aria-label="quantity"><button class="qb" data-dq="'+p.id+'" data-d="1" aria-label="increase quantity">'+ICONQ.plus+'</button></div>';
  var stamp='<div class="stampcell">'+(hasStamp?'<label class="switch2"><input type="checkbox" data-st="'+p.id+'"'+(st?" checked":"")+'><i></i></label>':'<span class="nosw"></span>')+
-  '<div class="slines"><span>Stamping</span><b class="samt'+(hasStamp&&!st?" off":"")+'">'+(hasStamp?'&#8377;'+inr(+p.stamp,1):(rg===2?'Not outside '+esc(s.homeState):'Not applicable'))+'</b></div></div>';
+  '<div class="slines"><span>Stamping</span><b class="samt'+(hasStamp&&!st?" off":"")+'">'+(hasStamp?'&#8377;'+inr(+p.stamp,1):'Nil')+'</b></div></div>';
  if(!u)return qrow+'<div class="noprice wide">Your state is not set. Open <b>My Details</b> and choose your state to see prices.</div>';
  var brk='<div class="brk2"><div><span>Basic'+(u.slab?' <em>'+p.slabQty+'+</em>':'')+'</span><b>&#8377;'+inr(u.rate,1)+'</b></div><div><span>GST '+s.gst+'%</span><b>&#8377;'+inr(u.gst,1)+'</b></div></div>';
  var tot=q>0?'<div class="ptotal2"><b>&#8377;'+inr(r2(u.total*q),1)+'</b><span>'+q+' &times; &#8377;'+inr(u.total,1)+' incl. GST</span></div>':'<div class="ptotal2 zero"><b>&#8377;'+inr(u.total,1)+'</b><span>per unit incl. GST</span></div>';
@@ -1116,6 +1131,8 @@ function renderSearchRes(){var box=$("#sres");if(!box)return;var q=(search||"").
  box.innerHTML=h}
 function gotoProduct(id){closeOv();filt="ALL";if(view!=="shop"){view="shop";render()}else renderShop();
  var c=document.getElementById("c-"+id),f=document.getElementById("feed");if(c&&f){f.scrollTop=c.offsetTop;c.classList.add("flash");setTimeout(function(){c.classList.remove("flash")},1200)}}
+function exitApp(){try{window.close()}catch(e){}
+ setTimeout(function(){if(window.closed)return;var s=DATA.settings;$("#app").innerHTML='<div class="bye"><div class="blogo big"></div><h1>Thank you</h1><p>No order was placed.</p><p class="bsub">You can close the app now<br>(swipe it away or press the Home button).</p><button class="b-co3" data-a="bye-back">BACK TO SHOP</button></div>'},250)}
 function startCheckout(){if(!cartLines().length){overlay('<h2>Select quantity</h2><div class="help">No product is selected yet. Use <b>+</b> on the product you need to choose the quantity, then tap <b>CHECK OUT</b>.</div><div class="sendgrid"><button class="b-co2" data-a="co-select">SELECT QUANTITY</button><button class="b-exit" data-a="co-exit">EXIT</button></div>');return}
  ensureFresh(function(){if(!cartLines().length){startCheckout();return}if(profMissing().length||profErrors().length){view="profile";render();renderProfile("po");toast("Please complete your details first");return}curIdx=-1;view="po";render()})}
 function setQty(id,v){var p=prodById(id);if(!p)return;if(!region()){toast("Please set your state in My Details first");return}v=Math.max(0,Math.min(9999,parseInt(v)||0));
@@ -1243,7 +1260,7 @@ function renderHist(){var h=installCard()+'<h2>My Orders</h2><div class="bar mut
 function renderHelp(){var s=DATA.settings;$("#main").innerHTML='<h2>How to use</h2><div class="bar help"><b>1.</b> Tap <b>My Details</b> once and fill your company, GSTIN, licence, address and State. They stay saved.<br><b>2.</b> Scroll the products, set <b>Qty</b>, tap <b>Add to cart</b>. Within '+esc(s.homeState)+' you can untick <b>Stamping</b> if not needed.<br><b>3.</b> Tap <b>Checkout</b>: your Purchase Order with Grand Total appears.<br><b>4.</b> Attach your <b>payment screenshot</b> from the gallery and the UTR number.<br><b>5.</b> <b>Share / Save PDF</b>, then <b>WhatsApp to Dispatch</b> (attach the PDF) and <b>Email</b>.<br><br>Prices update automatically when you have internet. Current price list: <b>'+esc(s.priceRef)+'</b>, '+fmtDT(DATA.version)+'. '+esc(note2())+'.<br><br>Faulty unit received? Call <b>Service Support '+esc(s.service)+'</b>.<br>Dispatch: <b>'+esc(s.dispatch)+'</b> &middot; Email: '+esc(s.email)+'</div>'}
 /* ================= auto-update (dealer) ================= */
 /* ================= dealer authorization + sync (v4) ================= */
-var APP_BUILD=65, DEVCODE="", syncing=null, updAsked=false;
+var APP_BUILD=66, DEVCODE="", syncing=null, updAsked=false;
 var CODE_ABC="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 function normCode(c){return String(c||"").toUpperCase().replace(/[^A-Z0-9]/g,"")}
 function fmtCode(c){c=normCode(c);return c.slice(0,5)+"-"+c.slice(5)}
@@ -1446,7 +1463,8 @@ document.addEventListener("click",function(ev){var el=ev.target.closest("[data-s
   case "install":if(deferredPrompt){deferredPrompt.prompt();deferredPrompt.userChoice.then(function(){deferredPrompt=null;renderShop()})}break;
   case "checkout":startCheckout();break;
   case "co-select":closeOv();if(view!=="shop"){view="shop";render()}var fq=document.querySelector('.card .qty .qb[data-d="1"]');toast("Tap + on the product you need");break;
-  case "co-exit":closeOv();toast("No order placed");if(view!=="shop"){view="shop";render()}break;
+  case "co-exit":closeOv();exitApp();break;
+  case "bye-back":view="shop";render();break;
   case "save-prof":document.querySelectorAll("[data-p]").forEach(function(x){prof[x.dataset.p]=x.dataset.p==="gstin"?x.value.trim().toUpperCase():x.value.trim()});saveProf();var m=profMissing(),e=profErrors();if(m.length){toast("Missing: "+m[0]);return}if(e.length){toast(e[0]);return}toast("Details saved");if($("#main").dataset.after==="po"&&cartLines().length){curIdx=-1;view="po"}else view="shop";render();break;
   case "pay-save":readPay();toast("Payment details saved with this order");renderPO();break;
   case "pay-rm":curPO.pay.img="";saveHist();renderPO();break;
