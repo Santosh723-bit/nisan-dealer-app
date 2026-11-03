@@ -409,13 +409,82 @@ body.pc .card{height:640px;border-radius:20px;border:1px solid var(--line2);over
 .incart-tag{top:auto;bottom:10px;right:10px}
 .pcode{display:none}
 body.pc .pimg .ph{position:absolute;inset:0;width:auto;height:auto;flex:none;border-radius:0}
+/* ===== v6: maximum product space ===== */
+.appbar{padding:6px 12px;padding-top:calc(6px + env(safe-area-inset-top));gap:10px}
+.appbar .blogo{width:84px;height:34px;background-size:72px auto;border-radius:9px}
+.appbar .brand b{font-size:19px;line-height:1.1}
+.appbar .brand span{font-size:8.5px;letter-spacing:.22em}
+.filtnote{flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;gap:8px;background:#1E1E22;color:var(--mus);font-size:12.5px;font-weight:600;padding:6px 12px}
+.filtnote button{background:var(--mus);color:var(--blk);padding:5px 10px;font-size:12px;border-radius:8px}
+.feed{position:relative}
+.card{height:auto;min-height:100%}
+.card.incart{box-shadow:inset 0 0 0 2px rgba(245,194,27,.55)}
+.card.flash{box-shadow:inset 0 0 0 3px var(--mus)}
+.pspec{grid-template-columns:.8fr 1.05fr 1.15fr .9fr;gap:4px;padding:7px 10px}
+.pspec div{padding-left:6px;border-left-width:2px}
+.pspec span{font-size:8.5px;letter-spacing:.14em}
+.pspec b{font-size:14px;letter-spacing:-.01em}
+.pspec .m b{color:var(--mus)}
+.pimg{flex:1 1 auto;min-height:170px}
+.pbuy{grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:10px;padding:8px 10px 10px;align-items:end}
+.pleft{gap:8px;justify-content:flex-end}
+.b-addtxt{background:var(--blk);color:var(--mus);border:2px solid var(--mus);border-radius:12px;font-size:15px;font-weight:800;letter-spacing:.08em;padding:9px 6px;width:100%}
+.card.incart .b-addtxt{background:var(--mus);color:var(--blk)}
+.switch{font-size:14px;gap:8px}
+.switch i{width:40px;height:23px;flex-basis:40px}
+.switch i:after{width:17px;height:17px}
+.switch input:checked+i:after{left:20px}
+.nostamp{min-height:23px;font-size:11.5px}
+.qty{display:grid;grid-template-columns:44px minmax(0,1fr) 44px;gap:6px;align-items:stretch}
+.qty .qb{background:var(--mus);color:var(--blk);font-size:28px;font-weight:800;line-height:1;padding:0;border-radius:12px;min-height:46px;display:flex;align-items:center;justify-content:center}
+.qty .qb:active{transform:scale(.94)}
+.qty input{font-size:24px;border-radius:12px;padding:0;min-height:46px}
+.brk{padding:6px 10px;border-radius:12px}
+.brk div{font-size:13px;gap:6px}
+.ptotal{padding:5px 10px;border-radius:12px}
+.ptotal b{font-size:24px}
+.ptotal span{font-size:10px}
+.slab{font-size:10.5px}
+.noprice{font-size:12px;padding:10px}
+.cartbar{padding:6px 12px}
+.cartbar .ct b{font-size:20px}
+.cartbar button{padding:10px 14px;font-size:14px}
+/* bottom menu: 5 items, ~14% lower */
+.bnav{padding:2px 2px calc(2px + env(safe-area-inset-bottom))}
+.bnav button{padding:3px 0 2px;gap:1px;font-size:9.5px;letter-spacing:.04em}
+.bnav button svg{width:21px;height:21px}
+.bnav button.on svg{width:38px;height:24px;padding:2px 8px}
+.bnav .nb{top:0;min-width:16px;height:16px;font-size:9.5px}
+/* search panel */
+.ov.sfull{align-items:stretch;background:rgba(0,0,0,.6)}
+.ssheet{background:var(--blk);color:#fff;width:100%;max-width:640px;height:100%;display:flex;flex-direction:column;margin:0 auto}
+.shead{display:flex;align-items:center;gap:8px;padding:10px 12px;padding-top:calc(10px + env(safe-area-inset-top));background:var(--mus)}
+.shead svg{width:20px;height:20px;color:var(--blk);flex:0 0 20px}
+.shead input{flex:1;border:0;border-radius:999px;padding:10px 14px;font-size:16px;background:#fff;color:#111}
+.shead .sx{background:var(--blk);color:var(--mus);font-size:22px;line-height:1;padding:7px 12px;border-radius:999px}
+.sres{flex:1;overflow-y:auto;padding:8px 10px 20px}
+.shint{color:var(--gry);font-size:12.5px;padding:6px 4px}
+.sgrp{display:flex;align-items:center;gap:10px;width:100%;background:#1E1E22;color:#fff;border-radius:14px;padding:16px 16px;margin:8px 0;text-align:left}
+.sgrp b{font-size:20px;letter-spacing:.08em;flex:1}
+.sgrp span{color:var(--gry);font-size:13px;font-weight:600}
+.sgrp i{font-style:normal;color:var(--mus)}
+.sgrp.open{background:var(--mus);color:var(--blk)}.sgrp.open span,.sgrp.open i{color:var(--blk)}
+.sgrp.cartg{border:2px solid var(--mus)}
+.ssub{color:var(--mus);font-size:11.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin:12px 4px 4px}
+.srow{display:flex;align-items:center;gap:10px;width:100%;background:transparent;color:#fff;border-radius:12px;padding:6px;text-align:left;border-bottom:1px solid #222}
+.srow:active{background:#1E1E22}
+.sth{width:56px;height:44px;flex:0 0 56px;border-radius:8px;background:#26262A;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.sth img.fg{width:100%;height:100%;object-fit:cover}.sth img.bgb{display:none}.sth svg{width:80%;height:80%}
+.stx{flex:1;min-width:0}.stx b{display:block;font-size:16px}.stx i{display:block;font-style:normal;font-size:12px;color:var(--gry);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.spr{color:var(--mus);font-weight:700;font-size:14px;white-space:nowrap}
+.main .installbar{background:#1F1F23}
 </style>
 </head>
-<body class="pc">
+<body>
 <div id="rotate"><div>↻</div>Please turn your phone upright (portrait) to use the NISAN order app.</div>
 <div id="app"></div>
 <div id="ov"></div>
-<script type="application/json" id="appdata">{"mode":"dealer","data":{"version":"2000-01-01T00:00:00.000Z","settings":{"supplier":"NISAN ELECTRONICS","address":"36, Pesh Industrial Premises, Off Telco Road, MIDC Bhosari, Pune - 411026","email":"nisanscale@gmail.com","dispatch":"+91 9822195935","service":"+91 9527288822","priceRef":"NISAN/DPL/2026-27/01","homeState":"Maharashtra","gst":18,"effDate":"2026-11-01","validMonths":3,"updateUrl":"https://santosh723-bit.github.io/nisan-dealer-app/nisan-data.json","regWa":"+91 9822195935","terms":[]},"products":[]},"web":true}</script>
+<script type="application/json" id="appdata">{"mode":"dealer","data":{"version":"2000-01-01T00:00:00.000Z","settings":{"supplier":"NISAN ELECTRONICS","address":"36, Pesh Industrial Premises, Off Telco Road, MIDC Bhosari, Pune - 411026","email":"nisanscale@gmail.com","dispatch":"+91 9850898822","service":"+91 9527288822","priceRef":"NISAN/DPL/2026-27/01","homeState":"Maharashtra","gst":18,"effDate":"2026-11-01","validMonths":3,"updateUrl":"https://santosh723-bit.github.io/nisan-dealer-app/nisan-data.json","regWa":"+91 9850898822","terms":[]},"products":[]},"web":true}</script>
 <script id="lib1">/** @license
  *
  * jsPDF - PDF Document creation from JavaScript
@@ -907,7 +976,7 @@ function render(){if(view==="register"){renderRegister();return}var s=DATA.setti
  h+='<header class="appbar"><div class="blogo"></div><div class="brand"><b>'+(MODE==="master"?"PARTNER MASTER":"PARTNER")+'</b><span>'+esc(s.supplier)+'</span></div>'+(MODE==="master"?'<button class="hbtn" data-a="edit">EDIT</button>':'')+'</header>';
  if(updMsg){h+='<div class="updbar" id="updbar">&#10003; '+esc(updMsg)+'</div>';clearTimeout(window.__ub);window.__ub=setTimeout(function(){updMsg="";var u=document.getElementById("updbar");if(u)u.remove()},4000)}
  h+='<main id="main" class="main'+(view==="shop"?" main-shop":"")+'"></main><div class="cartbar" id="cartbar"></div>';
- h+='<nav class="bnav">'+[["go-shop","shop","Shop","shop"],["go-cart","cart","Cart","po"],["go-hist","orders","Orders","hist"],["go-profile","user","My Details","profile"]].map(function(x){var on=(nav===x[3])||(x[3]==="hist"&&nav==="help");var badge=x[1]==="cart"&&L.length?'<i class="nb">'+L.length+'</i>':'';return '<button class="'+(on?"on":"")+'" data-a="'+x[0]+'">'+ICON[x[1]]+badge+'<span>'+x[2]+'</span></button>'}).join("")+'</nav>';
+ h+='<nav class="bnav">'+[["go-shop","shop","Shop","shop"],["go-search","search","Search","search"],["go-cart","cart","Cart","po"],["go-hist","orders","Orders","hist"],["go-profile","user","My Details","profile"]].map(function(x){var on=(nav===x[3])||(x[3]==="hist"&&nav==="help");var badge=x[1]==="cart"&&L.length?'<i class="nb">'+L.length+'</i>':'';return '<button class="'+(on?"on":"")+'" data-a="'+x[0]+'">'+ICON[x[1]]+badge+'<span>'+x[2]+'</span></button>'}).join("")+'</nav>';
  $("#app").innerHTML=h;
  ({shop:renderShop,profile:function(){renderProfile()},po:renderPO,hist:renderHist,help:renderHelp,"adm-list":renderAdmList,"adm-dealers":renderAdmDealers})[view]();
  renderCartBar();var mn=$("#main");if(mn)mn.scrollTop=0}
@@ -916,38 +985,47 @@ function renderCartBar(){var cb=$("#cartbar");if(!cb)return;var L=cartLines(),t=
  if(view!=="shop"||!L.length){cb.classList.add("hide");return}
  cb.classList.remove("hide");cb.innerHTML='<div class="ct"><span>'+L.length+' model'+(L.length>1?"s":"")+' &middot; Qty '+t.qty+' &middot; incl. GST</span><b>&#8377; '+inr(t.grand)+'</b></div><button data-a="checkout">CHECKOUT &rsaquo;</button>'}
 function shortGroup(g){return String(g).replace(/^(ECO|NPRO)\s*-\s*/,"").replace(/Platform Scale/,"Platform").replace(/\s*\(([^)]*)\)/," $1")}
-function renderShop(){var rg=region(),s=DATA.settings,h='<div class="toolbar">';
- h+=installCard();
- h+='<div class="searchbox">'+ICON.search+'<input id="srch" type="search" placeholder="Search model, item code" value="'+esc(search)+'"></div>';
- var G=[],B=[];DATA.products.forEach(function(p){if(G.indexOf(p.group)<0)G.push(p.group);if(B.indexOf(p.brand)<0)B.push(p.brand)});
- var nCart=Object.keys(cart).filter(function(k){return cart[k].q>0}).length;
- h+='<div class="chips"><label class="chip statechip'+(rg?"":" warn")+'">'+ICON.pin+'<select id="st-sel" aria-label="Delivery state"><option value="">Select state</option>'+STATES.map(function(x){return '<option'+(prof.state===x?" selected":"")+'>'+x+'</option>'}).join("")+'</select></label><button class="chip'+(filt==="ALL"?" on":"")+'" data-f="ALL">ALL</button><button class="chip'+(filt==="CART"?" on":"")+'" data-f="CART">IN CART'+(nCart?' ('+nCart+')':'')+'</button>'+B.map(function(b){return '<button class="chip'+(filt==="B:"+b?" on":"")+'" data-f="B:'+esc(b)+'">'+esc(b)+'</button>'}).join("")+G.map(function(g){return '<button class="chip sm'+(filt==="G:"+g?" on":"")+'" data-f="G:'+esc(g)+'">'+esc(g.split(" - ")[0])+' &middot; '+esc(shortGroup(g))+'</button>'}).join("")+'</div>';
- h+='</div>';
- var q=search.toLowerCase(),cnt=0,body='';
+function renderShop(){var q=search.toLowerCase(),cnt=0,body='';
  DATA.products.forEach(function(p){
   if(filt==="CART"&&!(cart[p.id]&&cart[p.id].q>0))return;
   if(filt.indexOf("B:")===0&&p.brand!==filt.slice(2))return;
   if(filt.indexOf("G:")===0&&p.group!==filt.slice(2))return;
-  if(q&&(p.model+" "+p.code+" "+p.cap+" "+p.group+" "+p.pan+" "+(p.material||"")).toLowerCase().indexOf(q)<0)return;
   body+=card(p);cnt++});
- if(!cnt)body='<div class="empty">'+(filt==="CART"?"Your cart is empty.":"No products match your search.")+'</div>';
- $("#main").innerHTML=h+'<div class="feed" id="feed">'+body+'</div>'}
+ if(!cnt)body='<div class="empty">No products to show.</div>';
+ var note=filt!=="ALL"?'<div class="filtnote">'+(filt==="CART"?"Showing: items in your cart":"Showing: "+esc(filt.slice(2).replace(" - "," · ")))+'<button data-a="filt-all">Show all</button></div>':'';
+ $("#main").innerHTML=note+'<div class="feed" id="feed">'+body+'</div>'}
+function compactCap(p){if(!p.cap)return "";return (String(p.cap)+(p.e?"×"+p.e:"")).replace(/\s+/g,"")}
+function compactPan(p){return String(p.pan||"").replace(/\s*mm\s*$/i,"").replace(/\s*[xX]\s*/g,"×")}
 function card(p){var c=cart[p.id],inC=c&&c.q>0,q=draftQ[p.id]!=null?draftQ[p.id]:(inC?c.q:1);var st=draftSt[p.id]!=null?draftSt[p.id]:(c?c.st!==false:true);var rg=region(),hasStamp=rg===1&&+p.stamp>0;
- var capTxt=p.cap?(p.cap+(p.e?" x "+p.e:"")):"";
- var panTxt=String(p.pan||"").replace(/\s*mm\s*$/i,"").replace(/\s*[xX]\s*/g,"\u00d7");var spec=[["Pan size (mm)",panTxt||"&mdash;"],["Capacity",capTxt||"&mdash;"],[p.panMat?"Pan":"Minimum",p.panMat||p.min||"&mdash;"]].map(function(x){return '<div><span>'+x[0]+'</span><b>'+(x[1]==="&mdash;"?x[1]:esc(x[1]))+'</b></div>'}).join("");
- var meta='<div class="pmeta">'+(p.material?'<div><span>Material</span><b>'+esc(p.material)+'</b></div>':'')+'<div><span>Model</span><b>'+esc(p.model)+'</b></div></div>';
- var stampCtl=hasStamp?'<label class="switch"><input type="checkbox" data-st="'+p.id+'"'+(st?" checked":"")+'><i></i><span>Stamping</span></label>':'<div class="nostamp">'+(rg===2?"No stamping outside "+esc(DATA.settings.homeState):+p.stamp>0?"":"Stamping not applicable")+'</div>';
+ var spec=[["Model",p.model],["Pan size",compactPan(p)||"—"],["Capacity",compactCap(p)||"—"],[p.panMat?"Pan":"Brand",p.panMat||p.brand]].map(function(x,i){return '<div'+(i===0?' class="m"':'')+'><span>'+x[0]+'</span><b>'+esc(x[1])+'</b></div>'}).join("");
+ var stampCtl=hasStamp?'<label class="switch"><input type="checkbox" data-st="'+p.id+'"'+(st?" checked":"")+'><i></i><span>Stamping</span></label>':'<div class="nostamp">'+(rg===2?"No stamping":rg===1?"No stamping for this item":"")+'</div>';
  return '<article class="card'+(inC?" incart":"")+'" id="c-'+p.id+'">'+
  '<div class="pspec">'+spec+'</div>'+
- '<div class="pimg"><div class="ph">'+pic(p)+'</div><div class="ptag"><em class="'+(p.brand==="ECO"?"eco":"npro")+'">'+esc(p.brand)+'</em>'+esc(shortGroup(p.group))+'</div>'+meta+(inC?'<div class="incart-tag">In cart &middot; '+c.q+'</div>':'')+'<div class="pcode">'+esc(p.code)+'</div></div>'+
- '<div class="pbuy"><div class="pleft">'+stampCtl+'<div class="qty"><div class="arrows"><button data-dq="'+p.id+'" data-d="1" aria-label="more">'+ICON.up+'</button><button data-dq="'+p.id+'" data-d="-1" aria-label="less">'+ICON.down+'</button></div><input type="number" inputmode="numeric" min="0" data-q="'+p.id+'" value="'+q+'" aria-label="quantity"></div></div>'+
- '<div class="price">'+priceBox(p,q,st)+'</div></div>'+
- '<div class="btns"><button class="b-add" data-add="'+p.id+'">'+(inC?"Update Cart":"Add to Cart")+'</button><button class="b-co" data-a="checkout">Check Out</button></div></article>'}
+ '<div class="pimg"><div class="ph">'+pic(p)+'</div></div>'+
+ '<div class="pbuy"><div class="pleft"><button class="b-addtxt" data-add="'+p.id+'">'+(inC?"UPDATE CART":"ADD TO CART")+'</button>'+stampCtl+
+ '<div class="qty"><button class="qb" data-dq="'+p.id+'" data-d="-1" aria-label="decrease quantity">&minus;</button><input type="number" inputmode="numeric" min="0" data-q="'+p.id+'" value="'+q+'" aria-label="quantity"><button class="qb" data-dq="'+p.id+'" data-d="1" aria-label="increase quantity">+</button></div></div>'+
+ '<div class="price">'+priceBox(p,q,st)+'</div></div></article>'}
 function priceBox(p,q,st){var u=unit(p,q,st),rg=region(),s=DATA.settings,hasStamp=rg===1&&+p.stamp>0;
- if(!u)return '<div class="noprice">Select your delivery state above to see prices</div>';
- return '<div class="brk"><div><span>Basic'+(u.slab?' <em>'+p.slabQty+'+ rate</em>':'')+'</span><b>'+inr(u.rate,1)+'</b></div>'+(hasStamp?'<div'+(st?'':' class="off"')+'><span>Stamping</span><b>'+inr(+p.stamp,1)+'</b></div>':'')+'<div><span>GST '+s.gst+'%</span><b>'+inr(u.gst,1)+'</b></div></div>'+
-  '<div class="ptotal"><b>'+inr(r2(u.total*q),1)+'</b><span>'+q+' &times; &#8377;'+inr(u.total,1)+' incl. GST</span></div>'+
-  (+p.slabQty>0?'<div class="slab">&#8377;'+inr(rg===1?p.slabMH:p.slabOut,1)+' each for '+p.slabQty+'+ Nos</div>':'')}
+ if(!u)return '<div class="noprice">Your state is not set. Open <b>My Details</b> and choose your state to see prices.</div>';
+ return '<div class="brk"><div><span>Basic'+(u.slab?' <em>'+p.slabQty+'+</em>':'')+'</span><b>'+inr(u.rate,1)+'</b></div>'+(hasStamp?'<div'+(st?'':' class="off"')+'><span>Stamping</span><b>'+inr(+p.stamp,1)+'</b></div>':'')+'<div><span>GST '+s.gst+'%</span><b>'+inr(u.gst,1)+'</b></div></div>'+
+  '<div class="ptotal"><b>'+inr(r2(u.total*q),1)+'</b><span>'+q+' &times; '+inr(u.total,1)+' incl. GST</span></div>'+
+  (+p.slabQty>0?'<div class="slab">'+inr(rg===1?p.slabMH:p.slabOut,1)+' each for '+p.slabQty+'+ Nos</div>':'')}
+/* ---------- search panel (bottom menu) ---------- */
+var sBrand="";
+function openSearch(){$("#ov").innerHTML='<div class="ov sfull"><div class="ssheet"><div class="shead">'+ICON.search+'<input id="s2" type="search" placeholder="Search model, capacity, pan size" value="'+esc(search)+'" autocomplete="off"><button class="sx" data-a="ov-close" aria-label="close">&times;</button></div><div class="sres" id="sres"></div></div></div>';renderSearchRes()}
+function sRow(p){var u=unit(p,1,true);return '<button class="srow" data-goto="'+p.id+'"><span class="sth">'+pic(p)+'</span><span class="stx"><b>'+esc(p.model)+'</b><i>'+esc(compactCap(p))+(p.pan?' &middot; '+esc(compactPan(p))+' mm':'')+'</i></span><span class="spr">'+(u?'&#8377;'+inr(u.total):'')+'</span></button>'}
+function renderSearchRes(){var box=$("#sres");if(!box)return;var q=(search||"").trim().toLowerCase(),h='';
+ if(q){var L=DATA.products.filter(function(p){return (p.model+" "+p.code+" "+p.cap+" "+p.e+" "+p.group+" "+p.pan+" "+(p.material||"")).toLowerCase().indexOf(q)>=0});
+  h=L.length?'<div class="shint">'+L.length+' match'+(L.length>1?"es":"")+'</div>'+L.map(sRow).join(""):'<div class="shint">No product matches "'+esc(search)+'"</div>'}
+ else{var B=[];DATA.products.forEach(function(p){if(B.indexOf(p.brand)<0)B.push(p.brand)});
+  var nCart=Object.keys(cart).filter(function(k){return cart[k].q>0}).length;
+  if(nCart)h+='<button class="sgrp cartg" data-a="s-cart"><b>IN MY CART</b><span>'+nCart+' model'+(nCart>1?"s":"")+'</span></button>';
+  B.forEach(function(b){var P=DATA.products.filter(function(p){return p.brand===b}),open=sBrand===b;
+   h+='<button class="sgrp'+(open?" open":"")+'" data-sg="'+esc(b)+'"><b>'+esc(b)+'</b><span>'+P.length+' models</span><i>'+(open?"&#9650;":"&#9660;")+'</i></button>';
+   if(open){var last=null;P.forEach(function(p){if(p.group!==last){h+='<div class="ssub">'+esc(shortGroup(p.group))+'</div>';last=p.group}h+=sRow(p)})}})}
+ box.innerHTML=h}
+function gotoProduct(id){closeOv();filt="ALL";if(view!=="shop"){view="shop";render()}else renderShop();
+ var c=document.getElementById("c-"+id),f=document.getElementById("feed");if(c&&f){f.scrollTop=c.offsetTop;c.classList.add("flash");setTimeout(function(){c.classList.remove("flash")},1200)}}
 function refreshCard(id){var p=prodById(id),el=$("#c-"+id);if(!p||!el||!el.isConnected)return;var tmp=document.createElement("div");tmp.innerHTML=card(p);el.replaceWith(tmp.firstChild)}
 function refreshPrice(id){var p=prodById(id),el=$("#c-"+id);if(!p||!el||!el.isConnected)return;var tmp=document.createElement("div");tmp.innerHTML=card(p);var np=tmp.querySelector(".price"),op=el.querySelector(".price");if(np&&op)op.innerHTML=np.innerHTML}
 /* ================= profile ================= */
@@ -1059,7 +1137,7 @@ function poText(po){var p=po.prof,t=po.t,rg=po.region,pay=po.pay||{},L=[];L.push
  L.push("");L.push("PO PDF attached / follows.");return L.join("\n")}
 function readPay(){if(!curPO)return;var tr=$("#po-trans");if(tr){curPO.transporter=tr.value;if(tr.value){prof.lastTrans=tr.value;saveProf()}}curPO.pay=curPO.pay||{};var m=$("#pay-mode");if(!m){saveHist();return}curPO.pay.mode=m.value;curPO.pay.amount=parseFloat($("#pay-amt").value)||"";curPO.pay.ref=$("#pay-ref").value.trim();curPO.pay.date=$("#pay-date").value;saveHist()}
 /* ================= history ================= */
-function renderHist(){var h='<h2>My Orders</h2><div class="bar muted">All your POs with your details and payment proof, saved on this device.</div>';
+function renderHist(){var h=installCard()+'<h2>My Orders</h2><div class="bar muted">All your POs with your details and payment proof, saved on this device.</div>';
  if(!hist.length)h+='<div class="bar muted">No orders yet.</div>';
  hist.forEach(function(r,i){var po=r.po;h+='<div class="bar hrow"><b>'+esc(po.no)+'</b> &middot; '+esc(po.date)+(po.cartKey==="current"?' <span class="badge unpaid">in progress</span>':'')+'<br><span class="muted">'+esc(po.prof.company||"")+' &middot; '+po.lines.length+' model(s)</span> &middot; <b>&#8377; '+inr(po.t.grand)+'</b> '+(payStatus(po)?'<span class="badge paid">payment attached</span>':'<span class="badge unpaid">no payment proof</span>')+
   '<div class="sendgrid" style="margin:8px 0 0"><button class="b-main" data-ho="'+i+'">Open</button><button class="pdf" data-hp="'+i+'">PDF</button><button class="b-sec" data-hr="'+i+'">Re-order same items</button></div></div>'});
@@ -1068,7 +1146,7 @@ function renderHist(){var h='<h2>My Orders</h2><div class="bar muted">All your P
 function renderHelp(){var s=DATA.settings;$("#main").innerHTML='<h2>How to use</h2><div class="bar help"><b>1.</b> Tap <b>My Details</b> once and fill your company, GSTIN, licence, address and State. They stay saved.<br><b>2.</b> Scroll the products, set <b>Qty</b>, tap <b>Add to cart</b>. Within '+esc(s.homeState)+' you can untick <b>Stamping</b> if not needed.<br><b>3.</b> Tap <b>Checkout</b>: your Purchase Order with Grand Total appears.<br><b>4.</b> Attach your <b>payment screenshot</b> from the gallery and the UTR number.<br><b>5.</b> <b>Share / Save PDF</b>, then <b>WhatsApp to Dispatch</b> (attach the PDF) and <b>Email</b>.<br><br>Prices update automatically when you have internet. Current price list: <b>'+esc(s.priceRef)+'</b>, '+fmtDT(DATA.version)+'. '+esc(note2())+'.<br><br>Faulty unit received? Call <b>Service Support '+esc(s.service)+'</b>.<br>Dispatch: <b>'+esc(s.dispatch)+'</b> &middot; Email: '+esc(s.email)+'</div>'}
 /* ================= auto-update (dealer) ================= */
 /* ================= dealer authorization + sync (v4) ================= */
-var APP_BUILD=50, DEVCODE="", syncing=null, updAsked=false;
+var APP_BUILD=60, DEVCODE="", syncing=null, updAsked=false;
 var CODE_ABC="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 function normCode(c){return String(c||"").toUpperCase().replace(/[^A-Z0-9]/g,"")}
 function fmtCode(c){c=normCode(c);return c.slice(0,5)+"-"+c.slice(5)}
@@ -1231,14 +1309,16 @@ function ghPublish(text,ver,webText){return sGet("gh_token").then(function(tok){
 function backup(){var b=new Blob([JSON.stringify({app:"NISAN-backup",at:new Date().toISOString(),profile:prof,history:hist,cart:cart,device:DEVCODE})],{type:"application/json"});download(b,"NISAN_my_backup_"+fmtDate(new Date())+".json");toast("Backup saved to Downloads")}
 function restore(file){var fr=new FileReader();fr.onload=function(){try{var j=JSON.parse(fr.result);if(j.app!=="NISAN-backup")throw 0;if(!confirm("Restore details and "+(j.history||[]).length+" order(s) from this backup? Current data on this device will be replaced."))return;prof=j.profile||{};hist=j.history||[];cart=j.cart||{};if(j.device&&normCode(j.device).length===10){DEVCODE=normCode(j.device);sSet("device_code",DEVCODE)}saveProf();saveHist();saveCart();toast("Backup restored");render()}catch(e){toast("Not a valid NISAN backup file")}};fr.readAsText(file)}
 /* ================= events ================= */
-document.addEventListener("click",function(ev){var el=ev.target.closest("[data-dlw],[data-dle],[data-dld],[data-a],[data-f],[data-dq],[data-add],[data-rm],[data-hp],[data-hr],[data-ho],[data-up],[data-dn],[data-ed],[data-del]");if(!el)return;var a=el.dataset.a;
+document.addEventListener("click",function(ev){var el=ev.target.closest("[data-sg],[data-goto],[data-dlw],[data-dle],[data-dld],[data-a],[data-f],[data-dq],[data-add],[data-rm],[data-hp],[data-hr],[data-ho],[data-up],[data-dn],[data-ed],[data-del]");if(!el)return;var a=el.dataset.a;
  if(a==="ov-bg"&&ev.target!==el)return;
+ if(el.dataset.sg!=null){sBrand=sBrand===el.dataset.sg?"":el.dataset.sg;renderSearchRes();return}
+ if(el.dataset.goto!=null){gotoProduct(el.dataset.goto);return}
  if(el.dataset.dlw!=null){sendDealerLink(dealers()[+el.dataset.dlw]);renderAdmDealers();return}
  if(el.dataset.dle!=null){openDealerForm(+el.dataset.dle);return}
  if(el.dataset.dld!=null){var di=+el.dataset.dld;if(confirm("Delete dealer "+dealers()[di].company+"? Their app loses access after the next PUBLISH.")){dealers().splice(di,1);saveDraft();renderAdmDealers()}return}
  if(el.dataset.f!=null){filt=el.dataset.f;renderShop();return}
  if(el.dataset.dq){var id=el.dataset.dq,inp=$('[data-q="'+id+'"]');var v=Math.max(0,(parseInt(inp.value)||0)+(+el.dataset.d));draftQ[id]=v;inp.value=v;refreshPrice(id);return}
- if(el.dataset.add){var id2=el.dataset.add,p=prodById(id2);if(!region()){toast("Select your Delivery State first");var s=$("#st-sel");if(s)s.focus();return}var q=parseInt($('[data-q="'+id2+'"]').value)||0;var stEl=$('[data-st="'+id2+'"]');var st=stEl?stEl.checked:true;
+ if(el.dataset.add){var id2=el.dataset.add,p=prodById(id2);if(!region()){toast("Please set your state in My Details first");return}var q=parseInt($('[data-q="'+id2+'"]').value)||0;var stEl=$('[data-st="'+id2+'"]');var st=stEl?stEl.checked:true;
   if(q<=0){delete cart[id2];toast(p.model+" removed from cart")}else{cart[id2]={q:q,st:st};toast(p.model+" x "+q+" added")}delete draftQ[id2];delete draftSt[id2];saveCart();refreshCard(id2);renderCartBar();return}
  if(el.dataset.rm){delete cart[el.dataset.rm];saveCart();if(!cartLines().length){hist.splice(curIdx,1);saveHist();curIdx=-1;view="shop";render();return}renderPO();return}
  if(el.dataset.ho!=null){curIdx=+el.dataset.ho;var po0=hist[curIdx].po;if(po0.cartKey==="current"&&!cartLines().length){po0.cartKey="";saveHist()}view="po";render();return}
@@ -1248,7 +1328,10 @@ document.addEventListener("click",function(ev){var el=ev.target.closest("[data-d
  if(el.dataset.ed!=null){openProdForm(+el.dataset.ed);return}
  if(el.dataset.del!=null){var k=+el.dataset.del;if(confirm("Delete "+DATA.products[k].model+"?")){DATA.products.splice(k,1);saveDraft();renderAdmList()}return}
  switch(a){
-  case "go-shop":view="shop";render();break;
+  case "go-shop":if(view==="shop"&&filt!=="ALL"){filt="ALL";renderShop();break}view="shop";render();break;
+  case "go-search":openSearch();setTimeout(function(){var i=$("#s2");if(i&&!search)i.blur()},0);break;
+  case "s-cart":closeOv();filt="CART";view="shop";render();break;
+  case "filt-all":filt="ALL";renderShop();break;
   case "go-profile":view="profile";render();break;
   case "go-profile-po":view="profile";render();renderProfile("po");break;
   case "go-hist":view="hist";curIdx=-1;render();break;
@@ -1299,7 +1382,7 @@ document.addEventListener("change",function(ev){var t=ev.target;
  if(t.id==="pay-img"&&t.files&&t.files[0]){readPay();resizeImg(t.files[0],1400,.75,function(u){curPO.pay.img=u;saveHist();toast("Payment screenshot attached");renderPO()});return}
  if(t.id==="restore"&&t.files&&t.files[0]){restore(t.files[0]);return}
  if(t.id==="pf-file"&&t.files&&t.files[0]){resizeImg(t.files[0],480,.72,function(u){editPhoto=u;$("#pf-ph").innerHTML='<img alt="" src="'+u+'">'})}});
-document.addEventListener("input",function(ev){if(ev.target.id==="df-code"){var c=extractCode(ev.target.value),h=$("#df-code-hint");if(h)h.innerHTML=c.length===10?'<span class="saved">&#10003; Code found: '+fmtCode(c)+'</span>':(ev.target.value.trim()?'<span class="unpub">No 10-character code found yet</span>':'');return}if(ev.target.id==="srch"){search=ev.target.value;clearTimeout(window.__st);window.__st=setTimeout(function(){var pos=ev.target.selectionStart;renderShop();var s=$("#srch");s.focus();try{s.setSelectionRange(pos,pos)}catch(e){}},250)}});
+document.addEventListener("input",function(ev){if(ev.target.id==="s2"){search=ev.target.value;renderSearchRes();return}if(ev.target.id==="df-code"){var c=extractCode(ev.target.value),h=$("#df-code-hint");if(h)h.innerHTML=c.length===10?'<span class="saved">&#10003; Code found: '+fmtCode(c)+'</span>':(ev.target.value.trim()?'<span class="unpub">No 10-character code found yet</span>':'');return}if(ev.target.id==="srch"){search=ev.target.value;clearTimeout(window.__st);window.__st=setTimeout(function(){var pos=ev.target.selectionStart;renderShop();var s=$("#srch");s.focus();try{s.setSelectionRange(pos,pos)}catch(e){}},250)}});
 /* ================= device ================= */
 function device(){var pc=window.matchMedia("(pointer:fine)").matches&&window.innerWidth>=900;document.body.classList.toggle("pc",pc)}
 window.addEventListener("resize",device);
