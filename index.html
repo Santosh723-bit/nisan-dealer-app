@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="theme-color" content="#1F3864">
-<title>PARTNER MASTER</title>
+<title>NPRO Partner</title>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" href="icon-192.png">
@@ -1388,7 +1388,7 @@ function openSettings(){var s=DATA.settings;var h='<h2>Settings</h2>';SET_F.forE
  h+='<label>Terms &amp; Conditions (one per line; first two are highlighted)</label><textarea id="ss-terms" style="min-height:180px">'+esc(s.terms.join("\n"))+'</textarea><div class="sendgrid"><button class="b-main" data-a="ss-save">Save settings</button><button class="b-red" data-a="ov-close">Cancel</button></div>';overlay(h);sGet("gh_token").then(function(t){var e=$("#gh-state");if(e)e.innerHTML=t?'<span class="saved">&#10003; Key saved on this device (ends ...'+esc(String(t).slice(-4))+')</span>':'<span class="unpub">No key yet &ndash; PUBLISH will save the file for manual upload</span>'})}
 function saveSettings(){var tk=$("#ss-ghtoken").value.trim();if(tk)sSet("gh_token",tk);var s=DATA.settings;SET_F.forEach(function(f){var k=f[0],v=$("#ss-"+k).value.trim();if(k==="validMonths"||k==="gst")v=parseFloat(v)||0;s[k]=v});s.terms=$("#ss-terms").value.split("\n").map(function(x){return x.trim()}).filter(Boolean);s.transporters=$("#ss-trans").value.split("\n").map(function(x){return x.trim()}).filter(Boolean);saveDraft().then(function(){toast("Settings saved on this device")});closeOv();render()}
 function appHTML(mode,data,web){var root=document.documentElement.cloneNode(true);root.querySelector("#app").innerHTML="";root.querySelector("#ov").innerHTML="";root.querySelectorAll(".toast,a[download]").forEach(function(x){x.remove()});
- root.querySelector("#appdata").textContent=JSON.stringify({mode:mode,data:data,web:!!web}).replace(/</g,"\\u003c");var ml=root.querySelector('link[rel="manifest"]');if(ml)ml.setAttribute("href",mode==="master"&&web?"manifest-master.json":"manifest.json");var tt=root.querySelector("title");if(tt&&mode==="master"&&web)tt.textContent="PARTNER MASTER";return "<!DOCTYPE html>\n"+root.outerHTML}
+ root.querySelector("#appdata").textContent=JSON.stringify({mode:mode,data:data,web:!!web}).replace(/</g,"\\u003c");var ml=root.querySelector('link[rel="manifest"]');if(ml)ml.setAttribute("href",mode==="master"&&web?"manifest-master.json":"manifest.json");var mw=mode==="master"&&web,ai=root.querySelector('link[rel="apple-touch-icon"]'),fi=root.querySelector('link[rel="icon"]');if(ai)ai.setAttribute("href",mw?"apple-touch-icon-master.png":"apple-touch-icon.png");if(fi)fi.setAttribute("href",mw?"icon-master-192.png":"icon-192.png");var tt=root.querySelector("title");if(tt&&mode==="master"&&web)tt.textContent="PARTNER MASTER";return "<!DOCTYPE html>\n"+root.outerHTML}
 function publish(){var now=new Date(),ver=now.toISOString(),stamp=now.getFullYear()+("0"+(now.getMonth()+1)).slice(-2)+("0"+now.getDate()).slice(-2)+"_"+("0"+now.getHours()).slice(-2)+("0"+now.getMinutes()).slice(-2);
  DATA.version=ver;var dealerSettings=JSON.parse(JSON.stringify(DATA.settings,function(k,v){return k==="pwHash"||k==="adminEmail"||k==="dataKey"?undefined:v}));
  var ph={},prods=DATA.products.map(function(p){var c=Object.assign({},p);if(p.photo){var hsh=sha256(p.photo).slice(0,16);c.ph=hsh;ph[hsh]=p.photo}else c.ph="";delete c.photo;return c});
