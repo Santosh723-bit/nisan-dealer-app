@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="theme-color" content="#1F3864">
-<title>PARTNER MASTER</title>
+<title>NPRO Partner</title>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" href="icon-192.png">
@@ -1096,7 +1096,7 @@ function compactPan(p){return String(p.pan||"").replace(/\s*mm\s*$/i,"").replace
 var ICONQ={minus:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="10.5" width="16" height="3" rx="1.5" fill="currentColor"/></svg>',plus:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="10.5" width="16" height="3" rx="1.5" fill="currentColor"/><rect x="10.5" y="4" width="3" height="16" rx="1.5" fill="currentColor"/></svg>'};
 function card(p){var c=cart[p.id],inC=c&&c.q>0,q=inC?c.q:0;var st=c?c.st!==false:(draftSt[p.id]!=null?draftSt[p.id]:true);var rg=region(),hasStamp=rg===1&&+p.stamp>0;
  var capFull=p.cap?String(p.cap)+(p.e?" \u00d7 "+p.e:""):"",panFull=p.pan?String(p.pan).replace(/\s*[xX]\s*/g," \u00d7 "):"";
- var spec='<div class="pcodebox"><span>CODE</span><b>'+esc(p.model)+'</b></div><div class="plines">'+[["Max",capFull],["Size",panFull],["Pan",p.panMat||""]].filter(function(x){return x[1]}).map(function(x){return '<div><span>'+x[0]+':</span> <b>'+esc(x[1])+'</b></div>'}).join("")+'</div>';
+ var spec='<div class="pcodebox"><span>CODE</span><b>'+esc(icode(p))+'</b></div><div class="plines">'+[["Max",capFull],["Size",panFull],["Pan",p.panMat||""]].filter(function(x){return x[1]}).map(function(x){return '<div><span>'+x[0]+':</span> <b>'+esc(x[1])+'</b></div>'}).join("")+'</div>';
  return '<article class="card'+(inC?" incart":"")+'" id="c-'+p.id+'">'+
  '<div class="pspec2">'+spec+'</div>'+
  '<div class="pimg"><div class="ph">'+pic(p)+'</div></div>'+
@@ -1118,7 +1118,7 @@ function priceBox(p,q,st){var qq=Math.max(1,q),u=unit(p,qq,st),rg=region(),s=DAT
 /* ---------- search panel (bottom menu) ---------- */
 var sBrand="";
 function openSearch(){$("#ov").innerHTML='<div class="ov sfull"><div class="ssheet"><div class="shead">'+ICON.search+'<input id="s2" type="search" placeholder="Search model, capacity, pan size" value="'+esc(search)+'" autocomplete="off"><button class="sx" data-a="ov-close" aria-label="close">&times;</button></div><div class="sres" id="sres"></div></div></div>';renderSearchRes()}
-function sRow(p){var u=unit(p,1,true);return '<button class="srow" data-goto="'+p.id+'"><span class="sth">'+pic(p)+'</span><span class="stx"><b>'+esc(p.model)+'</b><i>'+esc(compactCap(p))+(p.pan?' &middot; '+esc(compactPan(p))+' mm':'')+'</i></span><span class="spr">'+(u?'&#8377;'+inr(u.total):'')+'</span></button>'}
+function sRow(p){var u=unit(p,1,true);return '<button class="srow" data-goto="'+p.id+'"><span class="sth">'+pic(p)+'</span><span class="stx"><b>'+esc(icode(p))+'</b><i>'+esc(compactCap(p))+(p.pan?' &middot; '+esc(compactPan(p))+' mm':'')+'</i></span><span class="spr">'+(u?'&#8377;'+inr(u.total):'')+'</span></button>'}
 function renderSearchRes(){var box=$("#sres");if(!box)return;var q=(search||"").trim().toLowerCase(),h='';
  if(q){var L=DATA.products.filter(function(p){return (p.model+" "+p.code+" "+p.cap+" "+p.e+" "+p.group+" "+p.pan+" "+(p.material||"")).toLowerCase().indexOf(q)>=0});
   h=L.length?'<div class="shint">'+L.length+' match'+(L.length>1?"es":"")+'</div>'+L.map(sRow).join(""):'<div class="shint">No product matches "'+esc(search)+'"</div>'}
@@ -1157,17 +1157,17 @@ function renderProfile(after){var h='<h2>My Details</h2><div class="bar muted">F
 /* ================= PO ================= */
 function nextPONo(){var d=new Date(),ds=String(d.getFullYear()).slice(2)+("0"+(d.getMonth()+1)).slice(-2)+("0"+d.getDate()).slice(-2);var base="PO-"+ds+"-"+digits(prof.mobile).slice(-4);var n=hist.filter(function(h){return h.po.no.indexOf(base)===0}).length+1;return base+"-"+("0"+n).slice(-2)}
 function buildPO(prev){var L=cartLines(),t=totals(L);return {no:prev?prev.no:(prof.poref?String(prof.poref):nextPONo()),date:prev?prev.date:fmtDate(new Date()),ts:prev?prev.ts:Date.now(),prof:JSON.parse(JSON.stringify(prof)),region:region(),settings:JSON.parse(JSON.stringify(DATA.settings,function(k,v){return k==="pwHash"||k==="dataKey"||k==="accessCode"?undefined:v})),plVer:DATA.version,validTill:fmtDate(validTill()),note2:note2(),
- lines:L.map(function(x){return {pid:x.p.id,model:x.p.model,code:x.p.code,cap:x.p.cap,pan:x.p.pan,q:x.c.q,st:x.c.st!==false,rate:x.l.u.rate,stamp:x.l.u.stamp,taxable:x.l.taxable,gst:x.l.gst,amount:x.l.amount,slab:x.l.u.slab}}),t:t,pay:prev?prev.pay:{mode:"",ref:"",amount:"",date:"",img:""},status:prev?prev.status:"open"}}
+ lines:L.map(function(x){return {pid:x.p.id,mc:1,model:mdesc(x.p),code:icode(x.p),cap:x.p.cap,pan:x.p.pan,q:x.c.q,st:x.c.st!==false,rate:x.l.u.rate,stamp:x.l.u.stamp,taxable:x.l.taxable,gst:x.l.gst,amount:x.l.amount,slab:x.l.u.slab}}),t:t,pay:prev?prev.pay:{mode:"",ref:"",amount:"",date:"",img:""},status:prev?prev.status:"open"}}
 function payStatus(po){return po.pay&&(po.pay.img||po.pay.ref)}
 function poHTML(po){var s=po.settings,p=po.prof,t=po.t,rg=po.region,pay=po.pay||{};var ship=p.ship?p.ship+(p.shippin?" - "+p.shippin:""):p.bill+(p.billpin?" - "+p.billpin:"");
- var rows=po.lines.map(function(l,i){return '<tr><td class="c">'+(i+1)+'</td><td>'+esc(l.model)+'</td><td>'+esc(l.code)+(l.cap?' | '+esc(l.cap):'')+(l.slab?' <i>(slab rate)</i>':'')+'</td><td class="c">'+l.q+'</td><td class="r">'+inr(l.rate,1)+'</td><td class="r">'+(l.stamp?inr(l.stamp,1):"-")+'</td><td class="r">'+inr(l.taxable,1)+'</td><td class="r">'+inr(l.gst,1)+'</td><td class="r">'+inr(l.amount,1)+'</td></tr>'}).join("");
+ var rows=po.lines.map(function(l,i){return '<tr><td class="c">'+(i+1)+'</td><td><b>'+esc(lIc(l))+'</b></td><td>'+esc(lMd(l))+(l.cap?' | '+esc(l.cap):'')+(l.slab?' <i>(slab rate)</i>':'')+'</td><td class="c">'+l.q+'</td><td class="r">'+inr(l.rate,1)+'</td><td class="r">'+(l.stamp?inr(l.stamp,1):"-")+'</td><td class="r">'+inr(l.taxable,1)+'</td><td class="r">'+inr(l.gst,1)+'</td><td class="r">'+inr(l.amount,1)+'</td></tr>'}).join("");
  var tr=function(a,b,cls){return '<tr class="'+(cls||"")+'"><td colspan="8" class="r">'+a+'</td><td class="r">'+b+'</td></tr>'};
  return '<div class="po" id="po-doc"><div class="t">PURCHASE ORDER</div>'+
  '<div class="two"><div><div class="hd">PURCHASE ORDER TO</div><div class="box"><b>'+esc(s.supplier)+'</b><br>'+esc(s.address)+'<br>GSTIN: '+esc(s.gstin)+' &nbsp; Email: '+esc(s.email)+'<br><b>Dispatch: '+esc(s.dispatch)+'</b> &nbsp; <b>Service Support: '+esc(s.service)+'</b></div></div>'+
  '<div><div class="hd">PO DETAILS</div><div class="box">PO No: <b>'+esc(po.no)+'</b><br>PO Date: '+po.date+'<br>Place of supply: '+esc(p.state)+'<br>Tax: '+(rg===1?"CGST 9% + SGST 9%":"IGST 18%")+' &nbsp; Transport: '+esc(p.transport)+(po.transporter?'<br>Transporter: <b>'+esc(po.transporter)+'</b>':'')+'<br>Price list: '+esc(s.priceRef)+' ('+fmtDT(po.plVer)+', valid till '+po.validTill+')</div></div></div>'+
  '<div class="two"><div><div class="hd">FROM (DEALER / BILL TO)</div><div class="box"><b>'+esc(p.company)+'</b><br>'+esc(p.bill)+(p.billpin?" - "+esc(p.billpin):"")+'<br>Contact: '+esc(p.contact)+' &nbsp; Mob: '+esc(p.mobile)+(p.email?' &nbsp; '+esc(p.email):'')+'<br>GSTIN: '+esc(p.gstin)+' &nbsp; LM Licence: '+esc(p.lmlic)+'</div></div>'+
  '<div><div class="hd">SHIP TO</div><div class="box"><b>'+esc(p.company)+'</b><br>'+esc(ship)+'<br>State: '+esc(p.state)+'</div></div></div>'+
- '<div style="overflow-x:auto"><table><tr><th>Sr</th><th>Model</th><th>Item Code | Capacity</th><th>Qty</th><th>Rate</th><th>Stamping /unit</th><th>Taxable</th><th>GST 18%</th><th>Amount</th></tr>'+rows+
+ '<div style="overflow-x:auto"><table><tr><th>Sr</th><th>Item Code</th><th>Model | Capacity</th><th>Qty</th><th>Rate</th><th>Stamping /unit</th><th>Taxable</th><th>GST 18%</th><th>Amount</th></tr>'+rows+
  '<tr><td colspan="3" class="r"><b>Total Qty</b></td><td class="c"><b>'+t.qty+'</b></td><td colspan="5"></td></tr>'+
  tr("Basic value",inr(t.basic,1))+tr("Legal Metrology stamping",inr(t.stamp,1))+tr("<b>Taxable value</b>","<b>"+inr(t.taxable,1)+"</b>")+
  (rg===1?tr("CGST @ 9%",inr(t.cgst,1))+tr("SGST @ 9%",inr(t.sgst,1)):tr("IGST @ 18%",inr(t.igst,1)))+tr("Round off",inr(t.round,1))+tr("GRAND TOTAL &#8377;",inr(t.grand,1),"gt")+'</table></div>'+
@@ -1195,7 +1195,7 @@ function renderPO(){var rec=curIdx>=0?hist[curIdx]:null;
   if(pend!=null){hist[pend].po=po;curIdx=pend}else{hist.unshift({po:po});curIdx=0}hist=hist.slice(0,100);saveHist();rec=hist[curIdx]}
  curPO=rec.po;var editable=curPO.cartKey==="current";var h='<h2>'+(editable?"Review &amp; Purchase Order":"Order "+esc(curPO.no))+'</h2>';
  if(editable){var L2=cartLines();h+='<div class="bar"><b>Your cart</b> <span class="muted">(change qty or remove)</span><table class="cartedit">';
-  L2.forEach(function(x){h+='<tr><td><b>'+esc(x.p.model)+'</b><br><span class="muted">'+esc(x.p.code)+'</span></td><td><input type="number" inputmode="numeric" min="0" data-cq="'+x.p.id+'" value="'+x.c.q+'"></td><td style="text-align:right">&#8377; '+inr(x.l.amount)+'</td><td><button class="b-red" data-rm="'+x.p.id+'">&times;</button></td></tr>'});
+  L2.forEach(function(x){h+='<tr><td><b>'+esc(icode(x.p))+'</b><br><span class="muted">'+esc(mdesc(x.p))+'</span></td><td><input type="number" inputmode="numeric" min="0" data-cq="'+x.p.id+'" value="'+x.c.q+'"></td><td style="text-align:right">&#8377; '+inr(x.l.amount)+'</td><td><button class="b-red" data-rm="'+x.p.id+'">&times;</button></td></tr>'});
   h+='</table><div style="text-align:right;font-weight:800;color:var(--navy);margin-top:8px;font-size:17px">GRAND TOTAL &#8377; '+inr(curPO.t.grand)+'</div></div>'}
  h+=transHTML(curPO)+payHTML(curPO);
  h+='<div class="sendgrid"><button class="pdf" data-a="pdf-share">1. Share / Save PDF</button><button class="wa" data-a="send-wa">2. WhatsApp to Dispatch ('+esc(curPO.settings.dispatch)+')</button><button class="ml" data-a="send-mail">3. Email to '+esc(curPO.settings.email)+'</button>'+(editable?'<button class="b-sec" data-a="go-shop">&lsaquo; Add more items</button>':'<button class="b-sec" data-a="go-hist">&lsaquo; Back to orders</button>')+'</div>';
@@ -1215,11 +1215,11 @@ function makePDF(po){var J=window.jspdf&&window.jspdf.jsPDF;if(!J){toast("PDF en
   "PO DETAILS",["PO No: "+po.no,"PO Date: "+po.date,"Place of supply: "+p.state,"Tax: "+(rg===1?"CGST 9% + SGST 9%":"IGST 18%")+"   Transport: "+p.transport].concat(po.transporter?["Transporter: "+po.transporter]:[]).concat(["Price list: "+s.priceRef+" ("+fmtDT(po.plVer)+", valid till "+po.validTill+")"]));
  var ship=p.ship?p.ship+(p.shippin?" - "+p.shippin:""):p.bill+(p.billpin?" - "+p.billpin:"");
  boxes("FROM (DEALER / BILL TO)",[p.company,p.bill+(p.billpin?" - "+p.billpin:""),"Contact: "+p.contact+"   Mob: "+p.mobile+(p.email?"   "+p.email:""),"GSTIN: "+p.gstin+"   LM Licence: "+p.lmlic],"SHIP TO",[p.company,ship,"State: "+p.state]);
- var body=po.lines.map(function(l,i){return [i+1,l.model,l.code+(l.cap?" | "+l.cap:"")+(l.slab?" (slab rate)":""),l.q,rs(l.rate),l.stamp?rs(l.stamp):"-",rs(l.taxable),rs(l.gst),rs(l.amount)]});
+ var body=po.lines.map(function(l,i){return [i+1,lIc(l),lMd(l)+(l.cap?" | "+l.cap:"")+(l.slab?" (slab rate)":""),l.q,rs(l.rate),l.stamp?rs(l.stamp):"-",rs(l.taxable),rs(l.gst),rs(l.amount)]});
  var foot=[["","","Total Qty",t.qty,"","","","",""]];
  var tl=[["Basic value",rs(t.basic)],["Legal Metrology stamping",rs(t.stamp)],["Taxable value",rs(t.taxable)]].concat(rg===1?[["CGST @ 9%",rs(t.cgst)],["SGST @ 9%",rs(t.sgst)]]:[["IGST @ 18%",rs(t.igst)]]).concat([["Round off",rs(t.round)],["GRAND TOTAL Rs.",rs(t.grand)]]);
  tl.forEach(function(x){foot.push([{content:x[0],colSpan:8,styles:{halign:"right"}},x[1]])});
- doc.autoTable({startY:y,margin:{left:M,right:M},head:[["Sr","Model","Item Code | Capacity","Qty","Rate","Stamp","Taxable","GST 18%","Amount"]],body:body,foot:foot,showFoot:"lastPage",theme:"grid",
+ doc.autoTable({startY:y,margin:{left:M,right:M},head:[["Sr","Item Code","Model | Capacity","Qty","Rate","Stamp","Taxable","GST 18%","Amount"]],body:body,foot:foot,showFoot:"lastPage",theme:"grid",
   styles:{font:"helvetica",fontSize:8,cellPadding:1.3,lineColor:[170,170,170],lineWidth:.1,textColor:0},headStyles:{fillColor:[31,56,100],textColor:255,halign:"center",fontSize:8},footStyles:{fillColor:[255,255,255],textColor:0,fontStyle:"normal"},
   columnStyles:{0:{halign:"center",cellWidth:8},1:{cellWidth:14},2:{cellWidth:"auto"},3:{halign:"center",cellWidth:10},4:{halign:"right",cellWidth:18},5:{halign:"right",cellWidth:15},6:{halign:"right",cellWidth:21},7:{halign:"right",cellWidth:18},8:{halign:"right",cellWidth:22}},
   didParseCell:function(d){if(d.section==="foot"){var txt=String(d.row.raw[0]&&d.row.raw[0].content||"");if(txt.indexOf("GRAND")===0){d.cell.styles.fillColor=[221,235,247];d.cell.styles.fontStyle="bold";d.cell.styles.fontSize=10}if(txt==="Taxable value")d.cell.styles.fontStyle="bold";if(d.row.index===0)d.cell.styles.fontStyle="bold"}}});
@@ -1245,7 +1245,7 @@ function sharePDF(po){var doc=makePDF(po);if(!doc)return;var blob=doc.output("bl
  download(blob,name);toast("PDF saved to Downloads: "+name)}
 function download(blob,name){var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},4000)}
 function poText(po){var p=po.prof,t=po.t,rg=po.region,pay=po.pay||{},L=[];L.push("*PURCHASE ORDER* "+po.no);L.push("Date: "+po.date);L.push("To: "+po.settings.supplier);L.push("From: "+p.company+" ("+p.contact+", "+p.mobile+")");L.push("GSTIN: "+p.gstin+" | LM Lic: "+p.lmlic);L.push("Ship to: "+(p.ship||p.bill)+" - "+(p.shippin||p.billpin)+", "+p.state);L.push("Transport: "+p.transport+(po.transporter?" | Transporter: "+po.transporter:""));L.push("");
- po.lines.forEach(function(l,i){L.push((i+1)+". "+l.model+" "+l.code+(l.cap?" ("+l.cap+")":"")+" x "+l.q+" @ Rs."+rs(l.rate)+(l.stamp?" + stamping "+rs(l.stamp):"")+" = Rs."+rs(l.amount))});
+ po.lines.forEach(function(l,i){L.push((i+1)+". "+lIc(l)+" "+lMd(l)+(l.cap?" ("+l.cap+")":"")+" x "+l.q+" @ Rs."+rs(l.rate)+(l.stamp?" + stamping "+rs(l.stamp):"")+" = Rs."+rs(l.amount))});
  L.push("");L.push("Taxable: Rs."+rs(t.taxable));L.push(rg===1?"CGST: Rs."+rs(t.cgst)+" | SGST: Rs."+rs(t.sgst):"IGST: Rs."+rs(t.igst));L.push("*GRAND TOTAL: Rs."+inr(t.grand)+"*");L.push(words(t.grand));L.push("");
  L.push(payStatus(po)?"*Payment:* "+(pay.mode||"")+" | Ref/UTR: "+(pay.ref||"-")+" | Rs."+rs(pay.amount||0)+" | "+pd(pay.date)+(pay.img?" (screenshot in PDF page 2)":""):"Payment: not attached yet");
  L.push("");L.push("PO PDF attached / follows.");return L.join("\n")}
@@ -1260,7 +1260,7 @@ function renderHist(){var h=installCard()+'<h2>My Orders</h2><div class="bar mut
 function renderHelp(){var s=DATA.settings;$("#main").innerHTML='<h2>How to use</h2><div class="bar help"><b>1.</b> Tap <b>My Details</b> once and fill your company, GSTIN, licence, address and State. They stay saved.<br><b>2.</b> Scroll the products, set <b>Qty</b>, tap <b>Add to cart</b>. Within '+esc(s.homeState)+' you can untick <b>Stamping</b> if not needed.<br><b>3.</b> Tap <b>Checkout</b>: your Purchase Order with Grand Total appears.<br><b>4.</b> Attach your <b>payment screenshot</b> from the gallery and the UTR number.<br><b>5.</b> <b>Share / Save PDF</b>, then <b>WhatsApp to Dispatch</b> (attach the PDF) and <b>Email</b>.<br><br>Prices update automatically when you have internet. Current price list: <b>'+esc(s.priceRef)+'</b>, '+fmtDT(DATA.version)+'. '+esc(note2())+'.<br><br>Faulty unit received? Call <b>Service Support '+esc(s.service)+'</b>.<br>Dispatch: <b>'+esc(s.dispatch)+'</b> &middot; Email: '+esc(s.email)+'</div>'}
 /* ================= auto-update (dealer) ================= */
 /* ================= dealer authorization + sync (v4) ================= */
-var APP_BUILD=68, DEVCODE="", syncing=null, updAsked=false;
+var APP_BUILD=69, DEVCODE="", syncing=null, updAsked=false;
 var CODE_ABC="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 function normCode(c){return String(c||"").toUpperCase().replace(/[^A-Z0-9]/g,"")}
 function fmtCode(c){c=normCode(c);return c.slice(0,5)+"-"+c.slice(5)}
@@ -1362,12 +1362,12 @@ function checkPw(){var o=$("#pw-old").value;if(pwh(o)!==DATA.settings.pwHash){to
   setTimeout(function(){location.href=url},300);toast("Password changed and saved. Mail opening - tap Send.")}return true}
 function renderAdmList(){var h='<h2>Products ('+DATA.products.length+')</h2><div class="bar" id="savestate">'+saveStateHTML()+'</div><div class="bar muted">Every change is saved on this device immediately. Press <b>PUBLISH</b> when you want dealers to receive it.</div>';var last=null;
  DATA.products.forEach(function(p,i){if(p.group!==last){h+='<div class="ghead">'+esc(p.group)+'</div>';last=p.group}
-  h+='<div class="adminrow"><div class="ph">'+pic(p)+'</div><div class="x"><b>'+esc(p.model)+'</b> &middot; '+esc(p.code)+'<br><span class="muted">MH &#8377;'+inr(p.pMH,1)+' &middot; Out &#8377;'+inr(p.pOut,1)+' &middot; Stamp '+(+p.stamp||0)+'</span></div><button class="b-sec" data-up="'+i+'">&uarr;</button><button class="b-sec" data-dn="'+i+'">&darr;</button><button class="b-main" data-ed="'+i+'">Edit</button><button class="b-red" data-del="'+i+'">Del</button></div>'});
+  h+='<div class="adminrow"><div class="ph">'+pic(p)+'</div><div class="x"><b>'+esc(icode(p))+'</b> &middot; '+esc(mdesc(p))+'<br><span class="muted">MH &#8377;'+inr(p.pMH,1)+' &middot; Out &#8377;'+inr(p.pOut,1)+' &middot; Stamp '+(+p.stamp||0)+'</span></div><button class="b-sec" data-up="'+i+'">&uarr;</button><button class="b-sec" data-dn="'+i+'">&darr;</button><button class="b-main" data-ed="'+i+'">Edit</button><button class="b-red" data-del="'+i+'">Del</button></div>'});
  $("#main").innerHTML=h}
-var PF=[["brand","Brand / line (e.g. ECO, NPRO)",1],["group","Group heading",1,"group"],["model","Model No",1],["code","Item Code / Description",1],["cap","Max Capacity (e.g. 30 kg)",0],["min","Min",0],["e","e (division)",0],["pan","Pan size (e.g. 290 x 290 mm)",0],["material","Material / body (e.g. ABS body, Mild steel)",0],["panMat","Pan material (e.g. SS202, Chequered plate)",0],["pMH","Basic price within Maharashtra (Rs.)",1,"num"],["pOut","Basic price outside Maharashtra (Rs.)",1,"num"],["stamp","Stamping fee per unit (Rs., 0 = none)",0,"num"],["slabQty","Slab qty (0 = none, e.g. 5)",0,"num"],["slabMH","Slab price within MH (Rs.)",0,"num"],["slabOut","Slab price outside MH (Rs.)",0,"num"]];
+var PF=[["brand","Brand / line (e.g. ECO, NPRO)",1],["group","Group heading",1,"group"],["code","Item Code (shown as CODE, e.g. E101)",1],["model","Model No / Description",1],["cap","Max Capacity (e.g. 30 kg)",0],["min","Min",0],["e","e (division)",0],["pan","Pan size (e.g. 290 x 290 mm)",0],["material","Material / body (e.g. ABS body, Mild steel)",0],["panMat","Pan material (e.g. SS202, Chequered plate)",0],["pMH","Basic price within Maharashtra (Rs.)",1,"num"],["pOut","Basic price outside Maharashtra (Rs.)",1,"num"],["stamp","Stamping fee per unit (Rs., 0 = none)",0,"num"],["slabQty","Slab qty (0 = none, e.g. 5)",0,"num"],["slabMH","Slab price within MH (Rs.)",0,"num"],["slabOut","Slab price outside MH (Rs.)",0,"num"]];
 var editing=null,editPhoto="";
 function openProdForm(i){editing=i;var p=i==null?{brand:"",group:"",stamp:0,slabQty:0}:DATA.products[i];editPhoto=p.photo||"";var G=[];DATA.products.forEach(function(x){if(G.indexOf(x.group)<0)G.push(x.group)});
- var h='<h2>'+(i==null?"NEW product":"Edit "+esc(p.model))+'</h2><div style="display:flex;gap:10px;align-items:center"><div class="ph" id="pf-ph">'+pic(p)+'</div><div style="flex:1"><label>Product photo</label><input type="file" accept="image/*" id="pf-file"><button class="b-red" style="margin-top:6px;padding:6px 10px" data-a="pf-nophoto">Remove photo</button></div></div>';
+ var h='<h2>'+(i==null?"NEW product":"Edit "+esc(icode(p)))+'</h2><div style="display:flex;gap:10px;align-items:center"><div class="ph" id="pf-ph">'+pic(p)+'</div><div style="flex:1"><label>Product photo</label><input type="file" accept="image/*" id="pf-file"><button class="b-red" style="margin-top:6px;padding:6px 10px" data-a="pf-nophoto">Remove photo</button></div></div>';
  PF.forEach(function(f){var v=p[f[0]]==null?"":p[f[0]];h+='<label class="'+(f[2]?"req":"")+'">'+f[1]+'</label><input id="pf-'+f[0]+'" value="'+esc(v)+'"'+(f[3]==="num"?' inputmode="decimal"':'')+(f[3]==="group"?' list="pf-groups"':'')+'>'});
  h+='<datalist id="pf-groups">'+G.map(function(g){return '<option value="'+esc(g)+'">'}).join("")+'</datalist>';
  if(i==null)h+='<label>Insert position</label><select id="pf-pos"><option value="end">At the end of its group (recommended)</option><option value="last">At the very end</option></select>';
@@ -1376,7 +1376,7 @@ function saveProd(){var p=editing==null?{id:"p"+Date.now().toString(36)}:DATA.pr
  PF.forEach(function(f){var v=$("#pf-"+f[0]).value.trim();if(f[3]==="num"){v=v===""?0:parseFloat(v);if(isNaN(v)){bad.push(f[1]);v=0}}if(f[2]&&(v===""||(f[3]==="num"&&!(v>0))))bad.push(f[1]);tmp[f[0]]=v});
  if(bad.length){toast("Please fill: "+bad[0]);return}
  if(+tmp.slabQty>0&&!(+tmp.slabMH>0&&+tmp.slabOut>0)){toast("Enter both slab prices or set slab qty 0");return}
- var dup=DATA.products.some(function(x){return x!==p&&String(x.model).toLowerCase()===String(tmp.model).toLowerCase()});if(dup&&!confirm("Model "+tmp.model+" already exists. Save anyway?"))return;
+ tmp.mc=1;var dup=DATA.products.some(function(x){return x!==p&&String(icode(x)).toLowerCase()===String(tmp.code).toLowerCase()});if(dup&&!confirm("Item code "+tmp.code+" already exists. Save anyway?"))return;
  Object.assign(p,tmp);p.photo=editPhoto;
  if(editing==null){var pos=$("#pf-pos").value,idx=-1;if(pos==="end")DATA.products.forEach(function(x,i){if(x.group===p.group)idx=i});if(idx>=0)DATA.products.splice(idx+1,0,p);else DATA.products.push(p)}
  saveDraft().then(function(){toast("Saved on this device. PUBLISH when ready.")});closeOv();view="adm-list";render()}
@@ -1446,7 +1446,7 @@ function restoreMasterFile(file){var fr=new FileReader();fr.onload=function(){va
   if(!d||(!d.dealers&&!(d.products&&d.products.length))){toast("No Master data found in that file");return}
   var n=mergeDealers(d.dealers),msg=n+" dealer(s) added from the file.";
   if(d.products&&d.products.length&&confirm(msg+"\n\nAlso replace products, prices and settings with the ones in this backup ("+fmtDT(d.version)+")?\n(Press Cancel to keep the current products and prices.)")){var keep=dealers();var ph={};DATA.products.forEach(function(p){if(p.photo)ph[p.id]=p.photo});DATA.products=d.products.map(function(p){if(!p.photo&&ph[p.id])p.photo=ph[p.id];return p});var tok=DATA.settings;DATA.settings=Object.assign({},d.settings);DATA.dealers=keep;if(d.version>DATA.version)DATA.version=d.version}
-  if(!DATA.products.length&&d.products&&d.products.length){DATA.products=d.products;DATA.settings=Object.assign({},DATA.settings,d.settings);if(d.version)DATA.version=d.version}saveDraft();toast(msg);closeOv();view=ADMIN?"adm-dealers":"shop";render()};fr.readAsText(file)}
+  if(!DATA.products.length&&d.products&&d.products.length){DATA.products=d.products;DATA.settings=Object.assign({},DATA.settings,d.settings);if(d.version)DATA.version=d.version}migrateMC();saveDraft();toast(msg);closeOv();view=ADMIN?"adm-dealers":"shop";render()};fr.readAsText(file)}
 function allCodes(raw){var u=String(raw||"").toUpperCase(),out=[],m,re=/\b([A-HJ-NP-Z2-9]{5})[-\s]?([A-HJ-NP-Z2-9]{5})\b/g;while((m=re.exec(u)))if(out.indexOf(m[1]+m[2])<0)out.push(m[1]+m[2]);return out}
 function recoverFromCodes(){var ta=$("#bk-text"),msg=$("#bk-msg"),codes=allCodes(ta.value);if(!codes.length){msg.innerHTML='<b style="color:#C00000">No device code found. Paste the dealers&#39; WhatsApp messages (code looks like ABCDE-23456).</b>';return}
  var u=DATA.settings.updateUrl;msg.innerHTML="Checking "+codes.length+" code(s) on GitHub...";
@@ -1454,7 +1454,7 @@ function recoverFromCodes(){var ta=$("#bk-text"),msg=$("#bk-msg"),codes=allCodes
   var prodBack=0;if(!DATA.products.length){codes.some(function(c){var e=j.keys&&j.keys[idOf(c)];if(!e)return false;try{var d=deobf(j.d,unwrapKey(e.k,c));if(!d||!d.products)return false;var ph=j.ph||{};DATA.products=d.products.map(function(p){p.photo=p.ph?(ph[p.ph]||""):"";delete p.ph;return p});var keep={pwHash:DATA.settings.pwHash,adminEmail:DATA.settings.adminEmail,ghRepo:DATA.settings.ghRepo,updateUrl:DATA.settings.updateUrl};DATA.settings=Object.assign({},DATA.settings,d.settings,keep);DATA.version=j.v;prodBack=DATA.products.length;return true}catch(x){return false}})}
   codes.forEach(function(c){if(D.some(function(x){return normCode(x.code)===c})){have.push(fmtCode(c));return}var e=j.keys&&j.keys[idOf(c)];if(!e){miss.push(fmtCode(c));return}var p={};try{p=deobf(e.p,"NISAN-prof|"+c)||{}}catch(x){}
    var d={id:"d"+Date.now().toString(36)+got.length,added:new Date().toISOString(),recovered:new Date().toISOString(),code:c,active:true,transport:"",state:""};DPF.forEach(function(k){if(p[k])d[k]=p[k]});if(!d.company)d.company="Dealer "+fmtCode(c);D.push(d);got.push(d.company)});
-  if(got.length||prodBack)saveDraft();
+  if(prodBack)migrateMC();if(got.length||prodBack)saveDraft();
   if(prodBack&&view==="setup"){view="shop";render();toast(prodBack+" products and "+got.length+" dealer(s) restored");return}
   msg.innerHTML=(prodBack?'<span class="saved">&#10003; Products, prices and settings restored ('+prodBack+' products)</span><br>':'')+(got.length?'<span class="saved">&#10003; Recovered '+got.length+': '+got.map(esc).join(", ")+'</span><br>':'')+(have.length?'Already listed: '+have.join(", ")+'<br>':'')+(miss.length?'<b style="color:#C00000">Not on GitHub (never published or blocked): '+miss.join(", ")+'</b> &ndash; add these with + NEW dealer.':'');
   if(got.length)setTimeout(function(){if(view==="adm-dealers")renderAdmDealers()},50)}).catch(function(e){msg.innerHTML='<b style="color:#C00000">Could not reach GitHub ('+esc(e.message)+'). Check internet and try again.</b>'})}
@@ -1465,6 +1465,10 @@ function openRecover(){Promise.all([loadSnaps(),cloudBox()]).then(function(rr){v
  h+='<div class="bar"><b>4. Recover from dealers&#39; WhatsApp codes</b><div class="muted">Open WhatsApp on the Dispatch number, copy the registration messages your dealers sent (one or many) and paste them here. Each published dealer&#39;s details are read back from GitHub using his code.</div><textarea id="bk-text" style="min-height:110px;margin-top:8px" placeholder="Paste WhatsApp messages with device codes"></textarea><button class="wa" style="width:100%;margin-top:8px" data-a="bk-codes">Recover dealers from codes</button><div id="bk-msg" class="muted" style="margin-top:8px"></div></div>';
  h+='<button class="b-sec" style="width:100%" data-a="ov-close">Close</button>';overlay(h)})}
 
+/* item code vs model (build 69): p.mc=1 means code=item code (E101), model=model description */
+function icode(p){return p.mc?p.code:p.model}function mdesc(p){return p.mc?p.model:p.code}
+function lIc(l){return l.mc?l.code:l.model}function lMd(l){return l.mc?l.model:l.code}
+function migrateMC(){var n=0;(DATA.products||[]).forEach(function(p){if(!p.mc){var t=p.model;p.model=p.code;p.code=t;p.mc=1;n++}});return n}
 /* ================= cloud backup + online Master (build 68) ================= */
 var CLOUD_PATH="backup/master.json",cloudT=null;
 function masterShell(){var S=DATA.settings,o={};["supplier","address","email","dispatch","service","priceRef","homeState","gst","effDate","validMonths","updateUrl","regWa","ghRepo","adminEmail"].forEach(function(k){if(S[k]!=null)o[k]=S[k]});o.pwHash=pwh("1234");o.terms=[];o.transporters=[];return {version:"2000-01-01T00:00:00.000Z",settings:o,products:[],dealers:[]}}
@@ -1502,7 +1506,7 @@ function cloudRestore(rkIn,msgEl){var say=function(t){if(msgEl)msgEl.innerHTML=t
   return cloudFetch().then(function(f){if(!f||f.app!=="NISAN-cloud"){say('<b style="color:#C00000">No cloud backup found yet.</b> Use the dealers&#39; WhatsApp codes instead.');return}
    return cloudDecrypt(f,rk).then(function(j){var d=j.data;if(!confirm("Restore cloud backup of "+fmtDT(j.at)+"?\n\n"+(d.products||[]).length+" products, "+(d.dealers||[]).length+" dealers.\n\nThis replaces the Master data on this phone."))return;
     DATA=d;meta={dirty:0,savedAt:new Date().toISOString(),cloudAt:j.at,cloudN:(d.dealers||[]).length,assetVer:meta.assetVer,fileBakDay:meta.fileBakDay};
-    return Promise.all([sSet("master_data",DATA),sSet("master_meta",meta),sSet("rk",rk)]).then(function(){closeOv();view=ADMIN?"adm-dealers":"shop";render();toast("Restored: "+DATA.products.length+" products, "+dealers().length+" dealers")})},
+    migrateMC();return Promise.all([sSet("master_data",DATA),sSet("master_meta",meta),sSet("rk",rk)]).then(function(){closeOv();view=ADMIN?"adm-dealers":"shop";render();toast("Restored: "+DATA.products.length+" products, "+dealers().length+" dealers")})},
     function(e){say('<b style="color:#C00000">'+esc(e.message==="wrong recovery key"?"Recovery key is wrong.":e.message)+'</b>')})})}).catch(function(e){say('<b style="color:#C00000">Could not reach GitHub ('+esc(e.message)+'). Check internet.</b>')})}
 function renderSetup(){var h='<header class="appbar"><div class="blogo"></div><div class="brand"><b>PARTNER MASTER</b><span>'+esc(DATA.settings.supplier||"NISAN ELECTRONICS")+'</span></div></header><main class="main" id="main" style="padding-bottom:30px">'+installCard()+
  '<h2>Welcome to PARTNER MASTER</h2><div class="bar muted">Your products, prices and dealers are not on this phone yet. Bring them back with one tap:</div>'+
@@ -1525,14 +1529,14 @@ document.addEventListener("click",function(ev){var el=ev.target.closest("[data-s
  if(el.dataset.f!=null){filt=el.dataset.f;renderShop();return}
  if(el.dataset.dq){var id=el.dataset.dq,inp=$('[data-q="'+id+'"]');setQty(id,(parseInt(inp.value)||0)+(+el.dataset.d));return}
  if(el.dataset.add){var id2=el.dataset.add,p=prodById(id2);if(!region()){toast("Please set your state in My Details first");return}var q=parseInt($('[data-q="'+id2+'"]').value)||0;var stEl=$('[data-st="'+id2+'"]');var st=stEl?stEl.checked:true;
-  if(q<=0){delete cart[id2];toast(p.model+" removed from cart")}else{cart[id2]={q:q,st:st};toast(p.model+" x "+q+" added")}delete draftQ[id2];delete draftSt[id2];saveCart();refreshCard(id2);renderCartBar();return}
+  if(q<=0){delete cart[id2];toast(icode(p)+" removed from cart")}else{cart[id2]={q:q,st:st};toast(icode(p)+" x "+q+" added")}delete draftQ[id2];delete draftSt[id2];saveCart();refreshCard(id2);renderCartBar();return}
  if(el.dataset.rm){delete cart[el.dataset.rm];saveCart();if(!cartLines().length){hist.splice(curIdx,1);saveHist();curIdx=-1;view="shop";render();return}renderPO();return}
  if(el.dataset.ho!=null){curIdx=+el.dataset.ho;var po0=hist[curIdx].po;if(po0.cartKey==="current"&&!cartLines().length){po0.cartKey="";saveHist()}view="po";render();return}
  if(el.dataset.hp!=null){sharePDF(hist[+el.dataset.hp].po);return}
- if(el.dataset.hr!=null){var po=hist[+el.dataset.hr].po;cart={};po.lines.forEach(function(l){var pp=prodById(l.pid);if(!pp)DATA.products.forEach(function(x){if(x.model===l.model)pp=x});if(pp)cart[pp.id]={q:l.q,st:l.st!==false}});saveCart();view="shop";filt="CART";render();toast("Items loaded at current prices");return}
+ if(el.dataset.hr!=null){var po=hist[+el.dataset.hr].po;cart={};po.lines.forEach(function(l){var pp=prodById(l.pid);if(!pp)DATA.products.forEach(function(x){if(icode(x)===lIc(l))pp=x});if(pp)cart[pp.id]={q:l.q,st:l.st!==false}});saveCart();view="shop";filt="CART";render();toast("Items loaded at current prices");return}
  if(el.dataset.up!=null||el.dataset.dn!=null){var i=+(el.dataset.up!=null?el.dataset.up:el.dataset.dn),j=el.dataset.up!=null?i-1:i+1,P=DATA.products;if(j<0||j>=P.length)return;if(P[i].group!==P[j].group){toast("To move to another group, use Edit and change the Group heading");return}var t=P[i];P[i]=P[j];P[j]=t;saveDraft();renderAdmList();return}
  if(el.dataset.ed!=null){openProdForm(+el.dataset.ed);return}
- if(el.dataset.del!=null){var k=+el.dataset.del;if(confirm("Delete "+DATA.products[k].model+"?")){DATA.products.splice(k,1);saveDraft();renderAdmList()}return}
+ if(el.dataset.del!=null){var k=+el.dataset.del;if(confirm("Delete "+icode(DATA.products[k])+"?")){DATA.products.splice(k,1);saveDraft();renderAdmList()}return}
  switch(a){
   case "go-shop":if(view==="shop"&&filt!=="ALL"){filt="ALL";renderShop();break}view="shop";render();break;
   case "go-search":openSearch();setTimeout(function(){var i=$("#s2");if(i&&!search)i.blur()},0);break;
@@ -1619,6 +1623,7 @@ function boot(){device();
    meta.assetVer=EMB.data.assetVer;saveDraft();if(nPh)setTimeout(function(){toast(nPh+" product photos added. PUBLISH to send them to dealers.")},900)}
   if(!r[1]){try{var old=JSON.parse(localStorage.getItem("nisan_dealer")||"null");if(old){prof=old;saveProf()}var oh=JSON.parse(localStorage.getItem("nisan_history")||"null");if(oh&&!hist.length){hist=oh.map(function(x){var po=x.po;po.pay=po.pay||{};po.cartKey="";return {po:po}});saveHist()}}catch(e){}}
   Object.keys(cart).forEach(function(k){if(!prodById(k))delete cart[k]});
+  if(MODE==="master"&&migrateMC())saveDraft();
   render();
   if(MODE==="master"){loadSnaps().then(function(){if(!dealers().length&&bestSnap()&&ADMIN&&view==="adm-dealers")renderAdmDealers()});ghCount().then(function(){if(ADMIN&&view==="adm-dealers")renderAdmDealers()})}
   if(MODE==="dealer")setTimeout(function(){if(view==="register")regCheck(true);else checkUpdate(false)},600)})}
