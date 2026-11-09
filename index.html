@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="theme-color" content="#1F3864">
-<title>PARTNER MASTER</title>
+<title>NPRO Partner</title>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" href="icon-192.png">
@@ -585,6 +585,10 @@ body.pc .pimg .ph{position:absolute;inset:0;width:auto;height:auto;flex:none;bor
 .adminrow,.adminrow .x{color:#111}
 .adminrow .x b{color:#111;font-size:15px}
 .ghead{color:#F5C21B!important}
+/* build 71: datasheet */
+.dsbtn{display:inline-block;margin-top:3px;padding:3px 9px;border:0;border-radius:10px;background:#F5C21B;color:#111;font-weight:700;font-size:11.5px;line-height:1.3;cursor:pointer}
+.dsbox{border:1px dashed #bbb;border-radius:10px;padding:10px;margin-bottom:10px;color:#111;font-size:14px}
+.dsbox #pf-dsinfo{margin-bottom:6px;font-weight:600}
 </style>
 </head>
 <body class="pc">
@@ -1060,7 +1064,8 @@ function saveDraft(){meta.dirty=(meta.dirty||0)+1;meta.savedAt=new Date().toISOS
 function saveStateHTML(){return '<span class="saved">&#10003; Saved on this device '+(meta.savedAt?fmtDT(meta.savedAt):"")+'</span> '+(meta.dirty?'<span class="unpub">'+meta.dirty+' change(s) not yet published</span>':'')}
 /* ================= pictures ================= */
 function pic(p){if(p.photo)return '<img class="bgb" alt="" src="'+p.photo+'"><img class="fg" alt="" src="'+p.photo+'">';var g=(p.group||"").toLowerCase(),col=p.brand==="ECO"?"#2E75B6":"#1F3864",s;
- if(g.indexOf("crane")>=0)s='<rect x="44" y="6" width="12" height="16" rx="3" fill="#888"/><rect x="22" y="22" width="56" height="44" rx="8" fill="'+col+'"/><rect x="30" y="30" width="40" height="14" rx="2" fill="#c8f7c5"/><path d="M50 66 v10 a10 10 0 1 1 -10 10" stroke="#555" stroke-width="5" fill="none"/>';
+ if(g.indexOf("load")>=0||(p.brand||"").toLowerCase().indexOf("load")>=0)s='<rect x="14" y="34" width="72" height="30" rx="4" fill="#9aa3ad" stroke="#555" stroke-width="2"/><circle cx="30" cy="49" r="6" fill="#555"/><circle cx="70" cy="49" r="6" fill="#555"/><rect x="42" y="40" width="16" height="18" rx="2" fill="#F5C21B"/><path d="M86 49 h6 q4 0 4 6 v20" stroke="#222" stroke-width="4" fill="none"/>';
+ else if(g.indexOf("crane")>=0)s='<rect x="44" y="6" width="12" height="16" rx="3" fill="#888"/><rect x="22" y="22" width="56" height="44" rx="8" fill="'+col+'"/><rect x="30" y="30" width="40" height="14" rx="2" fill="#c8f7c5"/><path d="M50 66 v10 a10 10 0 1 1 -10 10" stroke="#555" stroke-width="5" fill="none"/>';
  else if(g.indexOf("mini hanging")>=0)s='<circle cx="50" cy="12" r="6" fill="none" stroke="#555" stroke-width="4"/><rect x="30" y="18" width="40" height="56" rx="10" fill="'+col+'"/><rect x="37" y="28" width="26" height="12" rx="2" fill="#c8f7c5"/><path d="M50 74 v8 a7 7 0 1 1 -7 7" stroke="#555" stroke-width="4" fill="none"/>';
  else if(g.indexOf("hanging")>=0)s='<circle cx="50" cy="10" r="6" fill="none" stroke="#555" stroke-width="4"/><rect x="24" y="16" width="52" height="40" rx="8" fill="'+col+'"/><rect x="32" y="24" width="36" height="13" rx="2" fill="#c8f7c5"/><path d="M50 56 v12 a9 9 0 1 1 -9 9" stroke="#555" stroke-width="5" fill="none"/>';
  else if(g.indexOf("indicator")>=0)s='<rect x="16" y="30" width="68" height="42" rx="6" fill="'+col+'"/><rect x="24" y="38" width="52" height="16" rx="2" fill="#c8f7c5"/><circle cx="70" cy="63" r="4" fill="#fff"/>';
@@ -1106,7 +1111,7 @@ function compactPan(p){return String(p.pan||"").replace(/\s*mm\s*$/i,"").replace
 var ICONQ={minus:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="10.5" width="16" height="3" rx="1.5" fill="currentColor"/></svg>',plus:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="10.5" width="16" height="3" rx="1.5" fill="currentColor"/><rect x="10.5" y="4" width="3" height="16" rx="1.5" fill="currentColor"/></svg>'};
 function card(p){var c=cart[p.id],inC=c&&c.q>0,q=inC?c.q:0;var st=c?c.st!==false:(draftSt[p.id]!=null?draftSt[p.id]:true);var rg=region(),hasStamp=rg===1&&+p.stamp>0;
  var capFull=p.cap?String(p.cap)+(p.e?" \u00d7 "+p.e:""):"",panFull=p.pan?String(p.pan).replace(/\s*[xX]\s*/g," \u00d7 "):"";
- var spec='<div class="pcodebox"><span>CODE</span><b>'+esc(icode(p))+'</b></div><div class="plines">'+[["Max",capFull],["Size",panFull],["Pan",p.panMat||""]].filter(function(x){return x[1]}).map(function(x){return '<div><span>'+x[0]+':</span> <b>'+esc(x[1])+'</b></div>'}).join("")+'</div>';
+ var spec='<div class="pcodebox"><span>CODE</span><b>'+esc(icode(p))+'</b></div><div class="plines">'+[["Max",capFull],["Size",panFull],["Pan",p.panMat||""]].filter(function(x){return x[1]}).map(function(x){return '<div><span>'+x[0]+':</span> <b>'+esc(x[1])+'</b></div>'}).join("")+(p.ds?'<button class="dsbtn" data-ds="'+p.id+'">&#128196; Datasheet (PDF)</button>':'')+'</div>';
  return '<article class="card'+(inC?" incart":"")+'" id="c-'+p.id+'">'+
  '<div class="pspec2">'+spec+'</div>'+
  '<div class="pimg"><div class="ph">'+pic(p)+'</div></div>'+
@@ -1136,7 +1141,7 @@ function renderSearchRes(){var box=$("#sres");if(!box)return;var q=(search||"").
   var nCart=Object.keys(cart).filter(function(k){return cart[k].q>0}).length;
   if(nCart)h+='<button class="sgrp cartg" data-a="s-cart"><b>IN MY CART</b><span>'+nCart+' model'+(nCart>1?"s":"")+'</span></button>';
   B.forEach(function(b){var P=DATA.products.filter(function(p){return p.brand===b}),open=sBrand===b;
-   h+='<button class="sgrp'+(open?" open":"")+'" data-sg="'+esc(b)+'"><b>'+esc(b)+'</b><span>'+P.length+' models</span><i>'+(open?"&#9650;":"&#9660;")+'</i></button>';
+   h+='<button class="sgrp'+(open?" open":"")+'" data-sg="'+esc(b)+'"><b>'+esc(b)+'</b><span>'+P.length+(P.length===1?' model':' models')+'</span><i>'+(open?"&#9650;":"&#9660;")+'</i></button>';
    if(open){var last=null;P.forEach(function(p){if(p.group!==last){h+='<div class="ssub">'+esc(shortGroup(p.group))+'</div>';last=p.group}h+=sRow(p)})}})}
  box.innerHTML=h}
 function gotoProduct(id){closeOv();filt="ALL";if(view!=="shop"){view="shop";render()}else renderShop();
@@ -1270,7 +1275,7 @@ function renderHist(){var h=installCard()+'<h2>My Orders</h2><div class="bar mut
 function renderHelp(){var s=DATA.settings;$("#main").innerHTML='<h2>How to use</h2><div class="bar help"><b>1.</b> Tap <b>My Details</b> once and fill your company, GSTIN, licence, address and State. They stay saved.<br><b>2.</b> Scroll the products, set <b>Qty</b>, tap <b>Add to cart</b>. Within '+esc(s.homeState)+' you can untick <b>Stamping</b> if not needed.<br><b>3.</b> Tap <b>Checkout</b>: your Purchase Order with Grand Total appears.<br><b>4.</b> Attach your <b>payment screenshot</b> from the gallery and the UTR number.<br><b>5.</b> <b>Share / Save PDF</b>, then <b>WhatsApp to Dispatch</b> (attach the PDF) and <b>Email</b>.<br><br>Prices update automatically when you have internet. Current price list: <b>'+esc(s.priceRef)+'</b>, '+fmtDT(DATA.version)+'. '+esc(note2())+'.<br><br>Faulty unit received? Call <b>Service Support '+esc(s.service)+'</b>.<br>Dispatch: <b>'+esc(s.dispatch)+'</b> &middot; Email: '+esc(s.email)+'</div>'}
 /* ================= auto-update (dealer) ================= */
 /* ================= dealer authorization + sync (v4) ================= */
-var APP_BUILD=70, DEVCODE="", syncing=null, updAsked=false;
+var APP_BUILD=71, DEVCODE="", syncing=null, updAsked=false;
 var CODE_ABC="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 function normCode(c){return String(c||"").toUpperCase().replace(/[^A-Z0-9]/g,"")}
 function fmtCode(c){c=normCode(c);return c.slice(0,5)+"-"+c.slice(5)}
@@ -1284,7 +1289,7 @@ var DPF=["company","contact","mobile","email","gstin","lmlic","bill","billpin","
 function openPackage(j){if(j.keys){var e=j.keys[idOf(DEVCODE)];if(!e)return null;var K=unwrapKey(e.k,DEVCODE);var d=deobf(j.d,K);if(!d||!d.products)return null;var p={};try{p=deobf(e.p,"NISAN-prof|"+normCode(DEVCODE))||{}}catch(x){}return {d:d,p:p}}
  if(DATA.settings.dataKey){var d2=deobf(j.d,DATA.settings.dataKey);return d2&&d2.products?{d:d2,p:{}}:null}return null}
 function applyOpened(j,o){var d=o.d;return sGet("photos").then(function(cache){cache=cache||{};var src=j.ph||{},keep={};
-  d.products.forEach(function(p){var u=p.ph?(cache[p.ph]||src[p.ph]||""):"";p.photo=u;if(p.ph&&u)keep[p.ph]=u});
+  d.products.forEach(function(p){var u=p.ph?(cache[p.ph]||src[p.ph]||""):"";p.photo=u;if(p.ph&&u)keep[p.ph]=u;if(p.dsh){var w=cache[p.dsh]||src[p.dsh]||"";if(w){p.ds=w;keep[p.dsh]=w}}});
   d.settings.dataKey=DATA.settings.dataKey;var first=!(DATA.products&&DATA.products.length);DATA={version:j.v,settings:d.settings,products:d.products};
   var changed=false;DPF.forEach(function(k){if(o.p&&o.p[k]&&!String(prof[k]||"").trim()){prof[k]=o.p[k];changed=true}});if(changed)saveProf();
   Object.keys(cart).forEach(function(k){if(!prodById(k))delete cart[k]});saveCart();
@@ -1371,18 +1376,26 @@ function checkPw(){var o=$("#pw-old").value;if(pwh(o)!==DATA.settings.pwHash){to
   DATA.settings.pwHash=pwh(n);saveDraft();var s=DATA.settings;var url="mailto:"+encodeURIComponent(s.adminEmail)+"?subject="+encodeURIComponent("NISAN app password ("+fmtDate(new Date())+")")+"&body="+encodeURIComponent("New EDIT password for the NISAN Master app: "+n+"\n\nKeep this mail for 'Forgot password'.");
   setTimeout(function(){location.href=url},300);toast("Password changed and saved. Mail opening - tap Send.")}return true}
 var ADMB="ECO";try{ADMB=localStorage.getItem("nisan_admb")||"ECO"}catch(e){}
-function brandList(){var B=[];DATA.products.forEach(function(p){var b=(p.brand||"").trim();if(b&&B.indexOf(b)<0)B.push(b)});["ECO","NPRO"].forEach(function(b){if(B.indexOf(b)<0)B.push(b)});return B}
+function brandList(){var B=[];DATA.products.forEach(function(p){var b=(p.brand||"").trim();if(b&&B.indexOf(b)<0)B.push(b)});["ECO","NPRO","Load Cell"].concat(DATA.settings.brands||[]).forEach(function(b){if(b&&B.indexOf(b)<0)B.push(b)});return B}
 function renderAdmList(){var B=brandList();if(ADMB!=="ALL"&&B.indexOf(ADMB)<0)ADMB=B[0];var cnt=function(b){return DATA.products.filter(function(p){return b==="ALL"||p.brand===b}).length};
  var h='<div class="btabs">'+B.concat(["ALL"]).map(function(b){return '<button class="'+(ADMB===b?"on":"")+'" data-admb="'+esc(b)+'">'+(b==="ALL"?"All":esc(b))+' <span>'+cnt(b)+'</span></button>'}).join("")+'</div><h2>'+(ADMB==="ALL"?"All products":esc(ADMB)+" products")+' ('+cnt(ADMB)+')</h2>'+(ADMB!=="ALL"?'<button class="b-main" style="width:100%;margin-bottom:10px" data-a="adm-new">+ NEW '+esc(ADMB)+' product</button>':'')+'<div class="bar" id="savestate">'+saveStateHTML()+'</div><div class="bar muted">Every change is saved on this device immediately. Press <b>PUBLISH</b> when you want dealers to receive it.</div>';var last=null;
+ if(ADMB!=="ALL"&&!cnt(ADMB))h+='<div class="empty">No '+esc(ADMB)+' products yet. Tap <b>+ NEW '+esc(ADMB)+' product</b> to add the first one.</div>';
  DATA.products.forEach(function(p,i){if(ADMB!=="ALL"&&p.brand!==ADMB)return;if(p.group!==last){h+='<div class="ghead">'+esc(p.group)+'</div>';last=p.group}
   h+='<div class="adminrow"><div class="ph">'+pic(p)+'</div><div class="x"><b>'+esc(icode(p))+'</b> &middot; '+esc(mdesc(p))+'<br><span class="muted">MH &#8377;'+inr(p.pMH,1)+' &middot; Out &#8377;'+inr(p.pOut,1)+' &middot; Stamp '+(+p.stamp||0)+'</span></div><button class="b-sec" data-up="'+i+'">&uarr;</button><button class="b-sec" data-dn="'+i+'">&darr;</button><button class="b-main" data-ed="'+i+'">Edit</button><button class="b-red" data-del="'+i+'">Del</button></div>'});
  $("#main").innerHTML=h}
 var PF=[["brand","Brand / line (e.g. ECO, NPRO)",1],["group","Group heading",1,"group"],["code","Item Code (shown as CODE, e.g. E101)",1],["model","Model No / Description",1],["cap","Max Capacity (e.g. 30 kg)",0],["min","Min",0],["e","e (division)",0],["pan","Pan size (e.g. 290 x 290 mm)",0],["material","Material / body (e.g. ABS body, Mild steel)",0],["panMat","Pan material (e.g. SS202, Chequered plate)",0],["pMH","Basic price within Maharashtra (Rs.)",1,"num"],["pOut","Basic price outside Maharashtra (Rs.)",1,"num"],["stamp","Stamping fee per unit (Rs., 0 = none)",0,"num"],["slabQty","Slab qty (0 = none, e.g. 5)",0,"num"],["slabMH","Slab price within MH (Rs.)",0,"num"],["slabOut","Slab price outside MH (Rs.)",0,"num"]];
-var editing=null,editPhoto="";
+var editing=null,editPhoto="",editDS="",editDSName="";
+function openDS(id){var p=DATA.products.find(function(x){return x.id===id});if(!p||!p.ds){toast("Datasheet not available");return}
+ try{var b64=p.ds.slice(p.ds.indexOf(",")+1),bin=atob(b64),u=new Uint8Array(bin.length);for(var i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);
+  var url=URL.createObjectURL(new Blob([u],{type:"application/pdf"})),nm=(p.dsName||(icode(p)+"_datasheet.pdf")).replace(/[^\w.\- ]+/g,"_");
+  var mob=window.matchMedia&&matchMedia("(pointer:coarse)").matches,w=mob?null:window.open(url,"_blank");
+  if(!w){var a=document.createElement("a");a.href=url;a.download=nm;document.body.appendChild(a);a.click();a.remove();toast("Datasheet saved: "+nm+" - open it from Downloads")}
+  setTimeout(function(){URL.revokeObjectURL(url)},60000)}catch(e){toast("Could not open the datasheet")}}
+function dsKB(u){return Math.round((String(u).length-String(u).indexOf(",")-1)*0.75/1024)}
 function groupsOf(b){var G=[];DATA.products.forEach(function(x){if(x.brand===b&&G.indexOf(x.group)<0)G.push(x.group)});return G}
-function openProdForm(i){editing=i;var p=i==null?{brand:ADMB!=="ALL"?ADMB:"ECO",group:"",stamp:0,slabQty:0}:DATA.products[i];editPhoto=p.photo||"";var G=groupsOf(p.brand);
- var h='<h2>'+(i==null?"NEW product":"Edit "+esc(icode(p)))+'</h2><div style="display:flex;gap:10px;align-items:center"><div class="ph" id="pf-ph">'+pic(p)+'</div><div style="flex:1"><label>Product photo</label><input type="file" accept="image/*" id="pf-file"><button class="b-red" style="margin-top:6px;padding:6px 10px" data-a="pf-nophoto">Remove photo</button></div></div>';
- PF.forEach(function(f){var v=p[f[0]]==null?"":p[f[0]];if(f[0]==="brand"){var BL=brandList();if(v&&BL.indexOf(v)<0)BL.push(v);h+='<label class="req">Brand (product list)</label><select id="pf-brand">'+BL.map(function(b){return '<option'+(b===v?' selected':'')+'>'+esc(b)+'</option>'}).join("")+'</select>';return}h+='<label class="'+(f[2]?"req":"")+'">'+f[1]+'</label><input id="pf-'+f[0]+'" value="'+esc(v)+'"'+(f[3]==="num"?' inputmode="decimal"':'')+(f[3]==="group"?' list="pf-groups"':'')+'>'});
+function openProdForm(i){editing=i;var p=i==null?{brand:ADMB!=="ALL"?ADMB:"ECO",group:"",stamp:0,slabQty:0}:DATA.products[i];editPhoto=p.photo||"";editDS=p.ds||"";editDSName=p.dsName||"";var G=groupsOf(p.brand);
+ var h='<h2>'+(i==null?"NEW product":"Edit "+esc(icode(p)))+'</h2><div style="display:flex;gap:10px;align-items:center"><div class="ph" id="pf-ph">'+pic(p)+'</div><div style="flex:1"><label>Product photo</label><input type="file" accept="image/*" id="pf-file"><button class="b-red" style="margin-top:6px;padding:6px 10px" data-a="pf-nophoto">Remove photo</button></div></div><label>Datasheet (PDF, optional)</label><div class="dsbox"><div id="pf-dsinfo">'+(editDS?'&#128196; '+esc(editDSName||"datasheet.pdf")+' &middot; '+dsKB(editDS)+' KB':'No datasheet attached')+'</div><input type="file" accept="application/pdf,.pdf" id="pf-pdf"><button class="b-red" style="margin-top:6px;padding:6px 10px" data-a="pf-nopdf">Remove datasheet</button></div>';
+ PF.forEach(function(f){var v=p[f[0]]==null?"":p[f[0]];if(f[0]==="brand"){var BL=brandList();if(v&&BL.indexOf(v)<0)BL.push(v);h+='<label class="req">Brand (product list)</label><select id="pf-brand">'+BL.map(function(b){return '<option'+(b===v?' selected':'')+'>'+esc(b)+'</option>'}).join("")+'<option value="__new">+ New brand / product list...</option></select>';return}h+='<label class="'+(f[2]?"req":"")+'">'+f[1]+'</label><input id="pf-'+f[0]+'" value="'+esc(v)+'"'+(f[3]==="num"?' inputmode="decimal"':'')+(f[3]==="group"?' list="pf-groups"':'')+'>'});
  h+='<datalist id="pf-groups">'+G.map(function(g){return '<option value="'+esc(g)+'">'}).join("")+'</datalist>';
  if(i==null)h+='<label>Insert position</label><select id="pf-pos"><option value="end">At the end of its group (recommended)</option><option value="last">At the very end</option></select>';
  h+='<div class="sendgrid"><button class="b-main" data-a="pf-save">Save product</button><button class="b-red" data-a="ov-close">Cancel</button></div>';overlay(h)}
@@ -1391,7 +1404,7 @@ function saveProd(){var p=editing==null?{id:"p"+Date.now().toString(36)}:DATA.pr
  if(bad.length){toast("Please fill: "+bad[0]);return}
  if(+tmp.slabQty>0&&!(+tmp.slabMH>0&&+tmp.slabOut>0)){toast("Enter both slab prices or set slab qty 0");return}
  tmp.mc=1;var dup=DATA.products.some(function(x){return x!==p&&String(icode(x)).toLowerCase()===String(tmp.code).toLowerCase()});if(dup&&!confirm("Item code "+tmp.code+" already exists. Save anyway?"))return;
- Object.assign(p,tmp);p.photo=editPhoto;
+ Object.assign(p,tmp);p.photo=editPhoto;if(editDS){p.ds=editDS;p.dsName=editDSName}else{delete p.ds;delete p.dsName}
  if(editing==null){var pos=$("#pf-pos").value,idx=-1;if(pos==="end")DATA.products.forEach(function(x,i){if(x.group===p.group)idx=i});if(idx>=0)DATA.products.splice(idx+1,0,p);else DATA.products.push(p)}
  saveDraft().then(function(){toast("Saved on this device. PUBLISH when ready.")});closeOv();view="adm-list";render()}
 function resizeImg(file,maxPx,q,cb){var fr=new FileReader();fr.onload=function(){var im=new Image();im.onload=function(){var w=im.width,h=im.height,k=Math.min(1,maxPx/Math.max(w,h));var c=document.createElement("canvas");c.width=Math.round(w*k);c.height=Math.round(h*k);var x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);cb(c.toDataURL("image/jpeg",q))};im.onerror=function(){toast("Could not read that image")};im.src=fr.result};fr.readAsDataURL(file)}
@@ -1405,7 +1418,7 @@ function appHTML(mode,data,web){var root=document.documentElement.cloneNode(true
  root.querySelector("#appdata").textContent=JSON.stringify({mode:mode,data:data,web:!!web}).replace(/</g,"\\u003c");var ml=root.querySelector('link[rel="manifest"]');if(ml)ml.setAttribute("href",mode==="master"&&web?"manifest-master.json":"manifest.json");var mw=mode==="master"&&web,ai=root.querySelector('link[rel="apple-touch-icon"]'),fi=root.querySelector('link[rel="icon"]');if(ai)ai.setAttribute("href",mw?"apple-touch-icon-master.png":"apple-touch-icon.png");if(fi)fi.setAttribute("href",mw?"icon-master-192.png":"icon-192.png");var tt=root.querySelector("title");if(tt&&mode==="master"&&web)tt.textContent="PARTNER MASTER";return "<!DOCTYPE html>\n"+root.outerHTML}
 function publish(){var now=new Date(),ver=now.toISOString(),stamp=now.getFullYear()+("0"+(now.getMonth()+1)).slice(-2)+("0"+now.getDate()).slice(-2)+"_"+("0"+now.getHours()).slice(-2)+("0"+now.getMinutes()).slice(-2);
  DATA.version=ver;var dealerSettings=JSON.parse(JSON.stringify(DATA.settings,function(k,v){return k==="pwHash"||k==="adminEmail"||k==="dataKey"?undefined:v}));
- var ph={},prods=DATA.products.map(function(p){var c=Object.assign({},p);if(p.photo){var hsh=sha256(p.photo).slice(0,16);c.ph=hsh;ph[hsh]=p.photo}else c.ph="";delete c.photo;return c});
+ var ph={},prods=DATA.products.map(function(p){var c=Object.assign({},p);if(p.photo){var hsh=sha256(p.photo).slice(0,16);c.ph=hsh;ph[hsh]=p.photo}else c.ph="";delete c.photo;if(p.ds){var dh="ds_"+sha256(p.ds).slice(0,16);c.dsh=dh;ph[dh]=p.ds}delete c.ds;return c});
  var pubSettings=JSON.parse(JSON.stringify(dealerSettings));delete pubSettings.dataKey;
  var built=buildPackage(ver,pubSettings,prods,ph),pkg=built.pkg,hasCode=built.count>0;
  var dataBlob=new Blob([JSON.stringify(pkg)],{type:"application/json"});
@@ -1465,7 +1478,7 @@ function allCodes(raw){var u=String(raw||"").toUpperCase(),out=[],m,re=/\b([A-HJ
 function recoverFromCodes(){var ta=$("#bk-text"),msg=$("#bk-msg"),codes=allCodes(ta.value);if(!codes.length){msg.innerHTML='<b style="color:#C00000">No device code found. Paste the dealers&#39; WhatsApp messages (code looks like ABCDE-23456).</b>';return}
  var u=DATA.settings.updateUrl;msg.innerHTML="Checking "+codes.length+" code(s) on GitHub...";
  fetch(u+(u.indexOf("?")<0?"?":"&")+"t="+Date.now(),{cache:"no-store"}).then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.json()}).then(function(j){var D=dealers(),got=[],have=[],miss=[];
-  var prodBack=0;if(!DATA.products.length){codes.some(function(c){var e=j.keys&&j.keys[idOf(c)];if(!e)return false;try{var d=deobf(j.d,unwrapKey(e.k,c));if(!d||!d.products)return false;var ph=j.ph||{};DATA.products=d.products.map(function(p){p.photo=p.ph?(ph[p.ph]||""):"";delete p.ph;return p});var keep={pwHash:DATA.settings.pwHash,adminEmail:DATA.settings.adminEmail,ghRepo:DATA.settings.ghRepo,updateUrl:DATA.settings.updateUrl};DATA.settings=Object.assign({},DATA.settings,d.settings,keep);DATA.version=j.v;prodBack=DATA.products.length;return true}catch(x){return false}})}
+  var prodBack=0;if(!DATA.products.length){codes.some(function(c){var e=j.keys&&j.keys[idOf(c)];if(!e)return false;try{var d=deobf(j.d,unwrapKey(e.k,c));if(!d||!d.products)return false;var ph=j.ph||{};DATA.products=d.products.map(function(p){p.photo=p.ph?(ph[p.ph]||""):"";delete p.ph;if(p.dsh){if(ph[p.dsh])p.ds=ph[p.dsh];delete p.dsh}return p});var keep={pwHash:DATA.settings.pwHash,adminEmail:DATA.settings.adminEmail,ghRepo:DATA.settings.ghRepo,updateUrl:DATA.settings.updateUrl};DATA.settings=Object.assign({},DATA.settings,d.settings,keep);DATA.version=j.v;prodBack=DATA.products.length;return true}catch(x){return false}})}
   codes.forEach(function(c){if(D.some(function(x){return normCode(x.code)===c})){have.push(fmtCode(c));return}var e=j.keys&&j.keys[idOf(c)];if(!e){miss.push(fmtCode(c));return}var p={};try{p=deobf(e.p,"NISAN-prof|"+c)||{}}catch(x){}
    var d={id:"d"+Date.now().toString(36)+got.length,added:new Date().toISOString(),recovered:new Date().toISOString(),code:c,active:true,transport:"",state:""};DPF.forEach(function(k){if(p[k])d[k]=p[k]});if(!d.company)d.company="Dealer "+fmtCode(c);D.push(d);got.push(d.company)});
   if(prodBack)migrateMC();if(got.length||prodBack)saveDraft();
@@ -1532,8 +1545,9 @@ function renderSetup(){var h='<header class="appbar"><div class="blogo"></div><d
 function backup(){var b=new Blob([JSON.stringify({app:"NISAN-backup",at:new Date().toISOString(),profile:prof,history:hist,cart:cart,device:DEVCODE})],{type:"application/json"});download(b,"NISAN_my_backup_"+fmtDate(new Date())+".json");toast("Backup saved to Downloads")}
 function restore(file){var fr=new FileReader();fr.onload=function(){try{var j=JSON.parse(fr.result);if(j.app!=="NISAN-backup")throw 0;if(!confirm("Restore details and "+(j.history||[]).length+" order(s) from this backup? Current data on this device will be replaced."))return;prof=j.profile||{};hist=j.history||[];cart=j.cart||{};if(j.device&&normCode(j.device).length===10){DEVCODE=normCode(j.device);sSet("device_code",DEVCODE)}saveProf();saveHist();saveCart();toast("Backup restored");render()}catch(e){toast("Not a valid NISAN backup file")}};fr.readAsText(file)}
 /* ================= events ================= */
-document.addEventListener("click",function(ev){var el=ev.target.closest("[data-sg],[data-goto],[data-dlw],[data-dle],[data-dld],[data-bks],[data-a],[data-f],[data-dq],[data-add],[data-rm],[data-hp],[data-hr],[data-ho],[data-up],[data-dn],[data-ed],[data-del],[data-admb]");if(!el)return;var a=el.dataset.a;
+document.addEventListener("click",function(ev){var el=ev.target.closest("[data-sg],[data-goto],[data-dlw],[data-dle],[data-dld],[data-bks],[data-a],[data-f],[data-dq],[data-add],[data-rm],[data-hp],[data-hr],[data-ho],[data-up],[data-dn],[data-ed],[data-del],[data-admb],[data-ds]");if(!el)return;var a=el.dataset.a;
  if(a==="ov-bg"&&ev.target!==el)return;
+ if(el.dataset.ds!=null){openDS(el.dataset.ds);return}
  if(el.dataset.admb!=null){ADMB=el.dataset.admb;try{localStorage.setItem("nisan_admb",ADMB)}catch(e){}renderAdmList();var mm=$("#main");if(mm)mm.scrollTop=0;return}
  if(el.dataset.sg!=null){sBrand=sBrand===el.dataset.sg?"":el.dataset.sg;renderSearchRes();return}
  if(el.dataset.goto!=null){gotoProduct(el.dataset.goto);return}
@@ -1605,11 +1619,13 @@ document.addEventListener("click",function(ev){var el=ev.target.closest("[data-s
   case "ss-save":saveSettings();break;
   case "gh-rm":if(confirm("Remove the GitHub key from this device?")){sSet("gh_token","");var g=$("#gh-state");if(g)g.innerHTML='<span class="unpub">Key removed</span>'}break;
   case "pf-save":saveProd();break;
+  case "pf-nopdf":editDS="";editDSName="";$("#pf-dsinfo").innerHTML="No datasheet attached";var fi=$("#pf-pdf");if(fi)fi.value="";break;
   case "pf-nophoto":editPhoto="";$("#pf-ph").innerHTML=pic({group:$("#pf-group").value,brand:$("#pf-brand").value});break;
   case "adm-publish":publish();break;
   case "adm-exit":ADMIN=false;view="shop";render();break;
  }});
 document.addEventListener("change",function(ev){var t=ev.target;
+ if(t.id==="pf-brand"&&t.value==="__new"){var nb=(prompt("Name of the new brand / product list (e.g. Load Cell):")||"").trim();if(nb){DATA.settings.brands=(DATA.settings.brands||[]);if(DATA.settings.brands.indexOf(nb)<0)DATA.settings.brands.push(nb);saveDraft();var o=document.createElement("option");o.textContent=nb;t.insertBefore(o,t.lastElementChild);t.value=nb}else t.selectedIndex=0}
  if(t.id==="pf-brand"){var dl=$("#pf-groups");if(dl)dl.innerHTML=groupsOf(t.value).map(function(g){return '<option value="'+esc(g)+'">'}).join("");return}
  if(t.id==="po-trans"){readPay();var pd=$("#po-doc");if(pd&&curPO){var tmp=document.createElement("div");tmp.innerHTML=poHTML(curPO);pd.replaceWith(tmp.firstChild)}return}
  if(t.id==="st-sel"){prof.state=t.value;saveProf();renderShop();renderCartBar();return}
@@ -1619,6 +1635,7 @@ document.addEventListener("change",function(ev){var t=ev.target;
  if(t.id==="pay-img"&&t.files&&t.files[0]){readPay();resizeImg(t.files[0],1400,.75,function(u){curPO.pay.img=u;saveHist();toast("Payment screenshot attached");renderPO()});return}
  if(t.id==="restore"&&t.files&&t.files[0]){restore(t.files[0]);return}
  if(t.id==="bk-file"&&t.files&&t.files[0]){restoreMasterFile(t.files[0]);return}
+ if(t.id==="pf-pdf"&&t.files&&t.files[0]){var pf=t.files[0];if(pf.size>3*1024*1024){toast("PDF is "+Math.round(pf.size/1048576*10)/10+" MB. Please use a PDF under 3 MB (compress it first).");t.value="";return}var rd=new FileReader();rd.onload=function(){editDS=rd.result;editDSName=pf.name;$("#pf-dsinfo").innerHTML="&#128196; "+esc(pf.name)+" &middot; "+dsKB(editDS)+" KB"};rd.readAsDataURL(pf);return}
  if(t.id==="pf-file"&&t.files&&t.files[0]){resizeImg(t.files[0],480,.72,function(u){editPhoto=u;$("#pf-ph").innerHTML='<img alt="" src="'+u+'">'})}});
 document.addEventListener("input",function(ev){if(ev.target.id==="s2"){search=ev.target.value;renderSearchRes();return}if(ev.target.id==="df-code"){var c=extractCode(ev.target.value),h=$("#df-code-hint");if(h)h.innerHTML=c.length===10?'<span class="saved">&#10003; Code found: '+fmtCode(c)+'</span>':(ev.target.value.trim()?'<span class="unpub">No 10-character code found yet</span>':'');return}if(ev.target.id==="srch"){search=ev.target.value;clearTimeout(window.__st);window.__st=setTimeout(function(){var pos=ev.target.selectionStart;renderShop();var s=$("#srch");s.focus();try{s.setSelectionRange(pos,pos)}catch(e){}},250)}});
 /* ================= device ================= */
