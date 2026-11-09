@@ -575,6 +575,16 @@ body.pc .pimg .ph{position:absolute;inset:0;width:auto;height:auto;flex:none;bor
 .brk2 div{flex-wrap:wrap;white-space:normal;column-gap:8px;row-gap:0}
 .brk2 div span,.brk2 div b{white-space:nowrap}
 .brk2 div b{margin-left:auto}
+
+/* build 70: ECO / NPRO tabs in Master product list */
+.btabs{display:flex;gap:8px;margin:2px 0 12px;position:sticky;top:0;z-index:5;background:#0b0b0c;padding:6px 0}
+.btabs button{flex:1;padding:11px 8px;border-radius:12px;border:2px solid #111;background:#fff;color:#111;font-weight:700;font-size:15px;letter-spacing:.5px}
+.btabs button span{display:inline-block;min-width:22px;padding:1px 7px;margin-left:4px;border-radius:10px;background:#eee;font-size:12px;font-weight:700}
+.btabs button.on{background:#F5C21B;color:#111;border-color:#F5C21B}
+.btabs button.on span{background:#111;color:#F5C21B}
+.adminrow,.adminrow .x{color:#111}
+.adminrow .x b{color:#111;font-size:15px}
+.ghead{color:#F5C21B!important}
 </style>
 </head>
 <body class="pc">
@@ -1260,7 +1270,7 @@ function renderHist(){var h=installCard()+'<h2>My Orders</h2><div class="bar mut
 function renderHelp(){var s=DATA.settings;$("#main").innerHTML='<h2>How to use</h2><div class="bar help"><b>1.</b> Tap <b>My Details</b> once and fill your company, GSTIN, licence, address and State. They stay saved.<br><b>2.</b> Scroll the products, set <b>Qty</b>, tap <b>Add to cart</b>. Within '+esc(s.homeState)+' you can untick <b>Stamping</b> if not needed.<br><b>3.</b> Tap <b>Checkout</b>: your Purchase Order with Grand Total appears.<br><b>4.</b> Attach your <b>payment screenshot</b> from the gallery and the UTR number.<br><b>5.</b> <b>Share / Save PDF</b>, then <b>WhatsApp to Dispatch</b> (attach the PDF) and <b>Email</b>.<br><br>Prices update automatically when you have internet. Current price list: <b>'+esc(s.priceRef)+'</b>, '+fmtDT(DATA.version)+'. '+esc(note2())+'.<br><br>Faulty unit received? Call <b>Service Support '+esc(s.service)+'</b>.<br>Dispatch: <b>'+esc(s.dispatch)+'</b> &middot; Email: '+esc(s.email)+'</div>'}
 /* ================= auto-update (dealer) ================= */
 /* ================= dealer authorization + sync (v4) ================= */
-var APP_BUILD=69, DEVCODE="", syncing=null, updAsked=false;
+var APP_BUILD=70, DEVCODE="", syncing=null, updAsked=false;
 var CODE_ABC="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 function normCode(c){return String(c||"").toUpperCase().replace(/[^A-Z0-9]/g,"")}
 function fmtCode(c){c=normCode(c);return c.slice(0,5)+"-"+c.slice(5)}
@@ -1360,15 +1370,19 @@ function checkPw(){var o=$("#pw-old").value;if(pwh(o)!==DATA.settings.pwHash){to
  var n=$("#pw-new").value,n2=$("#pw-new2").value;if(n||n2){if(n!==n2){toast("New passwords do not match");return false}if(n.length<4){toast("New password: at least 4 characters");return false}
   DATA.settings.pwHash=pwh(n);saveDraft();var s=DATA.settings;var url="mailto:"+encodeURIComponent(s.adminEmail)+"?subject="+encodeURIComponent("NISAN app password ("+fmtDate(new Date())+")")+"&body="+encodeURIComponent("New EDIT password for the NISAN Master app: "+n+"\n\nKeep this mail for 'Forgot password'.");
   setTimeout(function(){location.href=url},300);toast("Password changed and saved. Mail opening - tap Send.")}return true}
-function renderAdmList(){var h='<h2>Products ('+DATA.products.length+')</h2><div class="bar" id="savestate">'+saveStateHTML()+'</div><div class="bar muted">Every change is saved on this device immediately. Press <b>PUBLISH</b> when you want dealers to receive it.</div>';var last=null;
- DATA.products.forEach(function(p,i){if(p.group!==last){h+='<div class="ghead">'+esc(p.group)+'</div>';last=p.group}
+var ADMB="ECO";try{ADMB=localStorage.getItem("nisan_admb")||"ECO"}catch(e){}
+function brandList(){var B=[];DATA.products.forEach(function(p){var b=(p.brand||"").trim();if(b&&B.indexOf(b)<0)B.push(b)});["ECO","NPRO"].forEach(function(b){if(B.indexOf(b)<0)B.push(b)});return B}
+function renderAdmList(){var B=brandList();if(ADMB!=="ALL"&&B.indexOf(ADMB)<0)ADMB=B[0];var cnt=function(b){return DATA.products.filter(function(p){return b==="ALL"||p.brand===b}).length};
+ var h='<div class="btabs">'+B.concat(["ALL"]).map(function(b){return '<button class="'+(ADMB===b?"on":"")+'" data-admb="'+esc(b)+'">'+(b==="ALL"?"All":esc(b))+' <span>'+cnt(b)+'</span></button>'}).join("")+'</div><h2>'+(ADMB==="ALL"?"All products":esc(ADMB)+" products")+' ('+cnt(ADMB)+')</h2>'+(ADMB!=="ALL"?'<button class="b-main" style="width:100%;margin-bottom:10px" data-a="adm-new">+ NEW '+esc(ADMB)+' product</button>':'')+'<div class="bar" id="savestate">'+saveStateHTML()+'</div><div class="bar muted">Every change is saved on this device immediately. Press <b>PUBLISH</b> when you want dealers to receive it.</div>';var last=null;
+ DATA.products.forEach(function(p,i){if(ADMB!=="ALL"&&p.brand!==ADMB)return;if(p.group!==last){h+='<div class="ghead">'+esc(p.group)+'</div>';last=p.group}
   h+='<div class="adminrow"><div class="ph">'+pic(p)+'</div><div class="x"><b>'+esc(icode(p))+'</b> &middot; '+esc(mdesc(p))+'<br><span class="muted">MH &#8377;'+inr(p.pMH,1)+' &middot; Out &#8377;'+inr(p.pOut,1)+' &middot; Stamp '+(+p.stamp||0)+'</span></div><button class="b-sec" data-up="'+i+'">&uarr;</button><button class="b-sec" data-dn="'+i+'">&darr;</button><button class="b-main" data-ed="'+i+'">Edit</button><button class="b-red" data-del="'+i+'">Del</button></div>'});
  $("#main").innerHTML=h}
 var PF=[["brand","Brand / line (e.g. ECO, NPRO)",1],["group","Group heading",1,"group"],["code","Item Code (shown as CODE, e.g. E101)",1],["model","Model No / Description",1],["cap","Max Capacity (e.g. 30 kg)",0],["min","Min",0],["e","e (division)",0],["pan","Pan size (e.g. 290 x 290 mm)",0],["material","Material / body (e.g. ABS body, Mild steel)",0],["panMat","Pan material (e.g. SS202, Chequered plate)",0],["pMH","Basic price within Maharashtra (Rs.)",1,"num"],["pOut","Basic price outside Maharashtra (Rs.)",1,"num"],["stamp","Stamping fee per unit (Rs., 0 = none)",0,"num"],["slabQty","Slab qty (0 = none, e.g. 5)",0,"num"],["slabMH","Slab price within MH (Rs.)",0,"num"],["slabOut","Slab price outside MH (Rs.)",0,"num"]];
 var editing=null,editPhoto="";
-function openProdForm(i){editing=i;var p=i==null?{brand:"",group:"",stamp:0,slabQty:0}:DATA.products[i];editPhoto=p.photo||"";var G=[];DATA.products.forEach(function(x){if(G.indexOf(x.group)<0)G.push(x.group)});
+function groupsOf(b){var G=[];DATA.products.forEach(function(x){if(x.brand===b&&G.indexOf(x.group)<0)G.push(x.group)});return G}
+function openProdForm(i){editing=i;var p=i==null?{brand:ADMB!=="ALL"?ADMB:"ECO",group:"",stamp:0,slabQty:0}:DATA.products[i];editPhoto=p.photo||"";var G=groupsOf(p.brand);
  var h='<h2>'+(i==null?"NEW product":"Edit "+esc(icode(p)))+'</h2><div style="display:flex;gap:10px;align-items:center"><div class="ph" id="pf-ph">'+pic(p)+'</div><div style="flex:1"><label>Product photo</label><input type="file" accept="image/*" id="pf-file"><button class="b-red" style="margin-top:6px;padding:6px 10px" data-a="pf-nophoto">Remove photo</button></div></div>';
- PF.forEach(function(f){var v=p[f[0]]==null?"":p[f[0]];h+='<label class="'+(f[2]?"req":"")+'">'+f[1]+'</label><input id="pf-'+f[0]+'" value="'+esc(v)+'"'+(f[3]==="num"?' inputmode="decimal"':'')+(f[3]==="group"?' list="pf-groups"':'')+'>'});
+ PF.forEach(function(f){var v=p[f[0]]==null?"":p[f[0]];if(f[0]==="brand"){var BL=brandList();if(v&&BL.indexOf(v)<0)BL.push(v);h+='<label class="req">Brand (product list)</label><select id="pf-brand">'+BL.map(function(b){return '<option'+(b===v?' selected':'')+'>'+esc(b)+'</option>'}).join("")+'</select>';return}h+='<label class="'+(f[2]?"req":"")+'">'+f[1]+'</label><input id="pf-'+f[0]+'" value="'+esc(v)+'"'+(f[3]==="num"?' inputmode="decimal"':'')+(f[3]==="group"?' list="pf-groups"':'')+'>'});
  h+='<datalist id="pf-groups">'+G.map(function(g){return '<option value="'+esc(g)+'">'}).join("")+'</datalist>';
  if(i==null)h+='<label>Insert position</label><select id="pf-pos"><option value="end">At the end of its group (recommended)</option><option value="last">At the very end</option></select>';
  h+='<div class="sendgrid"><button class="b-main" data-a="pf-save">Save product</button><button class="b-red" data-a="ov-close">Cancel</button></div>';overlay(h)}
@@ -1518,8 +1532,9 @@ function renderSetup(){var h='<header class="appbar"><div class="blogo"></div><d
 function backup(){var b=new Blob([JSON.stringify({app:"NISAN-backup",at:new Date().toISOString(),profile:prof,history:hist,cart:cart,device:DEVCODE})],{type:"application/json"});download(b,"NISAN_my_backup_"+fmtDate(new Date())+".json");toast("Backup saved to Downloads")}
 function restore(file){var fr=new FileReader();fr.onload=function(){try{var j=JSON.parse(fr.result);if(j.app!=="NISAN-backup")throw 0;if(!confirm("Restore details and "+(j.history||[]).length+" order(s) from this backup? Current data on this device will be replaced."))return;prof=j.profile||{};hist=j.history||[];cart=j.cart||{};if(j.device&&normCode(j.device).length===10){DEVCODE=normCode(j.device);sSet("device_code",DEVCODE)}saveProf();saveHist();saveCart();toast("Backup restored");render()}catch(e){toast("Not a valid NISAN backup file")}};fr.readAsText(file)}
 /* ================= events ================= */
-document.addEventListener("click",function(ev){var el=ev.target.closest("[data-sg],[data-goto],[data-dlw],[data-dle],[data-dld],[data-bks],[data-a],[data-f],[data-dq],[data-add],[data-rm],[data-hp],[data-hr],[data-ho],[data-up],[data-dn],[data-ed],[data-del]");if(!el)return;var a=el.dataset.a;
+document.addEventListener("click",function(ev){var el=ev.target.closest("[data-sg],[data-goto],[data-dlw],[data-dle],[data-dld],[data-bks],[data-a],[data-f],[data-dq],[data-add],[data-rm],[data-hp],[data-hr],[data-ho],[data-up],[data-dn],[data-ed],[data-del],[data-admb]");if(!el)return;var a=el.dataset.a;
  if(a==="ov-bg"&&ev.target!==el)return;
+ if(el.dataset.admb!=null){ADMB=el.dataset.admb;try{localStorage.setItem("nisan_admb",ADMB)}catch(e){}renderAdmList();var mm=$("#main");if(mm)mm.scrollTop=0;return}
  if(el.dataset.sg!=null){sBrand=sBrand===el.dataset.sg?"":el.dataset.sg;renderSearchRes();return}
  if(el.dataset.goto!=null){gotoProduct(el.dataset.goto);return}
  if(el.dataset.dlw!=null){sendDealerLink(dealers()[+el.dataset.dlw]);renderAdmDealers();return}
@@ -1595,6 +1610,7 @@ document.addEventListener("click",function(ev){var el=ev.target.closest("[data-s
   case "adm-exit":ADMIN=false;view="shop";render();break;
  }});
 document.addEventListener("change",function(ev){var t=ev.target;
+ if(t.id==="pf-brand"){var dl=$("#pf-groups");if(dl)dl.innerHTML=groupsOf(t.value).map(function(g){return '<option value="'+esc(g)+'">'}).join("");return}
  if(t.id==="po-trans"){readPay();var pd=$("#po-doc");if(pd&&curPO){var tmp=document.createElement("div");tmp.innerHTML=poHTML(curPO);pd.replaceWith(tmp.firstChild)}return}
  if(t.id==="st-sel"){prof.state=t.value;saveProf();renderShop();renderCartBar();return}
  if(t.dataset.q){setQty(t.dataset.q,t.value);return}
