@@ -1,7 +1,7 @@
 /* NPRO PARTNER + PARTNER MASTER offline worker.
    Online: always loads the newest app and prices (network first).
    Offline or very slow network: opens the saved copy at once. */
-var CACHE = "npro-partner-v3";
+var CACHE = "npro-partner-v4";
 var CORE = [
   "./", "./index.html", "./master.html",
   "./manifest.json", "./manifest-master.json",
@@ -27,7 +27,9 @@ self.addEventListener("fetch", function (e) {
   var req = e.request;
   if (req.method !== "GET" || new URL(req.url).origin !== self.location.origin) return;
   var nav = req.mode === "navigate";
-  var net = fetch(req).then(function (res) {
+  /* always ask GitHub for the newest page / price file (no 10-minute browser cache), build 75 */
+  var fresh = nav || /\.(html|json)$/.test(new URL(req.url).pathname);
+  var net = fetch(fresh ? new Request(req.url, { cache: "no-cache", credentials: "same-origin" }) : req).then(function (res) {
     if (res && res.ok) { var copy = res.clone(); caches.open(CACHE).then(function (c) { c.put(req, copy); }); }
     return res;
   });
