@@ -26,6 +26,8 @@ function pageFallback(req) {
 self.addEventListener("fetch", function (e) {
   var req = e.request;
   if (req.method !== "GET" || new URL(req.url).origin !== self.location.origin) return;
+  /* the Quotation app (quotation/ folder) has its own worker; never answer for it */
+  if (new URL(req.url).pathname.indexOf("/quotation/") >= 0) return;
   var nav = req.mode === "navigate";
   /* always ask GitHub for the newest page / price file (no 10-minute browser cache), build 75 */
   var fresh = nav || /\.(html|json)$/.test(new URL(req.url).pathname);
