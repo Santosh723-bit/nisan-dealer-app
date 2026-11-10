@@ -2,7 +2,7 @@
 <html lang="en"><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<meta name="theme-color" content="#1F3864">
+<meta name="theme-color" content="#000000">
 <title>PARTNER MASTER</title>
 <link rel="manifest" href="manifest-master.json">
 <link rel="apple-touch-icon" href="apple-touch-icon-master.png">
@@ -603,6 +603,17 @@ body.pc .pimg .ph{position:absolute;inset:0;width:auto;height:auto;flex:none;bor
 #pfwrap.lcform .lconly{display:block;margin:4px 0 12px}
 .caprow{display:grid;grid-template-columns:1fr 1.2fr 40px;gap:6px;margin-bottom:6px}
 .caprow input{margin:0}.caprow button{padding:0;font-size:20px}
+/* build 73: less mustard - white bottom menu, white CHECK OUT, black +/- with mustard signs */
+html,body{background:#000}
+.bnav{background:#fff;border-top:1px solid #e4e4e7}
+.bnav button{color:#555;opacity:1}
+.bnav button.on{color:#B98A00;opacity:1}
+.bnav button.on svg{background:none;padding:0;width:21px;height:21px}
+.bnav .nb{background:#111;color:#F5C21B}
+.b-co3{background:#000;color:#fff;border:2px solid #fff}
+.b-co3:active{background:#fff;color:#000}
+.qrow .qb,.qty .qb{background:#000;color:#F5C21B;border:1.5px solid #3a3a3e}
+.qrow .qb:active,.qty .qb:active{background:#1E1E22}
 </style>
 </head>
 <body class="pc">
@@ -1305,7 +1316,7 @@ function renderHist(){var h=installCard()+'<h2>My Orders</h2><div class="bar mut
 function renderHelp(){var s=DATA.settings;$("#main").innerHTML='<h2>How to use</h2><div class="bar help"><b>1.</b> Tap <b>My Details</b> once and fill your company, GSTIN, licence, address and State. They stay saved.<br><b>2.</b> Scroll the products, set <b>Qty</b>, tap <b>Add to cart</b>. Within '+esc(s.homeState)+' you can untick <b>Stamping</b> if not needed.<br><b>3.</b> Tap <b>Checkout</b>: your Purchase Order with Grand Total appears.<br><b>4.</b> Attach your <b>payment screenshot</b> from the gallery and the UTR number.<br><b>5.</b> <b>Share / Save PDF</b>, then <b>WhatsApp to Dispatch</b> (attach the PDF) and <b>Email</b>.<br><br>Prices update automatically when you have internet. Current price list: <b>'+esc(s.priceRef)+'</b>, '+fmtDT(DATA.version)+'. '+esc(note2())+'.<br><br>Faulty unit received? Call <b>Service Support '+esc(s.service)+'</b>.<br>Dispatch: <b>'+esc(s.dispatch)+'</b> &middot; Email: '+esc(s.email)+'</div>'}
 /* ================= auto-update (dealer) ================= */
 /* ================= dealer authorization + sync (v4) ================= */
-var APP_BUILD=72, DEVCODE="", syncing=null, updAsked=false;
+var APP_BUILD=73, DEVCODE="", syncing=null, updAsked=false;
 var CODE_ABC="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 function normCode(c){return String(c||"").toUpperCase().replace(/[^A-Z0-9]/g,"")}
 function fmtCode(c){c=normCode(c);return c.slice(0,5)+"-"+c.slice(5)}
