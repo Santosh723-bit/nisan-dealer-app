@@ -629,6 +629,20 @@ html,body{background:#000}
 .licpill svg{width:16px;height:16px}
 .licpill.on{background:#111;color:#F5C21B;cursor:pointer}
 .licpill.off{background:#eee;color:#999}
+/* build 78: payment proof stacked */
+.pay2 label{display:block;margin:12px 0 5px;font-weight:600}
+.pay2 select,.pay2 input:not([type=file]){width:100%;display:block}
+.paytile{display:flex;align-items:center;gap:10px;border:1.5px dashed #B98A00;background:#FFF8E1;border-radius:14px;padding:10px}
+.paytile .paypick{flex:1;display:flex;align-items:center;gap:12px;margin:0;cursor:pointer;min-width:0}
+.payph{width:56px;height:72px;border-radius:10px;background:#efe6c8;color:#B98A00;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.paythumb{width:56px;height:72px;object-fit:cover;border-radius:10px;border:1px solid #ccc;flex:0 0 auto}
+.paytx{display:flex;flex-direction:column;min-width:0}
+.paytx b{color:#111;font-size:15px}
+.paytx span{color:#666;font-size:13px;font-weight:400}
+.paytile.has{border-style:solid;background:#F3FBF4;border-color:#2bb24c}
+.paydel{padding:7px 12px;width:auto;margin:0;flex:0 0 auto}
+.paysave{width:100%;margin-top:16px;background:#111;color:#F5C21B;border:0;border-radius:12px;padding:14px;font-weight:700;font-size:15px;letter-spacing:.6px;cursor:pointer}
+.paysave:active{background:#333}
 </style>
 </head>
 <body class="pc">
@@ -1258,11 +1272,13 @@ function transHTML(po){var T=transList();if(!T.length)return "";var cur=po.trans
  return '<div class="pay"><h3>Transporter / Courier</h3><div class="muted">Choose how you want the goods sent.</div><select id="po-trans"><option value="">&mdash; Select transporter / courier &mdash;</option>'+T.map(function(t){return '<option'+(cur===t?" selected":"")+'>'+esc(t)+'</option>'}).join("")+'</select></div>'}
 function needTrans(){if(!transList().length||!curPO)return false;if(curPO.transporter)return false;toast("Please select the transporter / courier first");var e=$("#po-trans");if(e){e.scrollIntoView({block:"center"});e.focus()}return true}
 function payHTML(po){var pay=po.pay||{};var _d=new Date(),today=_d.getFullYear()+"-"+("0"+(_d.getMonth()+1)).slice(-2)+"-"+("0"+_d.getDate()).slice(-2);
- return '<div class="pay"><h3>Payment proof (optional, recommended)</h3><div class="muted">Attach the payment screenshot from your gallery. It goes on the PO and as page 2 of the PDF, so '+esc(DATA.settings.supplier)+' can match payment to order.</div>'+
- '<label>Payment screenshot</label><input type="file" accept="image/*" id="pay-img">'+(pay.img?'<img class="payimg" src="'+pay.img+'" alt=""><button class="b-red" style="margin-top:6px;padding:6px 10px" data-a="pay-rm">Remove screenshot</button>':'')+
- '<div class="row2"><div><label>Mode</label><select id="pay-mode"><option value="">&mdash;</option>'+PAYMODES.map(function(m){return '<option'+(pay.mode===m?" selected":"")+'>'+m+'</option>'}).join("")+'</select></div><div><label>Amount paid (&#8377;)</label><input id="pay-amt" inputmode="decimal" value="'+esc(pay.amount===""||pay.amount==null?po.t.grand:pay.amount)+'"></div></div>'+
- '<div class="row2"><div><label>UTR / Transaction ref</label><input id="pay-ref" value="'+esc(pay.ref||"")+'"></div><div><label>Payment date</label><input id="pay-date" type="date" value="'+esc(pay.date||today)+'"></div></div>'+
- '<button class="b-main" style="width:100%;margin-top:10px" data-a="pay-save">Save payment details</button></div>'}
+ return '<div class="pay pay2"><h3>Payment proof</h3><div class="muted">Optional, recommended. Goes on the PO and as page 2 of the PDF, so '+esc(DATA.settings.supplier)+' can match payment to order.</div>'+
+ '<label>1. Payment screenshot</label><div class="paytile'+(pay.img?' has':'')+'"><label class="paypick">'+(pay.img?'<img class="paythumb" src="'+pay.img+'" alt="Payment screenshot">':'<span class="payph"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-8 9"/></svg></span>')+'<span class="paytx"><b>'+(pay.img?'Screenshot attached':'Tap to attach screenshot')+'</b><span>'+(pay.img?'Tap to change':'From gallery or WhatsApp')+'</span></span><input type="file" accept="image/*" id="pay-img" style="display:none"></label>'+(pay.img?'<button class="b-red paydel" data-a="pay-rm">Remove</button>':'')+'</div>'+
+ '<label>2. Payment mode</label><select id="pay-mode"><option value="">&mdash; Select &mdash;</option>'+PAYMODES.map(function(m){return '<option'+(pay.mode===m?" selected":"")+'>'+m+'</option>'}).join("")+'</select>'+
+ '<label>3. Amount paid (&#8377;)</label><input id="pay-amt" inputmode="decimal" value="'+esc(pay.amount===""||pay.amount==null?po.t.grand:pay.amount)+'">'+
+ '<label>4. UTR / Transaction ref</label><input id="pay-ref" placeholder="e.g. 431298765012" autocomplete="off" value="'+esc(pay.ref||"")+'">'+
+ '<label>5. Payment date</label><input id="pay-date" type="date" value="'+esc(pay.date||today)+'">'+
+ '<button class="paysave" data-a="pay-save">SAVE PAYMENT DETAILS</button></div>'}
 function renderPO(){var rec=curIdx>=0?hist[curIdx]:null;
  if(!rec){var L=cartLines();if(!L.length){view="shop";render();return}
   var pend=null;for(var i=0;i<hist.length;i++)if(hist[i].po.status==="open"&&hist[i].po.cartKey==="current"){pend=i;break}
@@ -1335,7 +1351,7 @@ function renderHist(){var h=installCard()+'<h2>My Orders</h2><div class="bar mut
 function renderHelp(){var s=DATA.settings;$("#main").innerHTML='<h2>How to use</h2><div class="bar help"><b>1.</b> Tap <b>My Details</b> once and fill your company, GSTIN, licence, address and State. They stay saved.<br><b>2.</b> Scroll the products, set <b>Qty</b>, tap <b>Add to cart</b>. Within '+esc(s.homeState)+' you can untick <b>Stamping</b> if not needed.<br><b>3.</b> Tap <b>Checkout</b>: your Purchase Order with Grand Total appears.<br><b>4.</b> Attach your <b>payment screenshot</b> from the gallery and the UTR number.<br><b>5.</b> <b>Share / Save PDF</b>, then <b>WhatsApp to Dispatch</b> (attach the PDF) and <b>Email</b>.<br><br>Prices update automatically when you have internet. Current price list: <b>'+esc(s.priceRef)+'</b>, '+fmtDT(DATA.version)+'. '+esc(note2())+'.<br><br>Faulty unit received? Call <b>Service Support '+esc(s.service)+'</b>.<br>Dispatch: <b>'+esc(s.dispatch)+'</b> &middot; Email: '+esc(s.email)+'</div>'}
 /* ================= auto-update (dealer) ================= */
 /* ================= dealer authorization + sync (v4) ================= */
-var APP_BUILD=77, DEVCODE="", syncing=null, updAsked=false;
+var APP_BUILD=78, DEVCODE="", syncing=null, updAsked=false;
 var CODE_ABC="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 function normCode(c){return String(c||"").toUpperCase().replace(/[^A-Z0-9]/g,"")}
 function fmtCode(c){c=normCode(c);return c.slice(0,5)+"-"+c.slice(5)}
