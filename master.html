@@ -709,6 +709,11 @@ html,body{background:#000}
 .qb2{background:#fff;color:#111;border:1.5px solid #111}.qb1{background:#111;color:#F5C21B;border:0}
 .qback{width:100%;margin:0 0 10px}
 @media (max-width:359px){.qtab .qa{width:84px}.qtab td{font-size:13px}}
+
+/* build 83 dispatch note */
+.dnote{display:flex;gap:10px;align-items:flex-start;background:#000;color:#F5C21B;border:1.5px solid #F5C21B;border-radius:14px;padding:13px 14px;margin:14px 0 4px}
+.dnote svg{flex:none;margin-top:2px}.dnote b{display:block;font-size:15px;line-height:1.45;font-weight:700}
+.dnote span{display:block;font-size:20px;font-weight:800;letter-spacing:.5px;margin-top:6px}
 </style>
 </head>
 <body class="pc">
@@ -1384,9 +1389,10 @@ function renderPO(){var rec=curIdx>=0?hist[curIdx]:null;
   else h+=quoteHTML(curPO,true)+'<button class="qgo" data-a="q-confirm">CONFIRM &middot; GO TO PAYMENT</button>';
   $("#main").innerHTML=h;return}
  var h='<h2>'+(editable?"Payment &amp; send <span class=\"qstep\">Step 2 of 2</span>":"Order "+esc(curPO.no))+'</h2>';
- if(editable)h+=quoteHTML(curPO,false).replace('class="qdoc"','class="qdoc qdoc2"').replace(/>PURCHASE ORDER</,payStatus(curPO)?">PURCHASE ORDER<":">QUOTATION<").replace(esc(curPO.no),payStatus(curPO)?esc(curPO.no):esc(qtNo(curPO)))+'<button class="b-sec qback" data-a="q-back">&lsaquo; Back to quotation</button>';
+ if(editable)h+=quoteHTML(curPO,false).replace('class="qdoc"','class="qdoc qdoc2"').replace(/>PURCHASE ORDER</,payStatus(curPO)?">PURCHASE ORDER<":">QUOTATION<").replace(esc(curPO.no),payStatus(curPO)?esc(curPO.no):esc(qtNo(curPO)));
  h+=transHTML(curPO)+payHTML(curPO);
- h+='<div class="sendgrid"><button class="pdf" data-a="pdf-share">1. Share / Save PDF</button><button class="wa" data-a="send-wa">2. WhatsApp to Dispatch ('+esc(curPO.settings.dispatch)+')</button><button class="ml" data-a="send-mail">3. Email to '+esc(curPO.settings.email)+'</button>'+(editable?'<button class="b-sec" data-a="go-shop">&lsaquo; Add more items</button>':'<button class="b-sec" data-a="go-hist">&lsaquo; Back to orders</button>')+'</div>';
+ h+='<div class="dnote"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21l1.65-3.8A9 9 0 1 1 7.5 20L3 21"/><path d="M9 10a.5.5 0 0 0 1 0V9a.5.5 0 0 0-1 0v1a5 5 0 0 0 5 5h1a.5.5 0 0 0 0-1h-1a.5.5 0 0 0 0 1"/></svg><div><b>Dear Partner, Order dispatch to communicate with this number only</b><span>'+esc(curPO.settings.dispatch)+'</span></div></div>';
+ h+='<div class="sendgrid"><button class="wa" data-a="send-wa">1. WhatsApp PO (PDF) to Dispatch</button><button class="ml" data-a="send-mail">2. Email to '+esc(curPO.settings.email)+'</button>'+(editable?'<button class="b-sec" data-a="q-back">&lsaquo; Back to quotation</button>':'<button class="b-sec" data-a="go-hist">&lsaquo; Back to orders</button>')+'</div>';
  h+=poHTML(curPO);
  if(editable)h+='<div class="sendgrid"><button class="b-sec" data-a="go-profile-po">Edit my details</button><button class="b-main" data-a="new-order">Order sent &ndash; start new order</button></div>';
  $("#main").innerHTML=h}
@@ -1427,10 +1433,14 @@ function makePDF(po){var J=window.jspdf&&window.jspdf.jsPDF;if(!J){toast("PDF en
   try{var ip=doc.getImageProperties(pay.img),mw=W-2*M,mh=297-y-14,k=Math.min(mw/ip.width,mh/ip.height),iw=ip.width*k,ih=ip.height*k;doc.addImage(pay.img,"JPEG",M+(mw-iw)/2,y,iw,ih)}catch(e){doc.text("(screenshot could not be added)",M+2,y+5)}}
  var pc=doc.getNumberOfPages();for(var i=1;i<=pc;i++){doc.setPage(i);doc.setFontSize(7);doc.setTextColor(130);doc.text("PO "+po.no+"  |  Page "+i+" of "+pc+"  |  Dealer-generated purchase order based on the current dealer price list",W/2,292,{align:"center"})}
  return doc}
-function pdfName(po){return "PO_"+po.no+"_"+String(po.prof.company||"Dealer").replace(/[^A-Za-z0-9]+/g,"_").slice(0,30)+".pdf"}
+function pdfName(po){return (/^PO-/i.test(String(po.no))?"":"PO_")+po.no+"_"+String(po.prof.company||"Dealer").replace(/[^A-Za-z0-9]+/g,"_").slice(0,30)+".pdf"}
 function sharePDF(po){var doc=makePDF(po);if(!doc)return;var blob=doc.output("blob"),name=pdfName(po);
  try{var f=new File([blob],name,{type:"application/pdf"});if(navigator.canShare&&navigator.canShare({files:[f]})){navigator.share({files:[f],title:"Purchase Order "+po.no,text:"Purchase Order "+po.no+" - Grand Total Rs. "+inr(po.t.grand)}).catch(function(){});return}}catch(e){}
  download(blob,name);toast("PDF saved to Downloads: "+name)}
+/* build 83: WhatsApp sends the PO as PDF only (no text). Phone: share sheet with the file. PC: PDF to Downloads + Dispatch chat opens. */
+function waPDF(po){var doc=makePDF(po);if(!doc)return;var blob=doc.output("blob"),name=pdfName(po),num=digits(po.settings.dispatch);if(num.length===10)num="91"+num;
+ try{var f=new File([blob],name,{type:"application/pdf"});if(navigator.canShare&&navigator.canShare({files:[f]})){navigator.share({files:[f]}).catch(function(){});return}}catch(e){}
+ download(blob,name);toast("PDF saved to Downloads. Attach it in the Dispatch WhatsApp chat.");setTimeout(function(){window.open("https://wa.me/"+num,"_blank")},700)}
 function download(blob,name){var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},4000)}
 function poText(po){var p=po.prof,t=po.t,rg=po.region,pay=po.pay||{},L=[];L.push("*PURCHASE ORDER* "+po.no);L.push("Date: "+po.date);L.push("To: "+po.settings.supplier);L.push("From: "+p.company+" ("+p.contact+", "+p.mobile+")");L.push("GSTIN: "+p.gstin+" | LM Lic: "+p.lmlic);L.push("Ship to: "+(p.ship||p.bill)+" - "+(p.shippin||p.billpin)+", "+p.state);L.push("Transport: "+p.transport+(po.transporter?" | Transporter: "+po.transporter:""));L.push("");
  po.lines.forEach(function(l,i){L.push((i+1)+". "+lIc(l)+" "+lMd(l)+(l.cap?" ("+l.cap+")":"")+" x "+l.q+" @ Rs."+rs(l.rate)+(l.stamp?" + stamping "+rs(l.stamp):"")+" = Rs."+rs(l.amount))});
@@ -1448,7 +1458,7 @@ function renderHist(){var h=installCard()+'<h2>My Orders</h2><div class="bar mut
 function renderHelp(){var s=DATA.settings;$("#main").innerHTML='<h2>How to use</h2><div class="bar help"><b>1.</b> Tap <b>My Details</b> once and fill your company, GSTIN, licence, address and State. They stay saved.<br><b>2.</b> Scroll the products, set <b>Qty</b>, tap <b>Add to cart</b>. Within '+esc(s.homeState)+' you can untick <b>Stamping</b> if not needed.<br><b>3.</b> Tap <b>Checkout</b>: your Purchase Order with Grand Total appears.<br><b>4.</b> Attach your <b>payment screenshot</b> from the gallery and the UTR number.<br><b>5.</b> <b>Share / Save PDF</b>, then <b>WhatsApp to Dispatch</b> (attach the PDF) and <b>Email</b>.<br><br>Prices update automatically when you have internet. Current price list: <b>'+esc(s.priceRef)+'</b>, '+fmtDT(DATA.version)+'. '+esc(note2())+'.<br><br>Faulty unit received? Call <b>Service Support '+esc(s.service)+'</b>.<br>Dispatch: <b>'+esc(s.dispatch)+'</b> &middot; Email: '+esc(s.email)+'</div>'}
 /* ================= auto-update (dealer) ================= */
 /* ================= dealer authorization + sync (v4) ================= */
-var APP_BUILD=82, DEVCODE="", syncing=null, updAsked=false;
+var APP_BUILD=83, DEVCODE="", syncing=null, updAsked=false;
 var CODE_ABC="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 function normCode(c){return String(c||"").toUpperCase().replace(/[^A-Z0-9]/g,"")}
 function fmtCode(c){c=normCode(c);return c.slice(0,5)+"-"+c.slice(5)}
@@ -1800,7 +1810,7 @@ document.addEventListener("click",function(ev){var el=ev.target.closest("[data-s
   case "pay-save":readPay();toast("Payment details saved with this order");renderPO();break;
   case "pay-rm":curPO.pay.img="";saveHist();renderPO();break;
   case "pdf-share":readPay();if(needTrans())return;sharePDF(curPO);break;
-  case "send-wa":readPay();if(needTrans())return;var num=digits(curPO.settings.dispatch);if(num.length===10)num="91"+num;window.open("https://wa.me/"+num+"?text="+encodeURIComponent(poText(curPO)),"_blank");break;
+  case "send-wa":readPay();if(needTrans())return;waPDF(curPO);break;
   case "send-mail":readPay();if(needTrans())return;location.href="mailto:"+encodeURIComponent(curPO.settings.email)+"?subject="+encodeURIComponent("Purchase Order "+curPO.no+" - "+curPO.prof.company+" - Rs. "+inr(curPO.t.grand))+"&body="+encodeURIComponent(poText(curPO).replace(/\*/g,"")+"\n\n(Please attach the PO PDF saved on your phone.)");break;
   case "new-order":if(confirm("Start a new order? This PO stays in My Orders.")){readPay();if(curPO){curPO.cartKey="";curPO.status="sent"}saveHist();cart={};saveCart();prof.poref="";prof.remarks="";saveProf();curIdx=-1;view="shop";filt="ALL";render()}break;
   case "backup":backup();break;
