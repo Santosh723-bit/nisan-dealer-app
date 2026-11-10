@@ -683,6 +683,32 @@ html,body{background:#000}
 .istab .istot td{border:0;padding-top:10px;font-size:16px}
 .istab .istot td:first-child{color:#111;font-weight:600}
 .isds{display:block;width:calc(100% - 32px);margin:12px 16px 16px;background:#111;color:#F5C21B;border:0;border-radius:12px;padding:12px;font-weight:700;font-size:14px;cursor:pointer}
+
+/* build 82 quotation */
+.qstep{font-size:12px;font-weight:600;color:#777;margin-left:6px;white-space:nowrap}
+.qdoc{background:#fff;border:1px solid #e3e3e3;border-radius:14px;padding:14px;margin:8px 0 12px;color:#111}
+.qhead{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;border-bottom:2px solid #111;padding-bottom:8px}
+.qt{font-size:19px;font-weight:800;letter-spacing:1.5px}
+.qn{font-size:12px;color:#666;margin-top:2px;overflow-wrap:anywhere}
+.qedit{display:inline-flex;align-items:center;gap:5px;background:#fff;color:#111;border:1.5px solid #111;border-radius:9px;padding:7px 12px;font-weight:800;font-size:13px;letter-spacing:.5px;flex:none}
+.qft{display:flex;gap:10px;margin:10px 0 4px;font-size:12.5px;color:#555}
+.qft>div{flex:1;min-width:0}.qft b{display:block;color:#111;font-size:12px}
+.qtab,.qsum{width:100%;border-collapse:collapse}
+.qtab td{padding:8px 0;border-bottom:1px solid #ececec;vertical-align:top;font-size:14px}
+.qtab .qh td{font-size:12px;color:#777;padding:6px 0}
+.qtab .qq{text-align:right;width:34px;font-weight:700}
+.qtab .qa{text-align:right;width:96px;font-weight:700;white-space:nowrap}
+.qtab .qh .qq,.qtab .qh .qa{font-weight:400}
+.qcode{background:none;border:0;padding:0;font:inherit;font-weight:800;color:#8a6700;border-bottom:1.5px dotted #B98A00;cursor:pointer}
+.qk{font-size:12px;color:#777}
+.qs{font-size:12px;color:#666;margin-top:2px;line-height:1.35}
+.qsum td{padding:4px 0;font-size:13px;color:#555}.qsum td+td{text-align:right;color:#111}
+.qw{font-size:12px;color:#666;margin-top:5px}
+.qgo{display:block;width:100%;background:#111;color:#F5C21B;border:0;border-radius:12px;padding:15px;font-weight:800;font-size:15px;letter-spacing:.5px;margin:4px 0 14px}
+.qbtns{display:flex;gap:8px;margin-top:12px}.qbtns button{flex:1;border-radius:11px;padding:13px 8px;font-weight:800;font-size:14px}
+.qb2{background:#fff;color:#111;border:1.5px solid #111}.qb1{background:#111;color:#F5C21B;border:0}
+.qback{width:100%;margin:0 0 10px}
+@media (max-width:359px){.qtab .qa{width:84px}.qtab td{font-size:13px}}
 </style>
 </head>
 <body class="pc">
@@ -1263,7 +1289,7 @@ function gotoProduct(id){closeOv();filt="ALL";if(view!=="shop"){view="shop";rend
 function exitApp(){try{window.close()}catch(e){}
  setTimeout(function(){if(window.closed)return;var s=DATA.settings;$("#app").innerHTML='<div class="bye"><div class="blogo big"></div><h1>Thank you</h1><p>No order was placed.</p><p class="bsub">You can close the app now<br>(swipe it away or press the Home button).</p><button class="b-co3" data-a="bye-back">BACK TO SHOP</button></div>'},250)}
 function startCheckout(){if(!cartLines().length){overlay('<h2>Select quantity</h2><div class="help">No product is selected yet. Use <b>+</b> on the product you need to choose the quantity, then tap <b>CHECK OUT</b>.</div><div class="sendgrid"><button class="b-co2" data-a="co-select">SELECT QUANTITY</button><button class="b-exit" data-a="co-exit">EXIT</button></div>');return}
- ensureFresh(function(){if(!cartLines().length){startCheckout();return}if(profMissing().length||profErrors().length){view="profile";render();renderProfile("po");toast("Please complete your details first");return}curIdx=-1;view="po";render()})}
+ ensureFresh(function(){if(!cartLines().length){startCheckout();return}if(profMissing().length||profErrors().length){view="profile";render();renderProfile("po");toast("Please complete your details first");return}curIdx=-1;poMode="quote";view="po";render()})}
 function setQty(id,v){var p=prodById(id);if(!p)return;if(!region()){toast("Please set your state in My Details first");return}v=Math.max(0,Math.min(9999,parseInt(v)||0));
  var stEl=$('[data-st="'+id+'"]'),st=stEl?stEl.checked:(cart[id]?cart[id].st!==false:true);
  if(v>0)cart[id]={q:v,st:st};else delete cart[id];saveCart();
@@ -1304,7 +1330,7 @@ function payStatus(po){return po.pay&&(po.pay.img||po.pay.ref)}
 function poHTML(po){var s=po.settings,p=po.prof,t=po.t,rg=po.region,pay=po.pay||{};var ship=p.ship?p.ship+(p.shippin?" - "+p.shippin:""):p.bill+(p.billpin?" - "+p.billpin:"");
  var rows=po.lines.map(function(l,i){return '<tr><td class="c">'+(i+1)+'</td><td><b>'+esc(lIc(l))+'</b></td><td>'+esc(lMd(l))+(l.cap?' | '+esc(l.cap):'')+(l.slab?' <i>(slab rate)</i>':'')+'</td><td class="c">'+l.q+'</td><td class="r">'+inr(l.rate,1)+'</td><td class="r">'+(l.stamp?inr(l.stamp,1):"-")+'</td><td class="r">'+inr(l.taxable,1)+'</td><td class="r">'+inr(l.gst,1)+'</td><td class="r">'+inr(l.amount,1)+'</td></tr>'}).join("");
  var tr=function(a,b,cls){return '<tr class="'+(cls||"")+'"><td colspan="8" class="r">'+a+'</td><td class="r">'+b+'</td></tr>'};
- return '<div class="po" id="po-doc"><div class="t">PURCHASE ORDER</div>'+
+ return '<div class="po" id="po-doc"><div class="t">'+(po.cartKey==="current"&&!payStatus(po)?"QUOTATION":"PURCHASE ORDER")+'</div>'+
  '<div class="two"><div><div class="hd">PURCHASE ORDER TO</div><div class="box"><b>'+esc(s.supplier)+'</b><br>'+esc(s.address)+'<br>GSTIN: '+esc(s.gstin)+' &nbsp; Email: '+esc(s.email)+'<br><b>Dispatch: '+esc(s.dispatch)+'</b> &nbsp; <b>Service Support: '+esc(s.service)+'</b></div></div>'+
  '<div><div class="hd">PO DETAILS</div><div class="box">PO No: <b>'+esc(po.no)+'</b><br>PO Date: '+po.date+'<br>Place of supply: '+esc(p.state)+'<br>Tax: '+(rg===1?"CGST 9% + SGST 9%":"IGST 18%")+' &nbsp; Transport: '+esc(p.transport)+(po.transporter?'<br>Transporter: <b>'+esc(po.transporter)+'</b>':'')+'<br>Price list: '+esc(s.priceRef)+' ('+fmtDT(po.plVer)+', valid till '+po.validTill+')</div></div></div>'+
  '<div class="two"><div><div class="hd">FROM (DEALER / BILL TO)</div><div class="box"><b>'+esc(p.company)+'</b><br>'+esc(p.bill)+(p.billpin?" - "+esc(p.billpin):"")+'<br>Contact: '+esc(p.contact)+' &nbsp; Mob: '+esc(p.mobile)+(p.email?' &nbsp; '+esc(p.email):'')+'<br>GSTIN: '+esc(p.gstin)+' &nbsp; LM Licence: '+esc(p.lmlic)+'</div></div>'+
@@ -1332,15 +1358,33 @@ function payHTML(po){var pay=po.pay||{};var _d=new Date(),today=_d.getFullYear()
  '<label>4. UTR / Transaction ref</label><input id="pay-ref" placeholder="e.g. 431298765012" autocomplete="off" value="'+esc(pay.ref||"")+'">'+
  '<label>5. Payment date</label><input id="pay-date" type="date" value="'+esc(pay.date||today)+'">'+
  '<button class="paysave" data-a="pay-save">SAVE PAYMENT DETAILS</button></div>'}
+/* build 82: read-only QUOTATION (same look as PO) with EDIT; becomes PURCHASE ORDER once payment is saved */
+var poMode="quote";
+function qtNo(po){var n=String(po.no||"");return /^PO-/i.test(n)?n.replace(/^PO-/i,"QT-"):"QT-"+n}
+function quoteHTML(po,editable){var t=po.t,rg=po.region,s=po.settings,p=po.prof,isPO=!editable||!!payStatus(po);
+ var rows=po.lines.map(function(l){var pr=prodById(l.pid),sp=pr?specList(pr).map(function(x){return x[1]}).join(" · "):(lMd(l)+(l.cap?" | "+l.cap:"")),each=l.q?l.amount/l.q:0;
+  var pp=pr&&pr.pid0?prodById(pr.pid0):pr,kind=pp?(pr.pid0?(isSP(pp)?"Spare":"Load cell"):(BU(pp.brand||"")+(pp.group?" "+String(pp.group).replace(/^(ECO|NPRO)\s*[-–]\s*/i,""):""))):"";
+  return '<tr><td>'+(pr?'<button class="qcode" data-cinfo="'+esc(l.pid)+'">'+esc(lIc(l))+'</button>':'<b>'+esc(lIc(l))+'</b>')+(kind?' <span class="qk">'+esc(kind)+'</span>':'')+'<div class="qs">'+esc(sp)+'</div><div class="qs">&#8377;'+inr(each,1)+' each'+(l.stamp?' incl. stamping + GST':' incl. GST')+(l.slab?' (slab rate)':'')+'</div></td><td class="qq">'+l.q+'</td><td class="qa">&#8377;'+inr(l.amount,1)+'</td></tr>'}).join("");
+ var tr=function(a,b){return '<tr><td>'+a+'</td><td>&#8377;'+b+'</td></tr>'};
+ return '<div class="qdoc"><div class="qhead"><div><div class="qt">'+(isPO?"PURCHASE ORDER":"QUOTATION")+'</div><div class="qn">'+esc(isPO?po.no:qtNo(po))+'<br>Date: '+esc(po.date)+'</div></div>'+(editable?'<button class="qedit" data-a="q-edit"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg>EDIT</button>':'')+'</div>'+
+ '<div class="qft"><div><b>To</b>'+esc(s.supplier)+(s.city?', '+esc(s.city):'')+'</div><div><b>From</b>'+esc(p.company||"")+(p.state?' &middot; '+esc(p.state):'')+'</div></div>'+
+ '<table class="qtab"><tr class="qh"><td>Item</td><td class="qq">Qty</td><td class="qa">Amount</td></tr>'+rows+'</table>'+
+ '<table class="qsum">'+tr("Basic value ("+t.qty+" Nos)",inr(t.basic,1))+(t.stamp?tr("Legal Metrology stamping",inr(t.stamp,1)):"")+(rg===1?tr("CGST 9% + SGST 9%",inr(r2(t.cgst+t.sgst),1)):tr("IGST 18%",inr(t.igst,1)))+(t.round?tr("Round off",inr(t.round,1)):"")+'</table>'+
+ '<div class="cigt"><span>GRAND TOTAL</span><b>&#8377; '+inr(t.grand)+'</b></div><div class="qw">'+words(t.grand)+'</div></div>'}
 function renderPO(){var rec=curIdx>=0?hist[curIdx]:null;
  if(!rec){var L=cartLines();if(!L.length){view="shop";render();return}
   var pend=null;for(var i=0;i<hist.length;i++)if(hist[i].po.status==="open"&&hist[i].po.cartKey==="current"){pend=i;break}
   var po=buildPO(pend!=null?hist[pend].po:null);po.cartKey="current";
   if(pend!=null){hist[pend].po=po;curIdx=pend}else{hist.unshift({po:po});curIdx=0}hist=hist.slice(0,100);saveHist();rec=hist[curIdx]}
- curPO=rec.po;var editable=curPO.cartKey==="current";var h='<h2>'+(editable?"Review &amp; Purchase Order":"Order "+esc(curPO.no))+'</h2>';
- if(editable){var L2=cartLines();h+='<div class="bar cart2"><b>Your cart</b> <span class="muted">(change qty or remove)</span>';
+ curPO=rec.po;var editable=curPO.cartKey==="current";
+ if(editable&&poMode!=="pay"){var h='<h2>'+(poMode==="edit"?"Edit quotation":"Review your order")+' <span class="qstep">Step 1 of 2</span></h2>';
+  if(poMode==="edit"){var L2=cartLines();h+='<div class="bar cart2"><b>Edit quotation</b> <span class="muted">(change qty or remove)</span>';
   L2.forEach(function(x){var cp=x.p.cap||"",each=x.c.q?x.l.amount/x.c.q:0;h+='<div class="ci"><div class="ci1"><button class="cicode" data-cinfo="'+esc(x.p.id)+'" aria-label="Details of '+esc(icode(x.p))+'">'+esc(icode(x.p))+'<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></button></div><div class="cispec">'+specChips(x.p)+'</div><div class="ci2"><span class="cist"><button class="cib" data-cqd="'+x.p.id+'" data-d="-1" aria-label="Less">&minus;</button><em>'+x.c.q+'</em><button class="cib" data-cqd="'+x.p.id+'" data-d="1" aria-label="More">+</button></span><span class="ciu">&times; &#8377;'+inr(each,1)+'</span><span class="cia">&#8377;'+inr(x.l.amount,1)+'</span><button class="cirm" data-rm="'+x.p.id+'" aria-label="Remove">&times;</button></div></div>'});
-  h+='<div class="cigt"><span>GRAND TOTAL</span><b>&#8377; '+inr(curPO.t.grand)+'</b></div></div>'}
+  h+='<div class="cigt"><span>GRAND TOTAL</span><b>&#8377; '+inr(curPO.t.grand)+'</b></div><div class="qbtns"><button class="qb2" data-a="go-shop">+ ADD MORE ITEMS</button><button class="qb1" data-a="q-done">DONE</button></div></div>'}
+  else h+=quoteHTML(curPO,true)+'<button class="qgo" data-a="q-confirm">CONFIRM &middot; GO TO PAYMENT</button>';
+  $("#main").innerHTML=h;return}
+ var h='<h2>'+(editable?"Payment &amp; send <span class=\"qstep\">Step 2 of 2</span>":"Order "+esc(curPO.no))+'</h2>';
+ if(editable)h+=quoteHTML(curPO,false).replace('class="qdoc"','class="qdoc qdoc2"').replace(/>PURCHASE ORDER</,payStatus(curPO)?">PURCHASE ORDER<":">QUOTATION<").replace(esc(curPO.no),payStatus(curPO)?esc(curPO.no):esc(qtNo(curPO)))+'<button class="b-sec qback" data-a="q-back">&lsaquo; Back to quotation</button>';
  h+=transHTML(curPO)+payHTML(curPO);
  h+='<div class="sendgrid"><button class="pdf" data-a="pdf-share">1. Share / Save PDF</button><button class="wa" data-a="send-wa">2. WhatsApp to Dispatch ('+esc(curPO.settings.dispatch)+')</button><button class="ml" data-a="send-mail">3. Email to '+esc(curPO.settings.email)+'</button>'+(editable?'<button class="b-sec" data-a="go-shop">&lsaquo; Add more items</button>':'<button class="b-sec" data-a="go-hist">&lsaquo; Back to orders</button>')+'</div>';
  h+=poHTML(curPO);
@@ -1404,7 +1448,7 @@ function renderHist(){var h=installCard()+'<h2>My Orders</h2><div class="bar mut
 function renderHelp(){var s=DATA.settings;$("#main").innerHTML='<h2>How to use</h2><div class="bar help"><b>1.</b> Tap <b>My Details</b> once and fill your company, GSTIN, licence, address and State. They stay saved.<br><b>2.</b> Scroll the products, set <b>Qty</b>, tap <b>Add to cart</b>. Within '+esc(s.homeState)+' you can untick <b>Stamping</b> if not needed.<br><b>3.</b> Tap <b>Checkout</b>: your Purchase Order with Grand Total appears.<br><b>4.</b> Attach your <b>payment screenshot</b> from the gallery and the UTR number.<br><b>5.</b> <b>Share / Save PDF</b>, then <b>WhatsApp to Dispatch</b> (attach the PDF) and <b>Email</b>.<br><br>Prices update automatically when you have internet. Current price list: <b>'+esc(s.priceRef)+'</b>, '+fmtDT(DATA.version)+'. '+esc(note2())+'.<br><br>Faulty unit received? Call <b>Service Support '+esc(s.service)+'</b>.<br>Dispatch: <b>'+esc(s.dispatch)+'</b> &middot; Email: '+esc(s.email)+'</div>'}
 /* ================= auto-update (dealer) ================= */
 /* ================= dealer authorization + sync (v4) ================= */
-var APP_BUILD=81, DEVCODE="", syncing=null, updAsked=false;
+var APP_BUILD=82, DEVCODE="", syncing=null, updAsked=false;
 var CODE_ABC="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 function normCode(c){return String(c||"").toUpperCase().replace(/[^A-Z0-9]/g,"")}
 function fmtCode(c){c=normCode(c);return c.slice(0,5)+"-"+c.slice(5)}
@@ -1710,13 +1754,17 @@ document.addEventListener("click",function(ev){var el=ev.target.closest("[data-s
  if(el.dataset.cinfo){openItemInfo(el.dataset.cinfo);return}
  if(el.dataset.cqd){var ck=el.dataset.cqd,cq=((cart[ck]||{}).q||0)+(+el.dataset.d);readPay();if(cq>0){cart[ck].q=cq;saveCart();refreshCurPO();renderPO();return}delete cart[ck];saveCart();if(!cartLines().length){hist.splice(curIdx,1);saveHist();curIdx=-1;view="shop";render();return}refreshCurPO();renderPO();return}
  if(el.dataset.rm){delete cart[el.dataset.rm];saveCart();if(!cartLines().length){hist.splice(curIdx,1);saveHist();curIdx=-1;view="shop";render();return}refreshCurPO();renderPO();return}
- if(el.dataset.ho!=null){curIdx=+el.dataset.ho;var po0=hist[curIdx].po;if(po0.cartKey==="current"&&!cartLines().length){po0.cartKey="";saveHist()}view="po";render();return}
+ if(el.dataset.ho!=null){curIdx=+el.dataset.ho;var po0=hist[curIdx].po;if(po0.cartKey==="current"&&!cartLines().length){po0.cartKey="";saveHist()}poMode="quote";view="po";render();return}
  if(el.dataset.hp!=null){sharePDF(hist[+el.dataset.hp].po);return}
  if(el.dataset.hr!=null){var po=hist[+el.dataset.hr].po;cart={};po.lines.forEach(function(l){var pp=prodById(l.pid);if(!pp)DATA.products.forEach(function(x){if(icode(x)===lIc(l))pp=x});if(pp)cart[pp.id]={q:l.q,st:l.st!==false}});saveCart();view="shop";filt="CART";render();toast("Items loaded at current prices");return}
  if(el.dataset.up!=null||el.dataset.dn!=null){var i=+(el.dataset.up!=null?el.dataset.up:el.dataset.dn),j=el.dataset.up!=null?i-1:i+1,P=DATA.products;if(j<0||j>=P.length)return;if(P[i].group!==P[j].group){toast("To move to another group, use Edit and change the Group heading");return}var t=P[i];P[i]=P[j];P[j]=t;saveDraft();renderAdmList();return}
  if(el.dataset.ed!=null){openProdForm(+el.dataset.ed);return}
  if(el.dataset.del!=null){var k=+el.dataset.del;if(confirm("Delete "+icode(DATA.products[k])+"?")){DATA.products.splice(k,1);saveDraft();renderAdmList()}return}
  switch(a){
+  case "q-edit":poMode="edit";renderPO();window.scrollTo(0,0);break;
+  case "q-done":poMode="quote";renderPO();window.scrollTo(0,0);break;
+  case "q-confirm":poMode="pay";renderPO();window.scrollTo(0,0);break;
+  case "q-back":readPay();poMode="quote";renderPO();window.scrollTo(0,0);break;
   case "go-shop":if(view==="shop"&&filt!=="ALL"){filt="ALL";renderShop();break}view="shop";render();break;
   case "go-search":openSearch();setTimeout(function(){var i=$("#s2");if(i&&!search)i.blur()},0);break;
   case "s-cart":closeOv();filt="CART";view="shop";render();break;
@@ -1748,7 +1796,7 @@ document.addEventListener("click",function(ev){var el=ev.target.closest("[data-s
   case "co-select":closeOv();if(view!=="shop"){view="shop";render()}var fq=document.querySelector('.card .qty .qb[data-d="1"]');toast("Tap + on the product you need");break;
   case "co-exit":closeOv();exitApp();break;
   case "bye-back":view="shop";render();break;
-  case "save-prof":document.querySelectorAll("[data-p]").forEach(function(x){prof[x.dataset.p]=x.dataset.p==="gstin"?x.value.trim().toUpperCase():x.value.trim()});saveProf();var m=profMissing(),e=profErrors();if(m.length){toast("Missing: "+m[0]);return}if(e.length){toast(e[0]);return}toast("Details saved");if($("#main").dataset.after==="po"&&cartLines().length){curIdx=-1;view="po"}else view="shop";render();break;
+  case "save-prof":document.querySelectorAll("[data-p]").forEach(function(x){prof[x.dataset.p]=x.dataset.p==="gstin"?x.value.trim().toUpperCase():x.value.trim()});saveProf();var m=profMissing(),e=profErrors();if(m.length){toast("Missing: "+m[0]);return}if(e.length){toast(e[0]);return}toast("Details saved");if($("#main").dataset.after==="po"&&cartLines().length){curIdx=-1;poMode="quote";view="po"}else view="shop";render();break;
   case "pay-save":readPay();toast("Payment details saved with this order");renderPO();break;
   case "pay-rm":curPO.pay.img="";saveHist();renderPO();break;
   case "pdf-share":readPay();if(needTrans())return;sharePDF(curPO);break;
