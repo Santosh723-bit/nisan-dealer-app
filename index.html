@@ -643,6 +643,22 @@ html,body{background:#000}
 .paydel{padding:7px 12px;width:auto;margin:0;flex:0 0 auto}
 .paysave{width:100%;margin-top:16px;background:#111;color:#F5C21B;border:0;border-radius:12px;padding:14px;font-weight:700;font-size:15px;letter-spacing:.6px;cursor:pointer}
 .paysave:active{background:#333}
+/* build 80: compact review cart rows */
+.cart2 .ci{border-bottom:1px solid #e3e3e3;padding:9px 0}
+.cart2 .ci:first-of-type{margin-top:6px}
+.ci1{display:flex;gap:8px;align-items:baseline;min-width:0}
+.ci1 b{flex:0 0 auto;font-size:15px;color:#111}
+.ci1 span{color:#555;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.ci2{display:flex;align-items:center;gap:8px;margin-top:6px}
+.cist{display:inline-flex;align-items:center;border:1px solid #ccc;border-radius:10px;overflow:hidden;flex:0 0 auto}
+.cib{width:34px;height:32px;border:0;background:#111;color:#F5C21B;font-size:18px;font-weight:700;line-height:1;padding:0;cursor:pointer}
+.cist em{font-style:normal;min-width:34px;text-align:center;font-weight:700;font-size:15px;color:#111}
+.ciu{color:#777;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.cia{margin-left:auto;font-weight:700;font-size:15px;color:#111;white-space:nowrap}
+.cirm{border:0;background:#fde8e8;color:#c00;border-radius:8px;width:30px;height:30px;font-size:18px;line-height:1;padding:0;flex:0 0 auto;cursor:pointer}
+.cigt{display:flex;justify-content:space-between;align-items:center;margin-top:10px;background:#F5C21B;color:#111;border-radius:10px;padding:9px 12px;font-weight:700}
+.cigt b{font-size:18px}
+@media (max-width:359px){.ciu{display:none}}
 </style>
 </head>
 <body class="pc">
@@ -1248,6 +1264,7 @@ function renderProfile(after){var h='<h2>My Details</h2><div class="bar muted">F
 function nextPONo(){var d=new Date(),ds=String(d.getFullYear()).slice(2)+("0"+(d.getMonth()+1)).slice(-2)+("0"+d.getDate()).slice(-2);var base="PO-"+ds+"-"+digits(prof.mobile).slice(-4);var n=hist.filter(function(h){return h.po.no.indexOf(base)===0}).length+1;return base+"-"+("0"+n).slice(-2)}
 function buildPO(prev){var L=cartLines(),t=totals(L);return {no:prev?prev.no:(prof.poref?String(prof.poref):nextPONo()),date:prev?prev.date:fmtDate(new Date()),ts:prev?prev.ts:Date.now(),prof:JSON.parse(JSON.stringify(prof)),region:region(),settings:JSON.parse(JSON.stringify(DATA.settings,function(k,v){return k==="pwHash"||k==="dataKey"||k==="accessCode"?undefined:v})),plVer:DATA.version,validTill:fmtDate(validTill()),note2:note2(),
  lines:L.map(function(x){return {pid:x.p.id,mc:1,model:mdesc(x.p),code:icode(x.p),cap:x.p.cap,pan:x.p.pan,q:x.c.q,st:x.c.st!==false,rate:x.l.u.rate,stamp:x.l.u.stamp,taxable:x.l.taxable,gst:x.l.gst,amount:x.l.amount,slab:x.l.u.slab}}),t:t,pay:prev?prev.pay:{mode:"",ref:"",amount:"",date:"",img:""},status:prev?prev.status:"open"}}
+function refreshCurPO(){if(curIdx<0||!hist[curIdx])return;var old=hist[curIdx].po;if(old.cartKey!=="current"||!cartLines().length)return;var np=buildPO(old);np.cartKey="current";Object.keys(old).forEach(function(k){if(!(k in np))np[k]=old[k]});hist[curIdx].po=np;saveHist()}
 function payStatus(po){return po.pay&&(po.pay.img||po.pay.ref)}
 function poHTML(po){var s=po.settings,p=po.prof,t=po.t,rg=po.region,pay=po.pay||{};var ship=p.ship?p.ship+(p.shippin?" - "+p.shippin:""):p.bill+(p.billpin?" - "+p.billpin:"");
  var rows=po.lines.map(function(l,i){return '<tr><td class="c">'+(i+1)+'</td><td><b>'+esc(lIc(l))+'</b></td><td>'+esc(lMd(l))+(l.cap?' | '+esc(l.cap):'')+(l.slab?' <i>(slab rate)</i>':'')+'</td><td class="c">'+l.q+'</td><td class="r">'+inr(l.rate,1)+'</td><td class="r">'+(l.stamp?inr(l.stamp,1):"-")+'</td><td class="r">'+inr(l.taxable,1)+'</td><td class="r">'+inr(l.gst,1)+'</td><td class="r">'+inr(l.amount,1)+'</td></tr>'}).join("");
@@ -1286,9 +1303,9 @@ function renderPO(){var rec=curIdx>=0?hist[curIdx]:null;
   var po=buildPO(pend!=null?hist[pend].po:null);po.cartKey="current";
   if(pend!=null){hist[pend].po=po;curIdx=pend}else{hist.unshift({po:po});curIdx=0}hist=hist.slice(0,100);saveHist();rec=hist[curIdx]}
  curPO=rec.po;var editable=curPO.cartKey==="current";var h='<h2>'+(editable?"Review &amp; Purchase Order":"Order "+esc(curPO.no))+'</h2>';
- if(editable){var L2=cartLines();h+='<div class="bar"><b>Your cart</b> <span class="muted">(change qty or remove)</span><table class="cartedit">';
-  L2.forEach(function(x){h+='<tr><td><b>'+esc(icode(x.p))+'</b><br><span class="muted">'+esc(mdesc(x.p))+'</span></td><td><input type="number" inputmode="numeric" min="0" data-cq="'+x.p.id+'" value="'+x.c.q+'"></td><td style="text-align:right">&#8377; '+inr(x.l.amount)+'</td><td><button class="b-red" data-rm="'+x.p.id+'">&times;</button></td></tr>'});
-  h+='</table><div style="text-align:right;font-weight:800;color:var(--navy);margin-top:8px;font-size:17px">GRAND TOTAL &#8377; '+inr(curPO.t.grand)+'</div></div>'}
+ if(editable){var L2=cartLines();h+='<div class="bar cart2"><b>Your cart</b> <span class="muted">(change qty or remove)</span>';
+  L2.forEach(function(x){var cp=x.p.cap||"",each=x.c.q?x.l.amount/x.c.q:0;h+='<div class="ci"><div class="ci1"><b>'+esc(icode(x.p))+'</b><span>'+esc(mdesc(x.p))+(cp?' &middot; '+esc(cp):'')+'</span></div><div class="ci2"><span class="cist"><button class="cib" data-cqd="'+x.p.id+'" data-d="-1" aria-label="Less">&minus;</button><em>'+x.c.q+'</em><button class="cib" data-cqd="'+x.p.id+'" data-d="1" aria-label="More">+</button></span><span class="ciu">&times; &#8377;'+inr(each,1)+'</span><span class="cia">&#8377;'+inr(x.l.amount,1)+'</span><button class="cirm" data-rm="'+x.p.id+'" aria-label="Remove">&times;</button></div></div>'});
+  h+='<div class="cigt"><span>GRAND TOTAL</span><b>&#8377; '+inr(curPO.t.grand)+'</b></div></div>'}
  h+=transHTML(curPO)+payHTML(curPO);
  h+='<div class="sendgrid"><button class="pdf" data-a="pdf-share">1. Share / Save PDF</button><button class="wa" data-a="send-wa">2. WhatsApp to Dispatch ('+esc(curPO.settings.dispatch)+')</button><button class="ml" data-a="send-mail">3. Email to '+esc(curPO.settings.email)+'</button>'+(editable?'<button class="b-sec" data-a="go-shop">&lsaquo; Add more items</button>':'<button class="b-sec" data-a="go-hist">&lsaquo; Back to orders</button>')+'</div>';
  h+=poHTML(curPO);
@@ -1352,7 +1369,7 @@ function renderHist(){var h=installCard()+'<h2>My Orders</h2><div class="bar mut
 function renderHelp(){var s=DATA.settings;$("#main").innerHTML='<h2>How to use</h2><div class="bar help"><b>1.</b> Tap <b>My Details</b> once and fill your company, GSTIN, licence, address and State. They stay saved.<br><b>2.</b> Scroll the products, set <b>Qty</b>, tap <b>Add to cart</b>. Within '+esc(s.homeState)+' you can untick <b>Stamping</b> if not needed.<br><b>3.</b> Tap <b>Checkout</b>: your Purchase Order with Grand Total appears.<br><b>4.</b> Attach your <b>payment screenshot</b> from the gallery and the UTR number.<br><b>5.</b> <b>Share / Save PDF</b>, then <b>WhatsApp to Dispatch</b> (attach the PDF) and <b>Email</b>.<br><br>Prices update automatically when you have internet. Current price list: <b>'+esc(s.priceRef)+'</b>, '+fmtDT(DATA.version)+'. '+esc(note2())+'.<br><br>Faulty unit received? Call <b>Service Support '+esc(s.service)+'</b>.<br>Dispatch: <b>'+esc(s.dispatch)+'</b> &middot; Email: '+esc(s.email)+'</div>'}
 /* ================= auto-update (dealer) ================= */
 /* ================= dealer authorization + sync (v4) ================= */
-var APP_BUILD=79, DEVCODE="", syncing=null, updAsked=false;
+var APP_BUILD=80, DEVCODE="", syncing=null, updAsked=false;
 var CODE_ABC="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 function normCode(c){return String(c||"").toUpperCase().replace(/[^A-Z0-9]/g,"")}
 function fmtCode(c){c=normCode(c);return c.slice(0,5)+"-"+c.slice(5)}
@@ -1639,7 +1656,7 @@ function renderSetup(){var h='<header class="appbar"><div class="blogo"></div><d
 function backup(){var b=new Blob([JSON.stringify({app:"NISAN-backup",at:new Date().toISOString(),profile:prof,history:hist,cart:cart,device:DEVCODE})],{type:"application/json"});download(b,"NISAN_my_backup_"+fmtDate(new Date())+".json");toast("Backup saved to Downloads")}
 function restore(file){var fr=new FileReader();fr.onload=function(){try{var j=JSON.parse(fr.result);if(j.app!=="NISAN-backup")throw 0;if(!confirm("Restore details and "+(j.history||[]).length+" order(s) from this backup? Current data on this device will be replaced."))return;prof=j.profile||{};hist=j.history||[];cart=j.cart||{};if(j.device&&normCode(j.device).length===10){DEVCODE=normCode(j.device);sSet("device_code",DEVCODE)}saveProf();saveHist();saveCart();toast("Backup restored");render()}catch(e){toast("Not a valid NISAN backup file")}};fr.readAsText(file)}
 /* ================= events ================= */
-document.addEventListener("click",function(ev){var el=ev.target.closest("[data-sg],[data-goto],[data-dlw],[data-dle],[data-dld],[data-bks],[data-a],[data-f],[data-dq],[data-add],[data-rm],[data-hp],[data-hr],[data-ho],[data-up],[data-dn],[data-ed],[data-del],[data-admb],[data-ds],[data-cap],[data-lic]");if(!el)return;var a=el.dataset.a;
+document.addEventListener("click",function(ev){var el=ev.target.closest("[data-sg],[data-goto],[data-dlw],[data-dle],[data-dld],[data-bks],[data-a],[data-f],[data-dq],[data-add],[data-rm],[data-hp],[data-hr],[data-ho],[data-up],[data-dn],[data-ed],[data-del],[data-admb],[data-ds],[data-cap],[data-lic],[data-cqd]");if(!el)return;var a=el.dataset.a;
  if(a==="ov-bg"&&ev.target!==el)return;
  if(el.dataset.ds!=null){openDS(el.dataset.ds);return}
  if(el.dataset.lic!=null){var dd=dealers()[+el.dataset.lic];if(dd)openData(dd.lic,dd.licName||((dd.company||"dealer")+" licence"));return}
@@ -1655,7 +1672,8 @@ document.addEventListener("click",function(ev){var el=ev.target.closest("[data-s
  if(el.dataset.dq){var id=el.dataset.dq,inp=$('[data-q="'+id+'"]');setQty(id,(parseInt(inp.value)||0)+(+el.dataset.d));return}
  if(el.dataset.add){var id2=el.dataset.add,p=prodById(id2);if(!region()){toast("Please set your state in My Details first");return}var q=parseInt($('[data-q="'+id2+'"]').value)||0;var stEl=$('[data-st="'+id2+'"]');var st=stEl?stEl.checked:true;
   if(q<=0){delete cart[id2];toast(icode(p)+" removed from cart")}else{cart[id2]={q:q,st:st};toast(icode(p)+" x "+q+" added")}delete draftQ[id2];delete draftSt[id2];saveCart();refreshCard(id2);renderCartBar();return}
- if(el.dataset.rm){delete cart[el.dataset.rm];saveCart();if(!cartLines().length){hist.splice(curIdx,1);saveHist();curIdx=-1;view="shop";render();return}renderPO();return}
+ if(el.dataset.cqd){var ck=el.dataset.cqd,cq=((cart[ck]||{}).q||0)+(+el.dataset.d);readPay();if(cq>0){cart[ck].q=cq;saveCart();refreshCurPO();renderPO();return}delete cart[ck];saveCart();if(!cartLines().length){hist.splice(curIdx,1);saveHist();curIdx=-1;view="shop";render();return}refreshCurPO();renderPO();return}
+ if(el.dataset.rm){delete cart[el.dataset.rm];saveCart();if(!cartLines().length){hist.splice(curIdx,1);saveHist();curIdx=-1;view="shop";render();return}refreshCurPO();renderPO();return}
  if(el.dataset.ho!=null){curIdx=+el.dataset.ho;var po0=hist[curIdx].po;if(po0.cartKey==="current"&&!cartLines().length){po0.cartKey="";saveHist()}view="po";render();return}
  if(el.dataset.hp!=null){sharePDF(hist[+el.dataset.hp].po);return}
  if(el.dataset.hr!=null){var po=hist[+el.dataset.hr].po;cart={};po.lines.forEach(function(l){var pp=prodById(l.pid);if(!pp)DATA.products.forEach(function(x){if(icode(x)===lIc(l))pp=x});if(pp)cart[pp.id]={q:l.q,st:l.st!==false}});saveCart();view="shop";filt="CART";render();toast("Items loaded at current prices");return}
@@ -1732,7 +1750,7 @@ document.addEventListener("change",function(ev){var t=ev.target;
  if(t.id==="st-sel"){prof.state=t.value;saveProf();renderShop();renderCartBar();return}
  if(t.dataset.q){setQty(t.dataset.q,t.value);return}
  if(t.dataset.st){draftSt[t.dataset.st]=t.checked;var c=cart[t.dataset.st];if(c){c.st=t.checked;saveCart();renderCartBar()}refreshPrice(t.dataset.st);return}
- if(t.dataset.cq){var q=Math.max(0,parseInt(t.value)||0);if(q)cart[t.dataset.cq].q=q;else delete cart[t.dataset.cq];saveCart();readPay();renderPO();return}
+ if(t.dataset.cq){var q=Math.max(0,parseInt(t.value)||0);if(q)cart[t.dataset.cq].q=q;else delete cart[t.dataset.cq];saveCart();readPay();refreshCurPO();renderPO();return}
  if(t.id==="pay-img"&&t.files&&t.files[0]){readPay();resizeImg(t.files[0],1400,.75,function(u){curPO.pay.img=u;saveHist();toast("Payment screenshot attached");renderPO()});return}
  if(t.id==="restore"&&t.files&&t.files[0]){restore(t.files[0]);return}
  if(t.id==="bk-file"&&t.files&&t.files[0]){restoreMasterFile(t.files[0]);return}
