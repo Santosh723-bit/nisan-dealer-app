@@ -589,6 +589,20 @@ body.pc .pimg .ph{position:absolute;inset:0;width:auto;height:auto;flex:none;bor
 .dsbtn{display:inline-block;margin-top:3px;padding:3px 9px;border:0;border-radius:10px;background:#F5C21B;color:#111;font-weight:700;font-size:11.5px;line-height:1.3;cursor:pointer}
 .dsbox{border:1px dashed #bbb;border-radius:10px;padding:10px;margin-bottom:10px;color:#111;font-size:14px}
 .dsbox #pf-dsinfo{margin-bottom:6px;font-weight:600}
+/* build 72: Load Cell capacities */
+.pbuy2 .brk2.full{grid-column:1/-1;flex-direction:row;justify-content:space-between;gap:16px}
+.pbuy2 .brk2.full div{flex:1}
+.capchips{flex:0 0 auto;padding:8px 10px 2px;background:#141416}
+.caplab{color:#bbb;font-size:12px;margin:0 2px 6px}
+.capwrap{display:flex;flex-wrap:wrap;gap:7px}
+.cap{position:relative;border:1.5px solid #555;color:#eee;background:#1E1E22;border-radius:18px;padding:7px 12px;font-size:14px;font-weight:600;line-height:1.1;cursor:pointer}
+.cap.on{border-color:#F5C21B;background:#F5C21B;color:#111}
+.cap i{position:absolute;top:-8px;right:-7px;background:#2bb24c;color:#fff;border-radius:10px;font-size:11px;font-style:normal;font-weight:700;padding:0 6px;line-height:17px}
+#pfwrap .ylc,#pfwrap .lconly{display:none}
+#pfwrap.lcform .ylc{display:inline}#pfwrap.lcform .nlc,#pfwrap.lcform .lchide{display:none}
+#pfwrap.lcform .lconly{display:block;margin:4px 0 12px}
+.caprow{display:grid;grid-template-columns:1fr 1.2fr 40px;gap:6px;margin-bottom:6px}
+.caprow input{margin:0}.caprow button{padding:0;font-size:20px}
 </style>
 </head>
 <body class="pc">
@@ -1054,8 +1068,19 @@ function region(){return !prof.state?0:(prof.state===DATA.settings.homeState?1:2
 function words(n){n=Math.round(n);if(!n)return "";var a=["","One","Two","Three","Four","Five","Six","Seven","Eight","Nine","Ten","Eleven","Twelve","Thirteen","Fourteen","Fifteen","Sixteen","Seventeen","Eighteen","Nineteen"],b=["","","Twenty","Thirty","Forty","Fifty","Sixty","Seventy","Eighty","Ninety"];function w2(x){return x<20?a[x]:b[Math.floor(x/10)]+(x%10?" "+a[x%10]:"")}var cr=Math.floor(n/1e7),lk=Math.floor(n%1e7/1e5),th=Math.floor(n%1e5/1000),hu=Math.floor(n%1000/100),re=n%100,o="";if(cr)o+=(cr<100?w2(cr):String(cr))+" Crore ";if(lk)o+=w2(lk)+" Lakh ";if(th)o+=w2(th)+" Thousand ";if(hu)o+=a[hu]+" Hundred ";if(re)o+=(n>=100?"and ":"")+w2(re);return "Rupees "+o.trim()+" Only"}
 function unit(p,q,st){var rg=region();if(!rg)return null;var slab=(+p.slabQty>0&&q>=+p.slabQty);var rate=rg===1?(slab?+p.slabMH:+p.pMH):(slab?+p.slabOut:+p.pOut);var stamp=(rg===1&&+p.stamp>0&&st!==false)?+p.stamp:0;var gst=+DATA.settings.gst/100;var tax=r2((rate+stamp)*gst);return {rate:rate,stamp:stamp,gst:tax,total:r2(rate+stamp+tax),slab:slab}}
 function line(p,q,st){var u=unit(p,q,st);if(!u)return null;var taxable=r2((u.rate+u.stamp)*q);var g=r2(taxable*DATA.settings.gst/100);return {u:u,q:q,basic:r2(u.rate*q),stampAmt:r2(u.stamp*q),taxable:taxable,gst:g,amount:r2(taxable+g)}}
-function prodById(id){var P=DATA.products;for(var i=0;i<P.length;i++)if(P[i].id===id)return P[i];return null}
-function cartLines(){var out=[];DATA.products.forEach(function(p){var c=cart[p.id];if(c&&c.q>0){var l=line(p,c.q,c.st);if(l)out.push({p:p,c:c,l:l})}});return out}
+function prodById(id){id=String(id);var P=DATA.products,t=id.indexOf("~");if(t>0){var b=prodById(id.slice(0,t)),cd=id.slice(t+1);if(!b||!b.caps)return null;for(var k=0;k<b.caps.length;k++)if(b.caps[k].code===cd)return vprod(b,b.caps[k]);return null}for(var i=0;i<P.length;i++)if(P[i].id===id)return P[i];return null}
+/* build 72: Load Cell capacities. One model card, each capacity = its own cart item ("<model id>~<item code>") */
+function isLC(p){return /load\s*cell/i.test(p.brand||"")}
+function hasCaps(p){return !!(p&&p.caps&&p.caps.length)}
+function vprod(p,c){var v=Object.assign({},p,{id:p.id+"~"+c.code,code:c.code,cap:c.cap,e:"",min:"",pan:"",stamp:0,slabQty:0,mc:1,pid0:p.id});delete v.caps;return v}
+function baseId(id){id=String(id);var t=id.indexOf("~");return t>0?id.slice(0,t):id}
+function capQ(p,c){var x=cart[p.id+"~"+c.code];return x&&x.q>0?x.q:0}
+function modelQ(p){if(!hasCaps(p)){var x=cart[p.id];return x&&x.q>0?x.q:0}var n=0;p.caps.forEach(function(c){n+=capQ(p,c)});return n}
+var capSel={};
+function selCap(p){var cd=capSel[p.id],c=null;p.caps.forEach(function(x){if(x.code===cd)c=x});if(!c)p.caps.forEach(function(x){if(!c&&capQ(p,x))c=x});return c||p.caps[0]}
+function capRange(p){return p.caps.length>1?p.caps[0].cap+" to "+p.caps[p.caps.length-1].cap:p.caps[0].cap}
+function capChips(p){var sc=selCap(p);return '<div class="capchips"><div class="caplab">Select capacity</div><div class="capwrap">'+p.caps.map(function(c){var n=capQ(p,c);return '<button class="cap'+(c===sc?" on":"")+'" data-cap="'+esc(p.id+"~"+c.code)+'">'+esc(c.cap)+(n?'<i>'+n+'</i>':'')+'</button>'}).join("")+'</div></div>'}
+function cartLines(){var out=[];DATA.products.forEach(function(p){(hasCaps(p)?p.caps.map(function(c){return vprod(p,c)}):[p]).forEach(function(x){var c=cart[x.id];if(c&&c.q>0){var l=line(x,c.q,c.st);if(l)out.push({p:x,c:c,l:l})}})});return out}
 function totals(lines,rg){var t={qty:0,basic:0,stamp:0,taxable:0,gst:0};lines.forEach(function(x){t.qty+=x.c.q;t.basic+=x.l.basic;t.stamp+=x.l.stampAmt;t.taxable+=x.l.taxable;t.gst+=x.l.gst});["basic","stamp","taxable","gst"].forEach(function(k){t[k]=r2(t[k])});rg=rg||region();t.cgst=rg===1?r2(t.gst/2):0;t.sgst=rg===1?r2(t.gst-t.cgst):0;t.igst=rg===2?t.gst:0;var raw=r2(t.taxable+t.gst);t.grand=Math.round(raw);t.round=r2(t.grand-raw);return t}
 function saveCart(){sSet("cart",cart)}
 function saveProf(){sSet("profile",prof)}
@@ -1099,7 +1124,7 @@ function renderCartBar(){var cb=$("#cartbar");if(!cb)return;var L=cartLines(),t=
 function shortGroup(g){return String(g).replace(/^(ECO|NPRO)\s*-\s*/,"").replace(/Platform Scale/,"Platform").replace(/\s*\(([^)]*)\)/," $1")}
 function renderShop(){var q=search.toLowerCase(),cnt=0,body='';
  DATA.products.forEach(function(p){
-  if(filt==="CART"&&!(cart[p.id]&&cart[p.id].q>0))return;
+  if(filt==="CART"&&!modelQ(p))return;
   if(filt.indexOf("B:")===0&&p.brand!==filt.slice(2))return;
   if(filt.indexOf("G:")===0&&p.group!==filt.slice(2))return;
   body+=card(p);cnt++});
@@ -1109,22 +1134,26 @@ function renderShop(){var q=search.toLowerCase(),cnt=0,body='';
 function compactCap(p){if(!p.cap)return "";return (String(p.cap)+(p.e?"×"+p.e:"")).replace(/\s+/g,"")}
 function compactPan(p){return String(p.pan||"").replace(/\s*mm\s*$/i,"").replace(/\s*[xX]\s*/g,"×")}
 var ICONQ={minus:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="10.5" width="16" height="3" rx="1.5" fill="currentColor"/></svg>',plus:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="10.5" width="16" height="3" rx="1.5" fill="currentColor"/><rect x="10.5" y="4" width="3" height="16" rx="1.5" fill="currentColor"/></svg>'};
-function card(p){var c=cart[p.id],inC=c&&c.q>0,q=inC?c.q:0;var st=c?c.st!==false:(draftSt[p.id]!=null?draftSt[p.id]:true);var rg=region(),hasStamp=rg===1&&+p.stamp>0;
+function card(p){if(hasCaps(p))return lcCard(p);var c=cart[p.id],inC=c&&c.q>0,q=inC?c.q:0;var st=c?c.st!==false:(draftSt[p.id]!=null?draftSt[p.id]:true);var rg=region(),hasStamp=rg===1&&+p.stamp>0;
  var capFull=p.cap?String(p.cap)+(p.e?" \u00d7 "+p.e:""):"",panFull=p.pan?String(p.pan).replace(/\s*[xX]\s*/g," \u00d7 "):"";
  var spec='<div class="pcodebox"><span>CODE</span><b>'+esc(icode(p))+'</b></div><div class="plines">'+[["Max",capFull],["Size",panFull],["Pan",p.panMat||""]].filter(function(x){return x[1]}).map(function(x){return '<div><span>'+x[0]+':</span> <b>'+esc(x[1])+'</b></div>'}).join("")+(p.ds?'<button class="dsbtn" data-ds="'+p.id+'">&#128196; Datasheet (PDF)</button>':'')+'</div>';
  return '<article class="card'+(inC?" incart":"")+'" id="c-'+p.id+'">'+
  '<div class="pspec2">'+spec+'</div>'+
  '<div class="pimg"><div class="ph">'+pic(p)+'</div></div>'+
  '<div class="pbuy2">'+buyArea(p,q,st)+'</div></article>'}
-function buyArea(p,q,st){var rg=region(),hasStamp=rg===1&&+p.stamp>0,u=unit(p,Math.max(1,q),st),s=DATA.settings;
+function lcCard(p){var v=vprod(p,selCap(p)),q=capQ(p,selCap(p));
+ var spec='<div class="pcodebox"><span>CODE</span><b>'+esc(v.code)+'</b></div><div class="plines"><div><span>Model:</span> <b>'+esc(mdesc(p))+'</b></div><div><span>Range:</span> <b>'+esc(capRange(p))+'</b></div>'+(p.ds?'<button class="dsbtn" data-ds="'+p.id+'">&#128196; Datasheet (PDF)</button>':'')+'</div>';
+ return '<article class="card lccard'+(modelQ(p)?" incart":"")+'" id="c-'+p.id+'"><div class="pspec2">'+spec+'</div><div class="pimg"><div class="ph">'+pic(p)+'</div></div>'+capChips(p)+'<div class="pbuy2">'+buyArea(v,q,true)+'</div></article>'}
+function buyArea(p,q,st){var rg=region(),noSt=isLC(p),hasStamp=!noSt&&rg===1&&+p.stamp>0,u=unit(p,Math.max(1,q),st),s=DATA.settings;
  var qrow='<div class="qrow"><button class="qb" data-dq="'+p.id+'" data-d="-1" aria-label="decrease quantity">'+ICONQ.minus+'</button><input type="number" inputmode="numeric" min="0" data-q="'+p.id+'" value="'+q+'" aria-label="quantity"><button class="qb" data-dq="'+p.id+'" data-d="1" aria-label="increase quantity">'+ICONQ.plus+'</button></div>';
  var stamp='<div class="stampcell">'+(hasStamp?'<label class="switch2"><input type="checkbox" data-st="'+p.id+'"'+(st?" checked":"")+'><i></i></label>':'<span class="nosw"></span>')+
   '<div class="slines"><span>Stamping</span><b class="samt'+(hasStamp&&!st?" off":"")+'">'+(hasStamp?'&#8377;'+inr(+p.stamp,1):'Nil')+'</b></div></div>';
  if(!u)return qrow+'<div class="noprice wide">Your state is not set. Open <b>My Details</b> and choose your state to see prices.</div>';
- var brk='<div class="brk2"><div><span>Basic'+(u.slab?' <em>'+p.slabQty+'+</em>':'')+'</span><b>&#8377;'+inr(u.rate,1)+'</b></div><div><span>GST '+s.gst+'%</span><b>&#8377;'+inr(u.gst,1)+'</b></div></div>';
- var tot=q>0?'<div class="ptotal2"><b>&#8377;'+inr(r2(u.total*q),1)+'</b><span>'+q+' &times; &#8377;'+inr(u.total,1)+' incl. GST</span></div>':'<div class="ptotal2 zero"><b>&#8377;'+inr(u.total,1)+'</b><span>per unit incl. GST</span></div>';
+ var brk='<div class="brk2'+(noSt?' full':'')+'"><div><span>Basic'+(u.slab?' <em>'+p.slabQty+'+</em>':'')+'</span><b>&#8377;'+inr(u.rate,1)+'</b></div><div><span>GST '+s.gst+'%</span><b>&#8377;'+inr(u.gst,1)+'</b></div></div>';
+ if(p.pid0){var m=prodById(p.pid0),n=modelQ(m),k=m.caps.filter(function(c){return capQ(m,c)}).length;q=n}
+ var tot=q>0?'<div class="ptotal2"><b>&#8377;'+inr(r2(u.total*q),1)+'</b><span>'+(p.pid0?q+' Nos in '+k+' capacit'+(k>1?'ies':'y'):q+' &times; &#8377;'+inr(u.total,1)+' incl. GST')+'</span></div>':'<div class="ptotal2 zero"><b>&#8377;'+inr(u.total,1)+'</b><span>per unit incl. GST</span></div>';
  var slab=+p.slabQty>0?'<div class="slab2">Special rate &#8377;'+inr(rg===1?p.slabMH:p.slabOut,1)+' each for '+p.slabQty+'+ Nos</div>':'';
- return qrow+slab+stamp+brk+'<button class="b-co3" data-a="checkout">CHECK OUT</button>'+tot}
+ return qrow+slab+(noSt?'':stamp)+brk+'<button class="b-co3" data-a="checkout">CHECK OUT</button>'+tot}
 function priceBox(p,q,st){var qq=Math.max(1,q),u=unit(p,qq,st),rg=region(),s=DATA.settings;
  if(!u)return '<div class="noprice">Your state is not set. Open <b>My Details</b> and choose your state to see prices.</div>';
  return '<div class="brk"><div><span>Basic'+(u.slab?' <em>'+p.slabQty+'+</em>':'')+'</span><b>&#8377;'+inr(u.rate,1)+'</b></div><div><span>GST '+s.gst+'%</span><b>&#8377;'+inr(u.gst,1)+'</b></div></div>'+
@@ -1133,9 +1162,9 @@ function priceBox(p,q,st){var qq=Math.max(1,q),u=unit(p,qq,st),rg=region(),s=DAT
 /* ---------- search panel (bottom menu) ---------- */
 var sBrand="";
 function openSearch(){$("#ov").innerHTML='<div class="ov sfull"><div class="ssheet"><div class="shead">'+ICON.search+'<input id="s2" type="search" placeholder="Search model, capacity, pan size" value="'+esc(search)+'" autocomplete="off"><button class="sx" data-a="ov-close" aria-label="close">&times;</button></div><div class="sres" id="sres"></div></div></div>';renderSearchRes()}
-function sRow(p){var u=unit(p,1,true);return '<button class="srow" data-goto="'+p.id+'"><span class="sth">'+pic(p)+'</span><span class="stx"><b>'+esc(icode(p))+'</b><i>'+esc(compactCap(p))+(p.pan?' &middot; '+esc(compactPan(p))+' mm':'')+'</i></span><span class="spr">'+(u?'&#8377;'+inr(u.total):'')+'</span></button>'}
+function sRow(p){var u=unit(p,1,true);return '<button class="srow" data-goto="'+p.id+'"><span class="sth">'+pic(p)+'</span><span class="stx"><b>'+esc(icode(p))+'</b><i>'+esc(hasCaps(p)?capRange(p)+' \u00b7 '+p.caps.length+' capacities':compactCap(p))+(p.pan?' &middot; '+esc(compactPan(p))+' mm':'')+'</i></span><span class="spr">'+(u?'&#8377;'+inr(u.total):'')+'</span></button>'}
 function renderSearchRes(){var box=$("#sres");if(!box)return;var q=(search||"").trim().toLowerCase(),h='';
- if(q){var L=DATA.products.filter(function(p){return (p.model+" "+p.code+" "+p.cap+" "+p.e+" "+p.group+" "+p.pan+" "+(p.material||"")).toLowerCase().indexOf(q)>=0});
+ if(q){var L=DATA.products.filter(function(p){return (p.model+" "+p.code+" "+p.cap+" "+p.e+" "+p.group+" "+p.pan+" "+(p.material||"")+" "+(p.caps||[]).map(function(c){return c.cap+" "+c.code}).join(" ")).toLowerCase().indexOf(q)>=0});
   h=L.length?'<div class="shint">'+L.length+' match'+(L.length>1?"es":"")+'</div>'+L.map(sRow).join(""):'<div class="shint">No product matches "'+esc(search)+'"</div>'}
  else{var B=[];DATA.products.forEach(function(p){if(B.indexOf(p.brand)<0)B.push(p.brand)});
   var nCart=Object.keys(cart).filter(function(k){return cart[k].q>0}).length;
@@ -1153,10 +1182,11 @@ function startCheckout(){if(!cartLines().length){overlay('<h2>Select quantity</h
 function setQty(id,v){var p=prodById(id);if(!p)return;if(!region()){toast("Please set your state in My Details first");return}v=Math.max(0,Math.min(9999,parseInt(v)||0));
  var stEl=$('[data-st="'+id+'"]'),st=stEl?stEl.checked:(cart[id]?cart[id].st!==false:true);
  if(v>0)cart[id]={q:v,st:st};else delete cart[id];saveCart();
+ if(id!==baseId(id)){refreshCard(baseId(id));renderCartBar();return}
  var el=$("#c-"+id);if(el){var inp=el.querySelector('[data-q]');if(inp&&String(inp.value)!==String(v))inp.value=v;el.classList.toggle("incart",v>0)}
  refreshPrice(id);renderCartBar()}
-function refreshCard(id){var p=prodById(id),el=$("#c-"+id);if(!p||!el||!el.isConnected)return;var tmp=document.createElement("div");tmp.innerHTML=card(p);el.replaceWith(tmp.firstChild)}
-function refreshPrice(id){var p=prodById(id),el=$("#c-"+id);if(!p||!el||!el.isConnected)return;var c=cart[p.id],q=c&&c.q>0?c.q:0,st=c?c.st!==false:(draftSt[p.id]!=null?draftSt[p.id]:true);var ba=el.querySelector(".pbuy2");if(ba)ba.innerHTML=buyArea(p,q,st)}
+function refreshCard(id){id=baseId(id);var p=prodById(id),el=$("#c-"+id);if(!p||!el||!el.isConnected)return;var tmp=document.createElement("div");tmp.innerHTML=card(p);el.replaceWith(tmp.firstChild)}
+function refreshPrice(id){if(id!==baseId(id)||hasCaps(prodById(id))){refreshCard(id);return}var p=prodById(id),el=$("#c-"+id);if(!p||!el||!el.isConnected)return;var c=cart[p.id],q=c&&c.q>0?c.q:0,st=c?c.st!==false:(draftSt[p.id]!=null?draftSt[p.id]:true);var ba=el.querySelector(".pbuy2");if(ba)ba.innerHTML=buyArea(p,q,st)}
 /* ================= profile ================= */
 function profMissing(){return PROFILE_FIELDS.filter(function(f){return f[2]&&!String(prof[f[0]]||"").trim()}).map(function(f){return f[1]})}
 function profErrors(){var e=[];if(prof.mobile&&digits(prof.mobile).length!==10)e.push("Mobile must be 10 digits");if(prof.gstin&&String(prof.gstin).trim().length!==15)e.push("GSTIN must be 15 characters");if(prof.billpin&&!/^\d{6}$/.test(String(prof.billpin).trim()))e.push("Billing PIN must be 6 digits");if(prof.shippin&&!/^\d{6}$/.test(String(prof.shippin).trim()))e.push("Delivery PIN must be 6 digits");return e}
@@ -1275,7 +1305,7 @@ function renderHist(){var h=installCard()+'<h2>My Orders</h2><div class="bar mut
 function renderHelp(){var s=DATA.settings;$("#main").innerHTML='<h2>How to use</h2><div class="bar help"><b>1.</b> Tap <b>My Details</b> once and fill your company, GSTIN, licence, address and State. They stay saved.<br><b>2.</b> Scroll the products, set <b>Qty</b>, tap <b>Add to cart</b>. Within '+esc(s.homeState)+' you can untick <b>Stamping</b> if not needed.<br><b>3.</b> Tap <b>Checkout</b>: your Purchase Order with Grand Total appears.<br><b>4.</b> Attach your <b>payment screenshot</b> from the gallery and the UTR number.<br><b>5.</b> <b>Share / Save PDF</b>, then <b>WhatsApp to Dispatch</b> (attach the PDF) and <b>Email</b>.<br><br>Prices update automatically when you have internet. Current price list: <b>'+esc(s.priceRef)+'</b>, '+fmtDT(DATA.version)+'. '+esc(note2())+'.<br><br>Faulty unit received? Call <b>Service Support '+esc(s.service)+'</b>.<br>Dispatch: <b>'+esc(s.dispatch)+'</b> &middot; Email: '+esc(s.email)+'</div>'}
 /* ================= auto-update (dealer) ================= */
 /* ================= dealer authorization + sync (v4) ================= */
-var APP_BUILD=71, DEVCODE="", syncing=null, updAsked=false;
+var APP_BUILD=72, DEVCODE="", syncing=null, updAsked=false;
 var CODE_ABC="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 function normCode(c){return String(c||"").toUpperCase().replace(/[^A-Z0-9]/g,"")}
 function fmtCode(c){c=normCode(c);return c.slice(0,5)+"-"+c.slice(5)}
@@ -1381,7 +1411,7 @@ function renderAdmList(){var B=brandList();if(ADMB!=="ALL"&&B.indexOf(ADMB)<0)AD
  var h='<div class="btabs">'+B.concat(["ALL"]).map(function(b){return '<button class="'+(ADMB===b?"on":"")+'" data-admb="'+esc(b)+'">'+(b==="ALL"?"All":esc(b))+' <span>'+cnt(b)+'</span></button>'}).join("")+'</div><h2>'+(ADMB==="ALL"?"All products":esc(ADMB)+" products")+' ('+cnt(ADMB)+')</h2>'+(ADMB!=="ALL"?'<button class="b-main" style="width:100%;margin-bottom:10px" data-a="adm-new">+ NEW '+esc(ADMB)+' product</button>':'')+'<div class="bar" id="savestate">'+saveStateHTML()+'</div><div class="bar muted">Every change is saved on this device immediately. Press <b>PUBLISH</b> when you want dealers to receive it.</div>';var last=null;
  if(ADMB!=="ALL"&&!cnt(ADMB))h+='<div class="empty">No '+esc(ADMB)+' products yet. Tap <b>+ NEW '+esc(ADMB)+' product</b> to add the first one.</div>';
  DATA.products.forEach(function(p,i){if(ADMB!=="ALL"&&p.brand!==ADMB)return;if(p.group!==last){h+='<div class="ghead">'+esc(p.group)+'</div>';last=p.group}
-  h+='<div class="adminrow"><div class="ph">'+pic(p)+'</div><div class="x"><b>'+esc(icode(p))+'</b> &middot; '+esc(mdesc(p))+'<br><span class="muted">MH &#8377;'+inr(p.pMH,1)+' &middot; Out &#8377;'+inr(p.pOut,1)+' &middot; Stamp '+(+p.stamp||0)+'</span></div><button class="b-sec" data-up="'+i+'">&uarr;</button><button class="b-sec" data-dn="'+i+'">&darr;</button><button class="b-main" data-ed="'+i+'">Edit</button><button class="b-red" data-del="'+i+'">Del</button></div>'});
+  h+='<div class="adminrow"><div class="ph">'+pic(p)+'</div><div class="x"><b>'+esc(icode(p))+'</b> &middot; '+esc(mdesc(p))+'<br><span class="muted">MH &#8377;'+inr(p.pMH,1)+' &middot; Out &#8377;'+inr(p.pOut,1)+(hasCaps(p)?' &middot; '+p.caps.length+' capacit'+(p.caps.length>1?'ies':'y')+': '+esc(p.caps.map(function(c){return c.cap}).join(", ")):' &middot; Stamp '+(+p.stamp||0))+'</span></div><button class="b-sec" data-up="'+i+'">&uarr;</button><button class="b-sec" data-dn="'+i+'">&darr;</button><button class="b-main" data-ed="'+i+'">Edit</button><button class="b-red" data-del="'+i+'">Del</button></div>'});
  $("#main").innerHTML=h}
 var PF=[["brand","Brand / line (e.g. ECO, NPRO)",1],["group","Group heading",1,"group"],["code","Item Code (shown as CODE, e.g. E101)",1],["model","Model No / Description",1],["cap","Max Capacity (e.g. 30 kg)",0],["min","Min",0],["e","e (division)",0],["pan","Pan size (e.g. 290 x 290 mm)",0],["material","Material / body (e.g. ABS body, Mild steel)",0],["panMat","Pan material (e.g. SS202, Chequered plate)",0],["pMH","Basic price within Maharashtra (Rs.)",1,"num"],["pOut","Basic price outside Maharashtra (Rs.)",1,"num"],["stamp","Stamping fee per unit (Rs., 0 = none)",0,"num"],["slabQty","Slab qty (0 = none, e.g. 5)",0,"num"],["slabMH","Slab price within MH (Rs.)",0,"num"],["slabOut","Slab price outside MH (Rs.)",0,"num"]];
 var editing=null,editPhoto="",editDS="",editDSName="";
@@ -1393,18 +1423,24 @@ function openDS(id){var p=DATA.products.find(function(x){return x.id===id});if(!
   setTimeout(function(){URL.revokeObjectURL(url)},60000)}catch(e){toast("Could not open the datasheet")}}
 function dsKB(u){return Math.round((String(u).length-String(u).indexOf(",")-1)*0.75/1024)}
 function groupsOf(b){var G=[];DATA.products.forEach(function(x){if(x.brand===b&&G.indexOf(x.group)<0)G.push(x.group)});return G}
+var LCHIDE=["cap","min","e","pan","panMat","stamp","slabQty","slabMH","slabOut"];
+function capRowHTML(c){return '<div class="caprow"><input class="cr-cap" placeholder="Capacity, e.g. 500 kg" value="'+esc(c.cap||"")+'"><input class="cr-code" placeholder="Item code, e.g. L501-500" value="'+esc(c.code||"")+'"><button class="b-red" data-a="cap-del" aria-label="Remove capacity">&times;</button></div>'}
+function lcForm(){var b=$("#pf-brand"),w=$("#pfwrap");if(b&&w)w.classList.toggle("lcform",isLC({brand:b.value}))}
 function openProdForm(i){editing=i;var p=i==null?{brand:ADMB!=="ALL"?ADMB:"ECO",group:"",stamp:0,slabQty:0}:DATA.products[i];editPhoto=p.photo||"";editDS=p.ds||"";editDSName=p.dsName||"";var G=groupsOf(p.brand);
  var h='<h2>'+(i==null?"NEW product":"Edit "+esc(icode(p)))+'</h2><div style="display:flex;gap:10px;align-items:center"><div class="ph" id="pf-ph">'+pic(p)+'</div><div style="flex:1"><label>Product photo</label><input type="file" accept="image/*" id="pf-file"><button class="b-red" style="margin-top:6px;padding:6px 10px" data-a="pf-nophoto">Remove photo</button></div></div><label>Datasheet (PDF, optional)</label><div class="dsbox"><div id="pf-dsinfo">'+(editDS?'&#128196; '+esc(editDSName||"datasheet.pdf")+' &middot; '+dsKB(editDS)+' KB':'No datasheet attached')+'</div><input type="file" accept="application/pdf,.pdf" id="pf-pdf"><button class="b-red" style="margin-top:6px;padding:6px 10px" data-a="pf-nopdf">Remove datasheet</button></div>';
- PF.forEach(function(f){var v=p[f[0]]==null?"":p[f[0]];if(f[0]==="brand"){var BL=brandList();if(v&&BL.indexOf(v)<0)BL.push(v);h+='<label class="req">Brand (product list)</label><select id="pf-brand">'+BL.map(function(b){return '<option'+(b===v?' selected':'')+'>'+esc(b)+'</option>'}).join("")+'<option value="__new">+ New brand / product list...</option></select>';return}h+='<label class="'+(f[2]?"req":"")+'">'+f[1]+'</label><input id="pf-'+f[0]+'" value="'+esc(v)+'"'+(f[3]==="num"?' inputmode="decimal"':'')+(f[3]==="group"?' list="pf-groups"':'')+'>'});
+ PF.forEach(function(f){var v=p[f[0]]==null?"":p[f[0]];if(f[0]==="brand"){var BL=brandList();if(v&&BL.indexOf(v)<0)BL.push(v);h+='<label class="req">Brand (product list)</label><select id="pf-brand">'+BL.map(function(b){return '<option'+(b===v?' selected':'')+'>'+esc(b)+'</option>'}).join("")+'<option value="__new">+ New brand / product list...</option></select>';return}var lab=f[0]==="code"?'<span class="nlc">'+f[1]+'</span><span class="ylc">Model code (shown in lists, e.g. L501)</span>':f[0]==="model"?'<span class="nlc">'+f[1]+'</span><span class="ylc">Model name / description (e.g. S-Type, alloy steel)</span>':f[1];h+='<div class="pff'+(LCHIDE.indexOf(f[0])>=0?" lchide":"")+'"><label class="'+(f[2]?"req":"")+'">'+lab+'</label><input id="pf-'+f[0]+'" value="'+esc(v)+'"'+(f[3]==="num"?' inputmode="decimal"':'')+(f[3]==="group"?' list="pf-groups"':'')+'></div>'});
+ h+='<div class="lconly"><label class="req">Capacities and item codes</label><div class="muted" style="font-size:13px;margin-bottom:6px">One row per capacity. Same price for all; each capacity has its own item code.</div><div id="pf-caps">'+(p.caps&&p.caps.length?p.caps:[{cap:"",code:""}]).map(capRowHTML).join("")+'</div><button class="b-sec" style="width:100%;margin-top:6px" data-a="cap-add">+ Add capacity</button></div>';
  h+='<datalist id="pf-groups">'+G.map(function(g){return '<option value="'+esc(g)+'">'}).join("")+'</datalist>';
  if(i==null)h+='<label>Insert position</label><select id="pf-pos"><option value="end">At the end of its group (recommended)</option><option value="last">At the very end</option></select>';
- h+='<div class="sendgrid"><button class="b-main" data-a="pf-save">Save product</button><button class="b-red" data-a="ov-close">Cancel</button></div>';overlay(h)}
+ h+='<div class="sendgrid"><button class="b-main" data-a="pf-save">Save product</button><button class="b-red" data-a="ov-close">Cancel</button></div>';overlay('<div id="pfwrap">'+h+'</div>');lcForm()}
 function saveProd(){var p=editing==null?{id:"p"+Date.now().toString(36)}:DATA.products[editing];var bad=[],tmp={};
- PF.forEach(function(f){var v=$("#pf-"+f[0]).value.trim();if(f[3]==="num"){v=v===""?0:parseFloat(v);if(isNaN(v)){bad.push(f[1]);v=0}}if(f[2]&&(v===""||(f[3]==="num"&&!(v>0))))bad.push(f[1]);tmp[f[0]]=v});
+ var LCm=isLC({brand:$("#pf-brand").value});
+ PF.forEach(function(f){var v=$("#pf-"+f[0]).value.trim();if(LCm&&LCHIDE.indexOf(f[0])>=0){tmp[f[0]]=f[3]==="num"?0:"";return}if(f[3]==="num"){v=v===""?0:parseFloat(v);if(isNaN(v)){bad.push(f[1]);v=0}}if(f[2]&&(v===""||(f[3]==="num"&&!(v>0))))bad.push(f[1]);tmp[f[0]]=v});
  if(bad.length){toast("Please fill: "+bad[0]);return}
+ var caps=[];if(LCm){var cerr="";$("#pf-caps").querySelectorAll(".caprow").forEach(function(r){var c=r.querySelector(".cr-cap").value.trim(),k=r.querySelector(".cr-code").value.trim();if(!c&&!k)return;if(!c||!k){cerr="Each capacity needs both capacity and item code";return}if(/[~]/.test(k)){cerr="Item code cannot contain ~";return}if(caps.some(function(x){return x.code.toLowerCase()===k.toLowerCase()})){cerr="Item code "+k+" is used twice";return}caps.push({cap:c,code:k})});if(cerr){toast(cerr);return}if(!caps.length){toast("Add at least one capacity with its item code");return}}
  if(+tmp.slabQty>0&&!(+tmp.slabMH>0&&+tmp.slabOut>0)){toast("Enter both slab prices or set slab qty 0");return}
  tmp.mc=1;var dup=DATA.products.some(function(x){return x!==p&&String(icode(x)).toLowerCase()===String(tmp.code).toLowerCase()});if(dup&&!confirm("Item code "+tmp.code+" already exists. Save anyway?"))return;
- Object.assign(p,tmp);p.photo=editPhoto;if(editDS){p.ds=editDS;p.dsName=editDSName}else{delete p.ds;delete p.dsName}
+ Object.assign(p,tmp);if(LCm)p.caps=caps;else delete p.caps;p.photo=editPhoto;if(editDS){p.ds=editDS;p.dsName=editDSName}else{delete p.ds;delete p.dsName}
  if(editing==null){var pos=$("#pf-pos").value,idx=-1;if(pos==="end")DATA.products.forEach(function(x,i){if(x.group===p.group)idx=i});if(idx>=0)DATA.products.splice(idx+1,0,p);else DATA.products.push(p)}
  saveDraft().then(function(){toast("Saved on this device. PUBLISH when ready.")});closeOv();view="adm-list";render()}
 function resizeImg(file,maxPx,q,cb){var fr=new FileReader();fr.onload=function(){var im=new Image();im.onload=function(){var w=im.width,h=im.height,k=Math.min(1,maxPx/Math.max(w,h));var c=document.createElement("canvas");c.width=Math.round(w*k);c.height=Math.round(h*k);var x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);cb(c.toDataURL("image/jpeg",q))};im.onerror=function(){toast("Could not read that image")};im.src=fr.result};fr.readAsDataURL(file)}
@@ -1545,9 +1581,10 @@ function renderSetup(){var h='<header class="appbar"><div class="blogo"></div><d
 function backup(){var b=new Blob([JSON.stringify({app:"NISAN-backup",at:new Date().toISOString(),profile:prof,history:hist,cart:cart,device:DEVCODE})],{type:"application/json"});download(b,"NISAN_my_backup_"+fmtDate(new Date())+".json");toast("Backup saved to Downloads")}
 function restore(file){var fr=new FileReader();fr.onload=function(){try{var j=JSON.parse(fr.result);if(j.app!=="NISAN-backup")throw 0;if(!confirm("Restore details and "+(j.history||[]).length+" order(s) from this backup? Current data on this device will be replaced."))return;prof=j.profile||{};hist=j.history||[];cart=j.cart||{};if(j.device&&normCode(j.device).length===10){DEVCODE=normCode(j.device);sSet("device_code",DEVCODE)}saveProf();saveHist();saveCart();toast("Backup restored");render()}catch(e){toast("Not a valid NISAN backup file")}};fr.readAsText(file)}
 /* ================= events ================= */
-document.addEventListener("click",function(ev){var el=ev.target.closest("[data-sg],[data-goto],[data-dlw],[data-dle],[data-dld],[data-bks],[data-a],[data-f],[data-dq],[data-add],[data-rm],[data-hp],[data-hr],[data-ho],[data-up],[data-dn],[data-ed],[data-del],[data-admb],[data-ds]");if(!el)return;var a=el.dataset.a;
+document.addEventListener("click",function(ev){var el=ev.target.closest("[data-sg],[data-goto],[data-dlw],[data-dle],[data-dld],[data-bks],[data-a],[data-f],[data-dq],[data-add],[data-rm],[data-hp],[data-hr],[data-ho],[data-up],[data-dn],[data-ed],[data-del],[data-admb],[data-ds],[data-cap]");if(!el)return;var a=el.dataset.a;
  if(a==="ov-bg"&&ev.target!==el)return;
  if(el.dataset.ds!=null){openDS(el.dataset.ds);return}
+ if(el.dataset.cap!=null){var cid=el.dataset.cap;capSel[baseId(cid)]=cid.slice(cid.indexOf("~")+1);refreshCard(cid);return}
  if(el.dataset.admb!=null){ADMB=el.dataset.admb;try{localStorage.setItem("nisan_admb",ADMB)}catch(e){}renderAdmList();var mm=$("#main");if(mm)mm.scrollTop=0;return}
  if(el.dataset.sg!=null){sBrand=sBrand===el.dataset.sg?"":el.dataset.sg;renderSearchRes();return}
  if(el.dataset.goto!=null){gotoProduct(el.dataset.goto);return}
@@ -1619,6 +1656,8 @@ document.addEventListener("click",function(ev){var el=ev.target.closest("[data-s
   case "ss-save":saveSettings();break;
   case "gh-rm":if(confirm("Remove the GitHub key from this device?")){sSet("gh_token","");var g=$("#gh-state");if(g)g.innerHTML='<span class="unpub">Key removed</span>'}break;
   case "pf-save":saveProd();break;
+  case "cap-add":$("#pf-caps").insertAdjacentHTML("beforeend",capRowHTML({}));var rs=$("#pf-caps").querySelectorAll(".cr-cap");rs[rs.length-1].focus();break;
+  case "cap-del":var rw=el.closest(".caprow");if($("#pf-caps").children.length>1)rw.remove();else{rw.querySelector(".cr-cap").value="";rw.querySelector(".cr-code").value=""}break;
   case "pf-nopdf":editDS="";editDSName="";$("#pf-dsinfo").innerHTML="No datasheet attached";var fi=$("#pf-pdf");if(fi)fi.value="";break;
   case "pf-nophoto":editPhoto="";$("#pf-ph").innerHTML=pic({group:$("#pf-group").value,brand:$("#pf-brand").value});break;
   case "adm-publish":publish();break;
@@ -1626,6 +1665,7 @@ document.addEventListener("click",function(ev){var el=ev.target.closest("[data-s
  }});
 document.addEventListener("change",function(ev){var t=ev.target;
  if(t.id==="pf-brand"&&t.value==="__new"){var nb=(prompt("Name of the new brand / product list (e.g. Load Cell):")||"").trim();if(nb){DATA.settings.brands=(DATA.settings.brands||[]);if(DATA.settings.brands.indexOf(nb)<0)DATA.settings.brands.push(nb);saveDraft();var o=document.createElement("option");o.textContent=nb;t.insertBefore(o,t.lastElementChild);t.value=nb}else t.selectedIndex=0}
+ if(t.id==="pf-brand")lcForm();
  if(t.id==="pf-brand"){var dl=$("#pf-groups");if(dl)dl.innerHTML=groupsOf(t.value).map(function(g){return '<option value="'+esc(g)+'">'}).join("");return}
  if(t.id==="po-trans"){readPay();var pd=$("#po-doc");if(pd&&curPO){var tmp=document.createElement("div");tmp.innerHTML=poHTML(curPO);pd.replaceWith(tmp.firstChild)}return}
  if(t.id==="st-sel"){prof.state=t.value;saveProf();renderShop();renderCartBar();return}
