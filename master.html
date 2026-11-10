@@ -614,6 +614,21 @@ html,body{background:#000}
 .b-co3:active{background:#F5C21B;color:#000}
 .qrow .qb,.qty .qb{background:#000;color:#F5C21B;border:1.5px solid #3a3a3e}
 .qrow .qb:active,.qty .qb:active{background:#1E1E22}
+/* build 76: dealer licence copy */
+.licrow{display:grid;grid-template-columns:1fr 70px;gap:6px;align-items:stretch}
+.licrow input{margin:0}
+.licbtn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;background:#111;color:#F5C21B;border-radius:10px;cursor:pointer;font-size:9.5px;font-weight:700;letter-spacing:.3px;padding:4px 2px;min-height:44px}
+.licatt{display:flex;flex-wrap:wrap;align-items:center;gap:6px;border:1px dashed #bbb;border-radius:10px;padding:7px 9px;margin:6px 0 10px;color:#111;font-size:13px}
+.licatt .lic-nm{flex:1;min-width:120px;font-weight:600;word-break:break-all}
+.licatt .lic-mini{padding:5px 10px;font-size:12px;width:auto;margin:0}
+.licchip{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;width:44px;min-height:44px;border-radius:10px;border:0;font-size:9px;font-weight:700;gap:1px;flex:0 0 auto}
+.licchip.on{background:#111;color:#F5C21B;cursor:pointer}
+.licchip.off{background:#eee;color:#aaa}
+.licline{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:4px}
+.licpill{display:inline-flex;align-items:center;gap:4px;border-radius:14px;border:0;padding:3px 10px 3px 6px;font-size:11.5px;font-weight:700}
+.licpill svg{width:16px;height:16px}
+.licpill.on{background:#111;color:#F5C21B;cursor:pointer}
+.licpill.off{background:#eee;color:#999}
 </style>
 </head>
 <body class="pc">
@@ -1316,7 +1331,7 @@ function renderHist(){var h=installCard()+'<h2>My Orders</h2><div class="bar mut
 function renderHelp(){var s=DATA.settings;$("#main").innerHTML='<h2>How to use</h2><div class="bar help"><b>1.</b> Tap <b>My Details</b> once and fill your company, GSTIN, licence, address and State. They stay saved.<br><b>2.</b> Scroll the products, set <b>Qty</b>, tap <b>Add to cart</b>. Within '+esc(s.homeState)+' you can untick <b>Stamping</b> if not needed.<br><b>3.</b> Tap <b>Checkout</b>: your Purchase Order with Grand Total appears.<br><b>4.</b> Attach your <b>payment screenshot</b> from the gallery and the UTR number.<br><b>5.</b> <b>Share / Save PDF</b>, then <b>WhatsApp to Dispatch</b> (attach the PDF) and <b>Email</b>.<br><br>Prices update automatically when you have internet. Current price list: <b>'+esc(s.priceRef)+'</b>, '+fmtDT(DATA.version)+'. '+esc(note2())+'.<br><br>Faulty unit received? Call <b>Service Support '+esc(s.service)+'</b>.<br>Dispatch: <b>'+esc(s.dispatch)+'</b> &middot; Email: '+esc(s.email)+'</div>'}
 /* ================= auto-update (dealer) ================= */
 /* ================= dealer authorization + sync (v4) ================= */
-var APP_BUILD=75, DEVCODE="", syncing=null, updAsked=false;
+var APP_BUILD=76, DEVCODE="", syncing=null, updAsked=false;
 var CODE_ABC="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 function normCode(c){return String(c||"").toUpperCase().replace(/[^A-Z0-9]/g,"")}
 function fmtCode(c){c=normCode(c);return c.slice(0,5)+"-"+c.slice(5)}
@@ -1384,19 +1399,27 @@ function renderAdmDealers(){var D=dealers(),act=D.filter(function(d){return d.ac
  recoverBars()+'<div class="sendgrid" style="margin-bottom:10px"><button class="b-main" data-a="dl-new">+ NEW dealer</button><button class="b-sec" data-a="dl-recover">Backup / Recover</button></div>';
  if(!D.length)h+='<div class="empty">No dealers in this copy. If you had dealers before, tap <b>Backup / Recover dealers</b>.</div>';
  D.forEach(function(d,i){var ok=normCode(d.code).length===10;h+='<div class="adminrow"><div class="x"><b>'+esc(d.company)+'</b> &middot; '+esc(d.state||"")+'<br><span class="muted">'+esc(d.contact||"")+' &middot; '+esc(d.mobile||"")+'</span><br>'+
-  (ok?'<span class="badge '+(d.active===false?"unpaid":"paid")+'">'+(d.active===false?"Blocked":"Active")+' &middot; '+fmtCode(d.code)+'</span>':'<span class="badge unpaid">'+(d.linkSent?"Link sent "+fmtDT(d.linkSent)+" &middot; waiting for code":"No device code yet")+'</span>')+'</div><button class="wa" data-dlw="'+i+'" title="Send app link on WhatsApp">Send app link</button><button class="b-main" data-dle="'+i+'">Edit</button><button class="b-red" data-dld="'+i+'">Del</button></div>'});
+  (ok?'<span class="badge '+(d.active===false?"unpaid":"paid")+'">'+(d.active===false?"Blocked":"Active")+' &middot; '+fmtCode(d.code)+'</span>':'<span class="badge unpaid">'+(d.linkSent?"Link sent "+fmtDT(d.linkSent)+" &middot; waiting for code":"No device code yet")+'</span>')+'<div class="licline">'+(d.lmlic?'<span class="muted">Lic. '+esc(d.lmlic)+'</span>':'<span class="muted">No licence no.</span>')+(d.lic?'<button class="licpill on" data-lic="'+i+'" title="Open licence copy"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h4"/><path d="M14 3v5h5"/><path d="M14 3l5 5v3"/><circle cx="17" cy="16" r="3"/><path d="M15.5 18.6L15 22l2-1 2 1-.5-3.4"/><path d="M8 9h3M8 13h4"/></svg><span>Licence copy</span></button>':'<span class="licpill off"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h4"/><path d="M14 3v5h5"/><path d="M14 3l5 5v3"/><circle cx="17" cy="16" r="3"/><path d="M15.5 18.6L15 22l2-1 2 1-.5-3.4"/><path d="M8 9h3M8 13h4"/></svg><span>No copy</span></span>')+'</div></div>'+'<button class="wa" data-dlw="'+i+'" title="Send app link on WhatsApp">Send app link</button><button class="b-main" data-dle="'+i+'">Edit</button><button class="b-red" data-dld="'+i+'">Del</button></div>'});
  $("#main").innerHTML=h}
-function openDealerForm(i){var d=i==null?{active:true,transport:"",state:""}:dealers()[i];var h='<h2>'+(i==null?"NEW dealer":"Edit "+esc(d.company))+'</h2>';
+/* build 76: dealer licence copy (PDF or photo) - kept only in Master + encrypted cloud backup, never published */
+var editLic="",editLicName="";
+function licInfoHTML(){return editLic?'<span class="lic-ic">'+(isImg(editLic)?'&#128247;':'&#128196;')+'</span><span class="lic-nm">'+esc(editLicName||"licence")+' &middot; '+dsKB(editLic)+' KB</span><button class="b-sec lic-mini" data-a="lic-view">View</button><button class="b-red lic-mini" data-a="lic-del">Remove</button>':'<span class="muted">No licence copy attached. Tap <b>PDF / JPG</b> to attach the PDF or a photo.</span>'}
+function isImg(u){return /^data:image\//.test(u||"")}
+function shrinkImg(file,cb){var rd=new FileReader();rd.onload=function(){var im=new Image();im.onload=function(){var m=1600,w=im.width,h=im.height,k=Math.min(1,m/Math.max(w,h)),c=document.createElement("canvas");c.width=Math.round(w*k);c.height=Math.round(h*k);var x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);cb(c.toDataURL("image/jpeg",0.82))};im.onerror=function(){cb("")};im.src=rd.result};rd.readAsDataURL(file)}
+function openData(u,nm){if(!u){toast("Nothing attached");return}if(isImg(u)){overlay('<h2>'+esc(nm||"Licence copy")+'</h2><img src="'+u+'" alt="Licence copy" style="width:100%;border-radius:10px;border:1px solid #ccc"><div class="sendgrid" style="margin-top:10px"><a class="b-main" style="text-align:center;padding:12px;border-radius:10px;text-decoration:none" href="'+u+'" download="'+esc((nm||"licence").replace(/\.[a-z]+$/i,""))+'.jpg">Save copy</a><button class="b-red" data-a="ov-close">Close</button></div>');return}
+ openDS(null,u,nm)}
+function openDealerForm(i){var d=i==null?{active:true,transport:"",state:""}:dealers()[i];editLic=d.lic||"";editLicName=d.licName||"";var h='<h2>'+(i==null?"NEW dealer":"Edit "+esc(d.company))+'</h2>';
  h+='<label>Device code &ndash; paste the dealer\'s WhatsApp message here, or type XXXXX-XXXXX</label><textarea id="df-code" rows="2" placeholder="Paste the dealer\'s registration message (leave empty until the dealer sends it)" style="min-height:52px;font-weight:700;letter-spacing:1px" autocomplete="off">'+esc(d.code?fmtCode(d.code):"")+'</textarea><div class="muted" id="df-code-hint">'+(d.code?"Code: "+fmtCode(d.code):"")+'</div>';
  h+='<label class="switch" style="margin-top:12px"><input type="checkbox" id="df-active"'+(d.active===false?"":" checked")+'><i></i><span>Active (allowed to see prices and order)</span></label>';
  DF.forEach(function(f){var k=f[0],v=d[k]||"",t=f[3];h+='<label class="'+(f[2]?"req":"")+'">'+f[1]+'</label>';
   if(t==="area")h+='<textarea id="df-'+k+'">'+esc(v)+'</textarea>';
   else if(t==="state")h+='<select id="df-state"><option value="">&mdash; Select &mdash;</option>'+STATES.map(function(x){return '<option'+(v===x?" selected":"")+'>'+x+'</option>'}).join("")+'</select>';
   else if(t==="transport")h+='<select id="df-transport"><option value="">&mdash;</option>'+["Included","To Pay"].map(function(x){return '<option'+(v===x?" selected":"")+'>'+x+'</option>'}).join("")+'</select>';
+  else if(k==="lmlic")h+='<div class="licrow"><input id="df-lmlic" value="'+esc(v)+'"><label class="licbtn" title="Attach licence copy (PDF or photo)"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h4"/><path d="M14 3v5h5"/><path d="M14 3l5 5v3"/><circle cx="17" cy="16" r="3"/><path d="M15.5 18.6L15 22l2-1 2 1-.5-3.4"/><path d="M8 9h3M8 13h4"/></svg><span>PDF / JPG</span><input type="file" id="df-licfile" accept="application/pdf,image/jpeg,image/png,.pdf,.jpg,.jpeg,.png" style="display:none"></label></div><div class="licatt" id="df-licinfo">'+licInfoHTML()+'</div>';
   else h+='<input id="df-'+k+'" value="'+esc(v)+'"'+(t==="tel"?' inputmode="numeric"':'')+'>'});
  h+='<div class="sendgrid"><button class="b-main" data-a="dl-save" data-i="'+(i==null?"":i)+'">Save dealer</button><button class="wa" data-a="dl-save-send" data-i="'+(i==null?"":i)+'">Save &amp; send app link</button><button class="b-red" data-a="ov-close">Cancel</button></div>';overlay(h)}
 function saveDealer(i,andSend){var D=dealers(),d=i===""?{id:"d"+Date.now().toString(36),added:new Date().toISOString()}:D[+i],tmp={};
- DF.forEach(function(f){tmp[f[0]]=($("#df-"+f[0]).value||"").trim()});tmp.gstin=tmp.gstin.toUpperCase();
+ DF.forEach(function(f){tmp[f[0]]=($("#df-"+f[0]).value||"").trim()});tmp.gstin=tmp.gstin.toUpperCase();if(editLic){tmp.lic=editLic;tmp.licName=editLicName}else{delete d.lic;delete d.licName}
  var code=extractCode($("#df-code").value);
  if(!tmp.company){toast("Enter the dealer company name");return}if(!tmp.contact){toast("Enter the contact person");return}if(digits(tmp.mobile).length!==10){toast("Mobile must be 10 digits");return}if(!tmp.state){toast("Select the state");return}
  if(code&&code.length!==10){toast("Device code must be exactly 10 letters/digits");return}
@@ -1426,11 +1449,11 @@ function renderAdmList(){var B=brandList();if(ADMB!=="ALL"&&B.indexOf(ADMB)<0)AD
  $("#main").innerHTML=h}
 var PF=[["brand","Brand / line (e.g. ECO, NPRO)",1],["group","Group heading",1,"group"],["code","Item Code (shown as CODE, e.g. E101)",1],["model","Model No / Description",1],["cap","Max Capacity (e.g. 30 kg)",0],["min","Min",0],["e","e (division)",0],["pan","Pan size (e.g. 290 x 290 mm)",0],["material","Material / body (e.g. ABS body, Mild steel)",0],["panMat","Pan material (e.g. SS202, Chequered plate)",0],["pMH","Basic price within Maharashtra (Rs.)",1,"num"],["pOut","Basic price outside Maharashtra (Rs.)",1,"num"],["stamp","Stamping fee per unit (Rs., 0 = none)",0,"num"],["slabQty","Slab qty (0 = none, e.g. 5)",0,"num"],["slabMH","Slab price within MH (Rs.)",0,"num"],["slabOut","Slab price outside MH (Rs.)",0,"num"]];
 var editing=null,editPhoto="",editDS="",editDSName="";
-function openDS(id){var p=DATA.products.find(function(x){return x.id===id});if(!p||!p.ds){toast("Datasheet not available");return}
+function openDS(id,raw,rawName){var p=raw?{ds:raw,dsName:rawName||"licence.pdf",code:"licence"}:DATA.products.find(function(x){return x.id===id});if(!p||!p.ds){toast("Datasheet not available");return}
  try{var b64=p.ds.slice(p.ds.indexOf(",")+1),bin=atob(b64),u=new Uint8Array(bin.length);for(var i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);
   var url=URL.createObjectURL(new Blob([u],{type:"application/pdf"})),nm=(p.dsName||(icode(p)+"_datasheet.pdf")).replace(/[^\w.\- ]+/g,"_");
   var mob=window.matchMedia&&matchMedia("(pointer:coarse)").matches,w=mob?null:window.open(url,"_blank");
-  if(!w){var a=document.createElement("a");a.href=url;a.download=nm;document.body.appendChild(a);a.click();a.remove();toast("Datasheet saved: "+nm+" - open it from Downloads")}
+  if(!w){var a=document.createElement("a");a.href=url;a.download=nm;document.body.appendChild(a);a.click();a.remove();toast((raw?"Saved: ":"Datasheet saved: ")+nm+" - open it from Downloads")}
   setTimeout(function(){URL.revokeObjectURL(url)},60000)}catch(e){toast("Could not open the datasheet")}}
 function dsKB(u){return Math.round((String(u).length-String(u).indexOf(",")-1)*0.75/1024)}
 function groupsOf(b){var G=[];DATA.products.forEach(function(x){if(x.brand===b&&G.indexOf(x.group)<0)G.push(x.group)});return G}
@@ -1502,7 +1525,7 @@ function snapBackup(){var D=dealers();sGet("mbak").then(function(L){L=L||[];var 
   if(!D.length&&L.some(function(x){return x.dealers&&x.dealers.length}))return; /* never let an empty copy overwrite a good backup */
   var snap={day:tk,at:new Date().toISOString(),n:D.length,data:liteData()};
   if(last&&last.day===tk&&D.length>=last.n)L[L.length-1]=snap;else L.push(snap);while(L.length>20)L.shift();SNAPS=L;return sSet("mbak",L)});
- if(D.length)try{localStorage.setItem(LSP()+"dealers_safe",JSON.stringify({at:new Date().toISOString(),dealers:D}))}catch(e){}}
+ if(D.length)try{localStorage.setItem(LSP()+"dealers_safe",JSON.stringify({at:new Date().toISOString(),dealers:D.map(function(x){var y=Object.assign({},x);delete y.lic;return y})}))}catch(e){}}
 function loadSnaps(){return sGet("mbak").then(function(L){SNAPS=(L||[]).slice();try{var x=JSON.parse(localStorage.getItem(LSP()+"dealers_safe")||"null");if(x&&x.dealers&&x.dealers.length&&!SNAPS.some(function(s){return s.at===x.at}))SNAPS.push({day:x.at.slice(0,10),at:x.at,n:x.dealers.length,data:{dealers:x.dealers},safe:1})}catch(e){}SNAPS.sort(function(a,b){return a.at<b.at?-1:1});return SNAPS})}
 function bestSnap(){var b=null;SNAPS.forEach(function(s){if(s.n&&(!b||s.n>b.n||(s.n===b.n&&s.at>b.at)))b=s});return b}
 /* build 74: never let an older Master put an older app design back online */
@@ -1595,9 +1618,10 @@ function renderSetup(){var h='<header class="appbar"><div class="blogo"></div><d
 function backup(){var b=new Blob([JSON.stringify({app:"NISAN-backup",at:new Date().toISOString(),profile:prof,history:hist,cart:cart,device:DEVCODE})],{type:"application/json"});download(b,"NISAN_my_backup_"+fmtDate(new Date())+".json");toast("Backup saved to Downloads")}
 function restore(file){var fr=new FileReader();fr.onload=function(){try{var j=JSON.parse(fr.result);if(j.app!=="NISAN-backup")throw 0;if(!confirm("Restore details and "+(j.history||[]).length+" order(s) from this backup? Current data on this device will be replaced."))return;prof=j.profile||{};hist=j.history||[];cart=j.cart||{};if(j.device&&normCode(j.device).length===10){DEVCODE=normCode(j.device);sSet("device_code",DEVCODE)}saveProf();saveHist();saveCart();toast("Backup restored");render()}catch(e){toast("Not a valid NISAN backup file")}};fr.readAsText(file)}
 /* ================= events ================= */
-document.addEventListener("click",function(ev){var el=ev.target.closest("[data-sg],[data-goto],[data-dlw],[data-dle],[data-dld],[data-bks],[data-a],[data-f],[data-dq],[data-add],[data-rm],[data-hp],[data-hr],[data-ho],[data-up],[data-dn],[data-ed],[data-del],[data-admb],[data-ds],[data-cap]");if(!el)return;var a=el.dataset.a;
+document.addEventListener("click",function(ev){var el=ev.target.closest("[data-sg],[data-goto],[data-dlw],[data-dle],[data-dld],[data-bks],[data-a],[data-f],[data-dq],[data-add],[data-rm],[data-hp],[data-hr],[data-ho],[data-up],[data-dn],[data-ed],[data-del],[data-admb],[data-ds],[data-cap],[data-lic]");if(!el)return;var a=el.dataset.a;
  if(a==="ov-bg"&&ev.target!==el)return;
  if(el.dataset.ds!=null){openDS(el.dataset.ds);return}
+ if(el.dataset.lic!=null){var dd=dealers()[+el.dataset.lic];if(dd)openData(dd.lic,dd.licName||((dd.company||"dealer")+" licence"));return}
  if(el.dataset.cap!=null){var cid=el.dataset.cap;capSel[baseId(cid)]=cid.slice(cid.indexOf("~")+1);refreshCard(cid);return}
  if(el.dataset.admb!=null){ADMB=el.dataset.admb;try{localStorage.setItem("nisan_admb",ADMB)}catch(e){}renderAdmList();var mm=$("#main");if(mm)mm.scrollTop=0;return}
  if(el.dataset.sg!=null){sBrand=sBrand===el.dataset.sg?"":el.dataset.sg;renderSearchRes();return}
@@ -1670,6 +1694,8 @@ document.addEventListener("click",function(ev){var el=ev.target.closest("[data-s
   case "ss-save":saveSettings();break;
   case "gh-rm":if(confirm("Remove the GitHub key from this device?")){sSet("gh_token","");var g=$("#gh-state");if(g)g.innerHTML='<span class="unpub">Key removed</span>'}break;
   case "pf-save":saveProd();break;
+  case "lic-view":openData(editLic,editLicName);break;
+  case "lic-del":editLic="";editLicName="";$("#df-licinfo").innerHTML=licInfoHTML();break;
   case "cap-add":$("#pf-caps").insertAdjacentHTML("beforeend",capRowHTML({}));var rs=$("#pf-caps").querySelectorAll(".cr-cap");rs[rs.length-1].focus();break;
   case "cap-del":var rw=el.closest(".caprow");if($("#pf-caps").children.length>1)rw.remove();else{rw.querySelector(".cr-cap").value="";rw.querySelector(".cr-code").value=""}break;
   case "pf-nopdf":editDS="";editDSName="";$("#pf-dsinfo").innerHTML="No datasheet attached";var fi=$("#pf-pdf");if(fi)fi.value="";break;
@@ -1689,6 +1715,8 @@ document.addEventListener("change",function(ev){var t=ev.target;
  if(t.id==="pay-img"&&t.files&&t.files[0]){readPay();resizeImg(t.files[0],1400,.75,function(u){curPO.pay.img=u;saveHist();toast("Payment screenshot attached");renderPO()});return}
  if(t.id==="restore"&&t.files&&t.files[0]){restore(t.files[0]);return}
  if(t.id==="bk-file"&&t.files&&t.files[0]){restoreMasterFile(t.files[0]);return}
+ if(t.id==="df-licfile"&&t.files&&t.files[0]){var lf=t.files[0],nm=lf.name;t.value="";if(/^image\//.test(lf.type)){if(lf.size>25*1024*1024){toast("Photo too large");return}$("#df-licinfo").innerHTML='<span class="muted">Preparing photo...</span>';shrinkImg(lf,function(u){if(!u){toast("Could not read that photo");$("#df-licinfo").innerHTML=licInfoHTML();return}editLic=u;editLicName=nm;$("#df-licinfo").innerHTML=licInfoHTML()});return}
+  if(!/pdf/i.test(lf.type)&&!/\.pdf$/i.test(nm)){toast("Please choose a PDF or a JPG photo");return}if(lf.size>3*1024*1024){toast("PDF is "+Math.round(lf.size/1048576*10)/10+" MB. Please use a PDF under 3 MB, or a photo.");return}var lr=new FileReader();lr.onload=function(){editLic=lr.result;editLicName=nm;$("#df-licinfo").innerHTML=licInfoHTML()};lr.readAsDataURL(lf);return}
  if(t.id==="pf-pdf"&&t.files&&t.files[0]){var pf=t.files[0];if(pf.size>3*1024*1024){toast("PDF is "+Math.round(pf.size/1048576*10)/10+" MB. Please use a PDF under 3 MB (compress it first).");t.value="";return}var rd=new FileReader();rd.onload=function(){editDS=rd.result;editDSName=pf.name;$("#pf-dsinfo").innerHTML="&#128196; "+esc(pf.name)+" &middot; "+dsKB(editDS)+" KB"};rd.readAsDataURL(pf);return}
  if(t.id==="pf-file"&&t.files&&t.files[0]){resizeImg(t.files[0],480,.72,function(u){editPhoto=u;$("#pf-ph").innerHTML='<img alt="" src="'+u+'">'})}});
 document.addEventListener("input",function(ev){if(ev.target.id==="s2"){search=ev.target.value;renderSearchRes();return}if(ev.target.id==="df-code"){var c=extractCode(ev.target.value),h=$("#df-code-hint");if(h)h.innerHTML=c.length===10?'<span class="saved">&#10003; Code found: '+fmtCode(c)+'</span>':(ev.target.value.trim()?'<span class="unpub">No 10-character code found yet</span>':'');return}if(ev.target.id==="srch"){search=ev.target.value;clearTimeout(window.__st);window.__st=setTimeout(function(){var pos=ev.target.selectionStart;renderShop();var s=$("#srch");s.focus();try{s.setSelectionRange(pos,pos)}catch(e){}},250)}});
