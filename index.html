@@ -726,6 +726,11 @@ html,body{background:#000}
 .qrimg{width:210px;max-width:70vw;margin:12px auto 4px;background:#fff;padding:6px;border:1px solid #e3e3e3;border-radius:10px}.qrimg svg{display:block;width:100%;height:auto}
 .qlink{font-size:12.5px;color:#555;word-break:break-all;margin-bottom:12px}
 .sbtns{display:flex;gap:8px}.sbtns button{flex:1;padding:13px 8px;border-radius:11px;font-weight:800}.sbtns .sqr{background:#111;color:#F5C21B}
+
+/* build 85 open in chrome */
+.oic{flex-wrap:wrap}.oic .gatx{flex:1 1 180px}
+.oicbtn{display:block;text-align:center;text-decoration:none;margin-top:10px;padding:12px}
+.linkbtn{background:none;border:0;color:#555;text-decoration:underline;font-size:12px;padding:0}
 </style>
 </head>
 <body class="pc">
@@ -3768,7 +3773,7 @@ function renderHist(){var h=installCard()+'<h2>My Orders</h2><div class="bar mut
 function renderHelp(){var s=DATA.settings;$("#main").innerHTML='<h2>How to use</h2><div class="bar help"><b>1.</b> Tap <b>My Details</b> once and fill your company, GSTIN, licence, address and State. They stay saved.<br><b>2.</b> Scroll the products, set <b>Qty</b>, tap <b>Add to cart</b>. Within '+esc(s.homeState)+' you can untick <b>Stamping</b> if not needed.<br><b>3.</b> Tap <b>Checkout</b>: your Purchase Order with Grand Total appears.<br><b>4.</b> Attach your <b>payment screenshot</b> from the gallery and the UTR number.<br><b>5.</b> <b>Share / Save PDF</b>, then <b>WhatsApp to Dispatch</b> (attach the PDF) and <b>Email</b>.<br><br>Prices update automatically when you have internet. Current price list: <b>'+esc(s.priceRef)+'</b>, '+fmtDT(DATA.version)+'. '+esc(note2())+'.<br><br>Faulty unit received? Call <b>Service Support '+esc(s.service)+'</b>.<br>Dispatch: <b>'+esc(s.dispatch)+'</b> &middot; Email: '+esc(s.email)+'</div>'}
 /* ================= auto-update (dealer) ================= */
 /* ================= dealer authorization + sync (v4) ================= */
-var APP_BUILD=84, DEVCODE="", syncing=null, updAsked=false;
+var APP_BUILD=85, DEVCODE="", syncing=null, updAsked=false;
 var CODE_ABC="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 function normCode(c){return String(c||"").toUpperCase().replace(/[^A-Z0-9]/g,"")}
 function fmtCode(c){c=normCode(c);return c.slice(0,5)+"-"+c.slice(5)}
@@ -3808,18 +3813,22 @@ function ensureFresh(next){if(!WEB){next();return}
 /* ================= registration screen (web app) ================= */
 var regMsg="",REGREF=null;
 function showRegister(msg){view="register";regMsg=msg||"";render()}
-function renderRegister(){var s=DATA.settings;$("#app").innerHTML='<div class="gate"><div class="gcard"><div class="blogo big"></div><h1>'+esc(s.supplier||"NISAN ELECTRONICS")+'</h1><p class="gsub">PARTNER app &middot; Registration</p>'+installCard(true)+(REGREF&&REGREF.n?'<p class="gwelcome">Welcome, <b>'+esc(REGREF.n)+'</b></p>':'')+
- (regMsg?'<div class="gwarn">'+esc(regMsg)+'</div>':'')+
- '<div class="codebox"><span>Your device code</span><b id="devcode">'+fmtCode(DEVCODE)+'</b><button class="b-sec" data-a="copy-code">Copy</button></div>'+
+function renderRegister(){var s=DATA.settings;$("#app").innerHTML='<div class="gate"><div class="gcard"><div class="blogo big"></div><h1>'+esc(s.supplier||"NISAN ELECTRONICS")+'</h1><p class="gsub">PARTNER app &middot; Registration</p>'+(inApp()&&!regHere?'':installCard(true))+(REGREF&&REGREF.n?'<p class="gwelcome">Welcome, <b>'+esc(REGREF.n)+'</b></p>':'')+
+ (regMsg?'<div class="gwarn">'+esc(regMsg)+'</div>':'')+(inApp()&&!regHere?openChromeCard()+'</div></div>':'')+
+ (inApp()&&!regHere?'':'<div class="codebox"><span>Your device code</span><b id="devcode">'+fmtCode(DEVCODE)+'</b><button class="b-sec" data-a="copy-code">Copy</button></div>'+
  '<label for="reg-name">Your company name</label><input id="reg-name" placeholder="e.g. Shree Ganesh Scales" value="'+esc(prof.company||(REGREF&&REGREF.n)||"")+'">'+
  '<button class="wa gbtn" data-a="reg-wa">Send code to '+esc(s.supplier||"NISAN")+' on WhatsApp</button>'+
  '<button class="b-main gbtn" data-a="reg-check">Check access</button>'+
- '<p class="gnote"><b>1.</b> Send this code to '+esc(s.supplier||"NISAN")+'. <b>2.</b> When they confirm activation, tap <b>Check access</b> (internet needed).</p></div></div>'}
+ '<p class="gnote"><b>1.</b> Send this code to '+esc(s.supplier||"NISAN")+'. <b>2.</b> When they confirm activation, tap <b>Check access</b> (internet needed).</p></div></div>')}
 function regCheck(auto){var b=$('[data-a="reg-check"]');if(b){b.disabled=true;b.textContent="Checking..."}
  syncNow().then(function(st){if(st==="ok"||st==="same"){if(DATA.products&&DATA.products.length){view="shop";render();return}}
   if(b){b.disabled=false;b.textContent="Check access"}
   if(auto)return;if(st==="net")toast("No internet. Please connect and try again.");else{regMsg="Not activated yet. Please send your code to "+(DATA.settings.supplier||"NISAN")+" and try again after they confirm.";renderRegister()}})}
 /* build 84: big Get-the-app card, also on the registration screen (new dealers start there) */
+/* build 85: links opened inside WhatsApp etc. run in that app's own browser: no install, and a different device code than Chrome */
+var regHere=false;function inApp(){var ua=navigator.userAgent;return /; wv\)|FBAN|FBAV|Instagram|WhatsApp|Line\//i.test(ua)}
+function chromeURL(){var u=location.origin+location.pathname,q=[];if(REGREF&&REGREF.ref){q.push("ref="+encodeURIComponent(REGREF.ref));if(REGREF.n)q.push("n="+encodeURIComponent(REGREF.n))}u+=q.length?"?"+q.join("&"):"";return "intent://"+u.replace(/^https?:\/\//,"")+"#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url="+encodeURIComponent(u)+";end"}
+function openChromeCard(){var ios=/iphone|ipad|ipod/i.test(navigator.userAgent);return '<div class="getapp oic"><img class="gaicon" src="icon-192.png" alt=""><div class="gatx"><b>Open in '+(ios?"Safari":"Chrome")+' to continue</b><span>WhatsApp can&#39;t install the PARTNER icon. Your device code will show in '+(ios?"Safari":"Chrome")+'.'+(ios?' Tap &#8943; or the compass icon &rsaquo; Open in Safari.':'')+'</span>'+(ios?'':'<a class="gabtn oicbtn" href="'+esc(chromeURL())+'">OPEN IN CHROME</a>')+'</div></div><p class="gnote">Device code is not shown here. <button class="linkbtn" data-a="reg-here">Continue here anyway</button></p>'}
 function installCard(reg){if(!WEB||isStandalone()||(!reg&&installHidden))return "";var ua=navigator.userAgent,ios=/iphone|ipad|ipod/i.test(ua),inapp=/; wv\)|FBAN|FBAV|Instagram|WhatsApp/i.test(ua),nm=MODE==="master"?"PARTNER MASTER":"PARTNER";
  var sub=deferredPrompt?"Icon on your home screen, works offline":inapp?"Open this page in Chrome first: menu &#8942; &rsaquo; Open in Chrome":ios?"Tap Share &#8679; then Add to Home Screen":"Chrome menu &#8942; &rsaquo; Install app";
  return '<div class="getapp"><img class="gaicon" src="'+(MODE==="master"?"icon-master-192.png":"icon-192.png")+'" alt=""><div class="gatx"><b>Get the '+nm+' app</b><span>'+sub+'</span></div>'+(deferredPrompt?'<button class="gabtn" data-a="install">INSTALL</button>':'')+(reg?'':'<button class="gax" data-a="install-hide" aria-label="close">&times;</button>')+'</div>'}
@@ -4107,6 +4116,7 @@ document.addEventListener("click",function(ev){var el=ev.target.closest("[data-s
   case "copy-code":try{navigator.clipboard.writeText(fmtCode(DEVCODE)).then(function(){toast("Code copied")},function(){toast(fmtCode(DEVCODE))})}catch(e){toast(fmtCode(DEVCODE))}break;
   case "reg-wa":var rn=($("#reg-name")||{}).value||"";if(rn){prof.company=rn.trim();saveProf()}var w=digits(DATA.settings.regWa||DATA.settings.dispatch);if(w.length===10)w="91"+w;window.open("https://wa.me/"+w+"?text="+encodeURIComponent("NISAN dealer app registration\nDevice code: "+fmtCode(DEVCODE)+(rn?"\nDealer: "+rn.trim():"")+(REGREF&&REGREF.ref?"\nRef: "+REGREF.ref:"")),"_blank");break;
   case "reg-check":regCheck(false);break;
+  case "reg-here":regHere=true;renderRegister();break;
   case "app-update":closeOv();doAppUpdate();break;
   case "adm-dealers":view="adm-dealers";render();break;
   case "dl-new":openDealerForm(null);break;
